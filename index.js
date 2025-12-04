@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const authRoutes = require('./src/routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -14,13 +15,8 @@ app.get('/', (req, res) => {
     res.send('API Fiber NET Telecom está funcionando !');
 });
 
-app.post('/api/auth/login'(req, res) => {
-    const { email, password } = req.body;
+app.use('/api/auth', authRoutes);
 
-    if (email === 'admin' && password === 'password') {
-    return res.json({
-        message: 'Login bem-sucessido!',
-        token: ''
-    })
-    }
-})
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
