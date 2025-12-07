@@ -1,0 +1,493 @@
+openapi: 3.0.3
+info:
+  title: IXC REST API Gateway
+  description: |
+    API Gateway para integração com o sistema IXC Soft.
+    
+    ## Recursos Principais
+    - Busca de clientes por CPF/CNPJ
+    - Consulta de boletos e faturas
+    - Gerenciamento de tickets
+    - Histórico de consumo de dados
+    
+    ## Autenticação
+    A API utiliza autenticação via Bearer Token no header Authorization.
+  version: 1.0.0
+  contact:
+    name: Suporte Técnico
+    email: suporte@exemplo.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Ambiente de Desenvolvimento
+  - url: https://api.producao.com/api
+    description: Ambiente de Produção
+
+tags:
+  - name: Clientes
+    description: Operações relacionadas a clientes
+  - name: Financeiro
+    description: Boletos e faturas
+  - name: Suporte
+    description: Tickets e ordens de serviço
+  - name: Técnico
+    description: Logins, ONT e consumo
+
+paths:
+  # ==========================================================================
+  # CLIENTES
+  # ==========================================================================
+  
+  /clientes/cpf:
+    post:
+      tags: [Clientes]
+      summary: Buscar clientes por CPF/CNPJ
+      description: Retorna todos os clientes cadastrados com o CPF/CNPJ informado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cpfCnpj]
+              properties:
+                cpfCnpj:
+                  type: string
+                  pattern: '^\d{11,14}$'
+                  example: "12345678901"
+                  description: CPF (11 dígitos) ou CNPJ (14 dígitos) sem formatação
+      responses:
+        '200':
+          description: Clientes encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /clientes/{id}:
+    get:
+      tags: [Clientes]
+      summary: Buscar cliente por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 123
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==========================================================================
+  # FINANCEIRO
+  # ==========================================================================
+  
+  /boletos/cpf:
+    post:
+      tags: [Financeiro]
+      summary: Buscar boletos por CPF/CNPJ
+      description: Retorna todos os boletos em aberto de clientes com o CPF/CNPJ informado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cpfCnpj]
+              properties:
+                cpfCnpj:
+                  type: string
+                  pattern: '^\d{11,14}$'
+                  example: "12345678901"
+      responses:
+        '200':
+          description: Boletos encontrados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  cpfCnpj:
+                    type: string
+                    example: "123.456.789-01"
+                  resumo:
+                    $ref: '#/components/schemas/ResumoBoletos'
+                  boletos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Boleto'
+                  clientes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        nome:
+                          type: string
+                        cpfCnpj:
+                          type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /boletos/{id}/segunda-via:
+    get:
+      tags: [Financeiro]
+      summary: Gerar segunda via de boleto
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Segunda via gerada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  boleto:
+                    type: object
+
+  # ==========================================================================
+  # SUPORTE
+  # ==========================================================================
+  
+  /tickets:
+    post:
+      tags: [Suporte]
+      summary: Criar novo ticket
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCreate'
+      responses:
+        '201':
+          description: Ticket criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /tickets/{clienteId}:
+    get:
+      tags: [Suporte]
+      summary: Listar tickets do cliente
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ticket'
+
+  # ==========================================================================
+  # TÉCNICO
+  # ==========================================================================
+  
+  /consumo/{loginId}:
+    get:
+      tags: [Técnico]
+      summary: Obter histórico de consumo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: loginId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Histórico de consumo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsumoCompleto'
+
+# ==============================================================================
+# COMPONENTES REUTILIZÁVEIS
+# ==============================================================================
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Cliente:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        razao:
+          type: string
+          example: "João da Silva"
+        fantasia:
+          type: string
+          example: "João"
+        cnpj_cpf:
+          type: string
+          example: "12345678901"
+        tipo_cliente:
+          type: string
+          enum: [F, J]
+          description: F=Física, J=Jurídica
+        status:
+          type: string
+          enum: [A, I, D]
+          description: A=Ativo, I=Inativo, D=Desativado
+        fone_comercial:
+          type: string
+        celular:
+          type: string
+        email:
+          type: string
+        endereco:
+          type: string
+        cidade:
+          type: string
+        uf:
+          type: string
+        cep:
+          type: string
+
+    Boleto:
+      type: object
+      properties:
+        id:
+          type: integer
+        clienteId:
+          type: integer
+        clienteNome:
+          type: string
+        documento:
+          type: string
+        vencimento:
+          type: string
+          format: date
+        vencimentoFormatado:
+          type: string
+        valor:
+          type: number
+        valorFormatado:
+          type: string
+        linhaDigitavel:
+          type: string
+        pixCopiaECola:
+          type: string
+          nullable: true
+        boleto_pdf_link:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [Vencido, Vence Hoje, Vence em Breve, A Vencer]
+        statusCor:
+          type: string
+          enum: [danger, warning, success]
+        diasVencimento:
+          type: integer
+
+    ResumoBoletos:
+      type: object
+      properties:
+        totalBoletos:
+          type: integer
+        totalEmAberto:
+          type: number
+        totalEmAbertoFormatado:
+          type: string
+        boletosVencidos:
+          type: integer
+        boletosAVencer:
+          type: integer
+
+    TicketCreate:
+      type: object
+      required:
+        - id_cliente
+        - assunto
+        - descricao
+      properties:
+        id_cliente:
+          type: integer
+        assunto:
+          type: string
+          maxLength: 200
+        descricao:
+          type: string
+        prioridade:
+          type: string
+          enum: [baixa, media, alta, urgente]
+          default: media
+        id_setor:
+          type: integer
+        id_tipo:
+          type: integer
+
+    TicketResponse:
+      allOf:
+        - $ref: '#/components/schemas/TicketCreate'
+        - type: object
+          properties:
+            id:
+              type: integer
+            protocolo:
+              type: string
+            status:
+              type: string
+            data_abertura:
+              type: string
+              format: date-time
+
+    Ticket:
+      allOf:
+        - $ref: '#/components/schemas/TicketResponse'
+        - type: object
+          properties:
+            data_fechamento:
+              type: string
+              format: date-time
+              nullable: true
+            tecnico_responsavel:
+              type: string
+              nullable: true
+
+    ConsumoCompleto:
+      type: object
+      properties:
+        total_download_bytes:
+          type: number
+        total_upload_bytes:
+          type: number
+        history:
+          type: object
+          properties:
+            daily:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsumoDaily'
+            weekly:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsumoDaily'
+            monthly:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsumoMonthly'
+
+    ConsumoDaily:
+      type: object
+      properties:
+        data:
+          type: string
+          format: date
+        download_bytes:
+          type: number
+        upload_bytes:
+          type: number
+
+    ConsumoMonthly:
+      type: object
+      properties:
+        mes_ano:
+          type: string
+          example: "2024-01"
+        download_bytes:
+          type: number
+        upload_bytes:
+          type: number
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        detalhes:
+          type: string
+        statusCode:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Dados inválidos"
+            detalhes: "CPF/CNPJ deve conter 11 ou 14 dígitos"
+            statusCode: 400
+
+    Unauthorized:
+      description: Não autorizado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalError:
+      description: Erro interno do servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -1,0 +1,23 @@
+{
+    "entryPoints": [
+        "src/index.ts",
+        "src/resources/base.ts",
+        "src/resources/clientes/index.ts",
+        "src/resources/clientes/types.ts",
+        "src/resources/contratos/index.ts",
+        "src/resources/contratos/types.ts",
+        "src/resources/financeiro/index.ts",
+        "src/resources/financeiro/types.ts",
+        "src/resources/logins/index.ts",
+        "src/resources/logins/types.ts"
+    ], 
+    "plugin": ["typedoc-plugin-markdown"],
+    "out": "docs",                     
+    "tsconfig": "tsconfig.json",       
+    "exclude": ["**/*.test.ts"],       
+    "includeVersion": true,            
+    "excludeExternals": true,          
+    "readme": "README.md",             
+    "name": "IXC SDK",        
+    "theme": "default"                 
+}
