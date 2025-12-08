@@ -1,27 +1,36 @@
 import { Request, Response } from "express";
-import { activeAIProvider } from "../../services/ai";
+import { activeAIProvider } from "../../services/ai"; // Corrected import
 import { ixcService } from "../../services/ixcService";
+
+// Função auxiliar para formatar bytes (necessária para o consumo)
+function formatBytes(bytes: number, decimals = 2) {
+    if (!bytes) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
 
 export async function handleChat(req: Request, res: Response) {
   try {
     const { message } = req.body;
-    const rawUserId = req.user?.ids?.[0]; // Pega o ID do usuário logado como string | undefined
+    
+    // 1. Recupera e converte o ID do usuário
+    // @ts-ignore
+    const userIdRaw = req.user?.ids?.[0]; 
+    const userId = Number(userIdRaw); // Converte para número para evitar erro de tipo
 
-    if (!rawUserId) {
-      return res.status(401).json({ error: "Usuário não autenticado." });
+    if (!userId || isNaN(userId)) {
+        return res.status(401).json({ error: "Usuário não identificado." });
     }
 
-    const userId = parseInt(rawUserId, 10);
-
-    if (isNaN(userId)) {
-      return res.status(400).json({ error: "ID de usuário inválido." });
+    if (!message) {
+        return res.status(400).json({ error: "Mensagem vazia." });
     }
 
-    if (!message) return res.status(400).json({ error: "Mensagem vazia." });
-
-    // 1. Busca dados frescos do cliente para dar contexto à IA
-    // Podemos reutilizar a lógica do dashboard ou buscar algo mais leve
-    // Aqui vou simular uma busca rápida de contexto usando o serviço existente
+    // 2. Busca dados frescos do cliente para dar contexto à IA
+    // Promise.all para executar em paralelo e ser mais rápido
     const [clientes, contratos, faturas, logins] = await Promise.all([
       ixcService.buscarClientesPorId(userId),
       ixcService.buscarContratosPorIdCliente(userId),
@@ -29,21 +38,35 @@ export async function handleChat(req: Request, res: Response) {
       ixcService.loginsListar(userId),
     ]);
 
+    // 3. Busca dados de consumo reais (se houver login)
+    let consumoDados = { total_download: "0", total_upload: "0" };
+    if (logins && logins.length > 0) {
+        try {
+            // Pega o consumo do primeiro login encontrado
+            const consumoReal = await ixcService.getConsumoCompleto(logins[0]);
+            consumoDados = {
+                total_download: formatBytes(consumoReal.total_download_bytes),
+                total_upload: formatBytes(consumoReal.total_upload_bytes)
+            };
+        } catch (e) {
+            console.warn("Falha ao buscar consumo para o chat:", e);
+        }
+    }
+
+    // 4. Monta o pacote de dados para a IA
     const clientData = {
-      clientes: [clientes],
+      clientes: [clientes], // Array para manter padrão de resposta
       contratos,
       faturas,
       logins,
-      consumo: {
-        total_download: "Verificar no App",
-        total_upload: "Verificar no App",
-      }, // Simplificado para rapidez
+      consumo: consumoDados,
     };
 
-    // 2. Envia para a IA
-    const responseText = await activeAIProvider.chat(message, clientData);
+    // 5. Envia para a IA processar
+    const responseText = await activeAIProvider.chat(message, clientData); // Corrected call
 
     return res.json({ text: responseText });
+
   } catch (error) {
     console.error("Erro no chat:", error);
     return res.status(500).json({ error: "Erro ao processar mensagem." });
