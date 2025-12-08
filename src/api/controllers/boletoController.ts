@@ -123,47 +123,61 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
 }
 
 /**
- * Gera segunda via de boleto
+ * Gera segunda via de boleto (Baixa PDF e retorna Base64)
  */
-export async function gerarSegundaVia(req: any, res: Response) {
+export async function gerarSegundaVia(req: Request, res: Response) {
   try {
     const { fatura_id } = req.params;
-    const clienteId = req.user?.ids?.[0]; // Para rotas autenticadas
+
+    // O middleware de autenticação popula o req.user
+    // @ts-ignore
+    const userIds = req.user?.ids;
 
     if (!fatura_id) {
-      return res.status(400).json({
-        error: "ID da fatura é obrigatório",
-      });
+      return res.status(400).json({ error: "ID da fatura é obrigatório" });
     }
 
-    // Se for uma rota autenticada, verificar se a fatura pertence ao cliente
-    if (clienteId) {
-      const faturas = await ixcService.financeiroListar(clienteId);
-      const fatura = faturas.find((f: any) => f.id === parseInt(fatura_id));
+    // 1. Validação de Segurança: A fatura pertence ao usuário?
+    // Se estiver logado, verificamos se a fatura é dele.
+    if (userIds && userIds.length > 0) {
+      let pertence = false;
+      // Verifica em todos os clientes vinculados ao login do usuário
+      for (const idCliente of userIds) {
+        const faturas = await ixcService.financeiroListar(idCliente);
+        // Verifica se o ID da fatura existe na lista deste cliente
+        if (faturas.some((f: any) => String(f.id) === String(fatura_id))) {
+          pertence = true;
+          break;
+        }
+      }
 
-      if (!fatura) {
+      if (!pertence) {
         return res.status(403).json({
-          error: "Fatura não pertence a este cliente",
+          error: "Acesso negado: Fatura não pertence a este usuário.",
         });
       }
     }
 
-    // Buscar dados da fatura
-    // Nota: O IXC geralmente já retorna o link do boleto na listagem
-    // Se precisar gerar nova via, usar endpoint específico do IXC
+    // 2. Busca o Conteúdo do PDF (Base64)
+    // Chama o novo método do serviço que baixa o arquivo do link do IXC
+    const base64 = await ixcService.imprimirBoleto(Number(fatura_id));
 
+    if (!base64) {
+      return res.status(404).json({
+        error: "O arquivo da fatura não está disponível no momento.",
+      });
+    }
+
+    // 3. Retorna para o Frontend
     return res.json({
       success: true,
+      base64_document: base64, // O frontend espera esta chave para gerar o download
       message: "Segunda via gerada com sucesso",
-      boleto: {
-        id: fatura_id,
-        // Adicionar link do PDF ou dados do boleto
-      },
     });
   } catch (error) {
     console.error("Erro ao gerar segunda via:", error);
     return res.status(500).json({
-      error: "Erro ao gerar segunda via do boleto",
+      error: "Erro interno ao processar a segunda via.",
     });
   }
 }

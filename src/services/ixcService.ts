@@ -201,6 +201,46 @@ export const ixcService = {
   },
 
   /**
+   * Imprime (Baixa) o PDF do boleto e retorna em Base64
+   */
+  async imprimirBoleto(id: number): Promise<string | null> {
+    try {
+      // 1. Buscar a fatura para obter o link
+      const registros = await fetchIxc("fn_areceber", {
+        qtype: "fn_areceber.id",
+        query: String(id),
+        oper: "=",
+        page: "1",
+        rp: "1",
+        sortname: "fn_areceber.id",
+        sortorder: "desc",
+      });
+
+      if (!registros.length) return null;
+
+      const fatura = registros[0];
+      const linkBoleto = fatura.boleto;
+
+      if (!linkBoleto) {
+        console.warn(`Fatura ${id} não possui link de boleto.`);
+        return null;
+      }
+
+      // 2. Baixar o PDF do link
+      const response = await axios.get(linkBoleto, {
+        responseType: "arraybuffer",
+      });
+
+      // 3. Converter para Base64
+      const base64 = Buffer.from(response.data, "binary").toString("base64");
+      return base64;
+    } catch (error) {
+      console.error("Erro ao imprimir boleto (download/base64):", error);
+      return null;
+    }
+  },
+
+  /**
    * Obtém dados PIX de uma fatura
    */
   async getPixFatura(faturaId: number): Promise<any | null> {
@@ -312,12 +352,30 @@ export const ixcService = {
       throw new Error("IXC URL não configurada");
     }
 
+    // 1. Buscar dados atuais do cliente para não perder informações
+    const clienteAtual = await ixcService.buscarClientesPorId(clienteId);
+
+    if (!clienteAtual) {
+      throw new Error("Cliente não encontrado para atualização");
+    }
+
+    // 2. Prepara o pyload com os dados originais + a nova senha
+
+    const payload = {
+      ...clienteAtual,
+      senha: novaSenha
+    };
+
+
     const url = `${baseUrl}/cliente/${clienteId}`;
 
     try {
+      console.log(`[IXC] Atualizando senha do cliente ${clienteId}...`)
+
+      // 3. Envia o objeto completo via PUT
       const resp = await axios.put(
         url,
-        { senha: novaSenha },
+        payload,
         { headers: getHeaders() }
       );
 
