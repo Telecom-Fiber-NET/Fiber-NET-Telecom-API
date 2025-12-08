@@ -23,6 +23,7 @@ import {
   buscarBoletosPorCpf,
   gerarSegundaVia,
 } from "./controllers/boletoController";
+import { executarAcaoLogin } from "./controllers/loginsController";
 
 const router = Router();
 
@@ -91,6 +92,13 @@ router.post("/senha/recuperar", solicitarRecuperacaoSenha);
  * Body: { senha }
  */
 router.post("/senha/validar", validarForcaSenha);
+
+
+// ==================== LOGINS (NOVO) ====================
+
+// Rota dinâmica para ações: /api/logins/:id/:action
+// Ex: /api/logins/4177/diagnostico
+router.post("/logins/:id/:action", verifyToken, executarAcaoLogin);
 
 // ==================== BOLETOS ====================
 /**

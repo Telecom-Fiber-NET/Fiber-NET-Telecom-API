@@ -16,7 +16,7 @@ export class Gemini {
       // CORREÇÃO: Usando o nome padrão estável.
       // Se ainda der erro 404, troque para "gemini-pro"
       const model = this.genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
       });
 
       // Prepara os dados para economizar tokens e focar no essencial

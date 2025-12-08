@@ -201,41 +201,53 @@ export const ixcService = {
   },
 
   /**
-   * Imprime (Baixa) o PDF do boleto e retorna em Base64
+   * Imprime (Gera) o PDF do boleto usando a rota get_boleto do IXC
+   * Retorna o arquivo em Base64
    */
   async imprimirBoleto(id: number): Promise<string | null> {
+    const baseUrl = getBaseUrl();
+
+    // Endpoint específico para gerar o arquivo
+    const url = `${baseUrl}/get_boleto`;
+
+    // Payload conforme documentação do IXC
+    const payload = {
+      boletos: String(id), // ID da fatura
+      juro: "N", // Não recalcular juros na visualização
+      multa: "N", // Não recalcular multa
+      atualiza_boleto: "S", // Atualiza o registro se necessário
+      tipo_boleto: "arquivo", // Tipo de saída
+      base64: "S", // OBRIGATÓRIO: Retorna o conteúdo do arquivo em Base64
+      layout_impressao: "", // Usa o layout padrão do sistema
+    };
+
     try {
-      // 1. Buscar a fatura para obter o link
-      const registros = await fetchIxc("fn_areceber", {
-        qtype: "fn_areceber.id",
-        query: String(id),
-        oper: "=",
-        page: "1",
-        rp: "1",
-        sortname: "fn_areceber.id",
-        sortorder: "desc",
-      });
+      console.log(`[IXC] Gerando boleto ID ${id} via get_boleto...`);
 
-      if (!registros.length) return null;
+      const resp = await axios.post(url, payload, { headers: getHeaders() });
 
-      const fatura = registros[0];
-      const linkBoleto = fatura.boleto;
+      // O IXC geralmente retorna o base64 diretamente no campo 'base64'
+      // ou dentro de um objeto de resposta.
+      // Vamos tentar capturar de forma segura.
+      const base64 = resp.data.base64 || resp.data;
 
-      if (!linkBoleto) {
-        console.warn(`Fatura ${id} não possui link de boleto.`);
+      if (!base64 || typeof base64 !== "string") {
+        console.warn(`[IXC] Resposta inválida ao gerar boleto:`, resp.data);
         return null;
       }
 
-      // 2. Baixar o PDF do link
-      const response = await axios.get(linkBoleto, {
-        responseType: "arraybuffer",
-      });
-
-      // 3. Converter para Base64
-      const base64 = Buffer.from(response.data, "binary").toString("base64");
       return base64;
-    } catch (error) {
-      console.error("Erro ao imprimir boleto (download/base64):", error);
+    } catch (error: any) {
+      console.error("Erro ao gerar boleto (get_boleto):", error.message);
+
+      // Log detalhado para debug se a API recusar
+      if (axios.isAxiosError(error) && error.response) {
+        console.error(
+          "Detalhes do erro API:",
+          JSON.stringify(error.response.data)
+        );
+      }
+
       return null;
     }
   },
@@ -245,7 +257,9 @@ export const ixcService = {
    */
   async getPixFatura(faturaId: number): Promise<any | null> {
     // TODO: Implementar a lógica real para buscar dados PIX do IXC
-    console.warn(`[IXC Service] getPixFatura(${faturaId}) not implemented. Returning dummy data.`);
+    console.warn(
+      `[IXC Service] getPixFatura(${faturaId}) not implemented. Returning dummy data.`
+    );
     return {
       qrCode: "dummy_qr_code_base64",
       qrCodeText: "dummy_qr_code_text",
@@ -286,6 +300,76 @@ export const ixcService = {
       sortname: "radpop_radio_cliente_fibra.id",
       sortorder: "desc",
     });
+  },
+
+  /**
+   * Limpa o MAC Address do login para permitir nova conexão
+   */
+  async limparMacLogin(id: number): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/radusuarios/${id}`;
+
+    try {
+      // No IXC, limpar MAC é um PUT enviando string vazia
+      await axios.put(url, { mac: "" }, { headers: getHeaders() });
+      return { success: true, message: "MAC address limpo com sucesso." };
+    } catch (error: any) {
+      console.error(`Erro ao limpar MAC (ID: ${id}):`, error.message);
+      throw new Error("Falha ao limpar MAC address.");
+    }
+  },
+
+  /**
+   * Desconecta o login do cliente
+   */
+  async desconectarLogin(id: number): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/radusuarios/${id}`;
+
+    try {
+      // Tenta forçar a desconexão alterando o status online ou via comando específico
+      // Nota: A API padrão do IXC pode variar. O método comum é PUT com online: 'N'
+      await axios.put(url, { online: "N" }, { headers: getHeaders() });
+      return { success: true, message: "Comando de desconexão enviado." };
+    } catch (error: any) {
+      console.error(`Erro ao desconectar (ID: ${id}):`, error.message);
+      throw new Error("Falha ao enviar comando de desconexão.");
+    }
+  },
+  /**
+   * Realiza diagnóstico do login (Retorna consumo atual e status)
+   */
+  async getDiagnosticoLogin(id: number): Promise<any> {
+    try {
+      // Busca dados atualizados do login
+      const registros = await fetchIxc("radusuarios", {
+        qtype: "radusuarios.id",
+        query: String(id),
+        oper: "=",
+        page: "1",
+        rp: "1",
+        sortname: "radusuarios.id",
+        sortorder: "desc",
+      });
+
+      if (!registros.length) throw new Error("Login não encontrado.");
+
+      const login = registros[0];
+
+      // Retorna uma estrutura simplificada para o diagnóstico
+      return {
+        consumo: {
+          download: login.download_atual || "0",
+          upload: login.upload_atual || "0",
+        },
+        status: login.online === "S" ? "Online" : "Offline",
+        ip: login.ip_concentrador || login.ip,
+        message: "Diagnóstico realizado com sucesso.",
+      };
+    } catch (error: any) {
+      console.error(`Erro no diagnóstico (ID: ${id}):`, error.message);
+      throw new Error("Falha ao realizar diagnóstico.");
+    }
   },
 
   // ==========================================================================
@@ -363,21 +447,16 @@ export const ixcService = {
 
     const payload = {
       ...clienteAtual,
-      senha: novaSenha
+      senha: novaSenha,
     };
-
 
     const url = `${baseUrl}/cliente/${clienteId}`;
 
     try {
-      console.log(`[IXC] Atualizando senha do cliente ${clienteId}...`)
+      console.log(`[IXC] Atualizando senha do cliente ${clienteId}...`);
 
       // 3. Envia o objeto completo via PUT
-      const resp = await axios.put(
-        url,
-        payload,
-        { headers: getHeaders() }
-      );
+      const resp = await axios.put(url, payload, { headers: getHeaders() });
 
       return resp.data;
     } catch (error: unknown) {
