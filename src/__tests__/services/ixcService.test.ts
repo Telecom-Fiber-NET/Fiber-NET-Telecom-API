@@ -208,6 +208,54 @@ describe("IxcService", () => {
     });
   });
 
+  describe("getPixFatura", () => {
+    const mockPixData = {
+      pix_copia_e_cola: "pix_code_text",
+      valor: "150.77",
+    };
+
+    it("deve buscar dados PIX com sucesso", async () => {
+      const axiosInstance = mockedAxios.create({});
+      (axiosInstance.post as jest.Mock).mockResolvedValueOnce({
+        data: mockPixData,
+      });
+
+      const resultado = await ixcService.getPixFatura(12345);
+
+      expect(resultado).not.toBeNull();
+      expect(resultado.qrCodeText).toBe("pix_code_text");
+      expect(resultado.valor).toBe(150.77);
+      expect(axiosInstance.post).toHaveBeenCalledWith(
+        expect.stringContaining("/get_pix"),
+        expect.objectContaining({
+          id_fatura: 12345,
+          retornar_qrcode: "S",
+        })
+      );
+    });
+
+    it("deve retornar null se a resposta da API for inválida", async () => {
+      const axiosInstance = mockedAxios.create({});
+      (axiosInstance.post as jest.Mock).mockResolvedValueOnce({
+        data: { message: "Nenhum dado encontrado" },
+      });
+
+      const resultado = await ixcService.getPixFatura(54321);
+
+      expect(resultado).toBeNull();
+    });
+
+    it("deve lançar erro quando a API falhar", async () => {
+      const axiosInstance = mockedAxios.create({});
+      (axiosInstance.post as jest.Mock).mockRejectedValueOnce(
+        new Error("API error")
+      );
+
+      await expect(ixcService.getPixFatura(999)).rejects.toThrow();
+    });
+  });
+
+
   // ==========================================================================
   // TESTES DE TICKETS
   // ==========================================================================

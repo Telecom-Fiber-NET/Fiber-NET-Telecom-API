@@ -5,6 +5,7 @@ import { verifyToken } from "../middleware/authMiddleware";
 // Controllers
 import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
+import { supportRoutes } from "./routes/supportRoutes"; // Importe as novas rotas de suporte
 import {
   listarOrdensServico,
   buscarOrdemServico,
@@ -32,6 +33,9 @@ router.use("/auth", authRoutes);
 
 // ==================== DASHBOARD ====================
 router.use("/dashboard", dashboardRoutes);
+
+// ==================== SUPORTE ====================
+router.use("/support", supportRoutes);
 
 // ==================== ORDENS DE SERVIÇO ====================
 /**

@@ -1,4 +1,4 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+const { describe, it, expect, jest, beforeEach, afterEach } = require('@jest/globals');
 import { QueryBase } from "../../base";
 // FIX: Updated import to use the renamed 'Financeiros' class.
 import { Financeiros } from "..";

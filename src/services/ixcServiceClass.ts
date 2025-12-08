@@ -250,6 +250,41 @@ export class IxcService {
     );
   }
 
+  async getPixFatura(faturaId: number): Promise<any | null> {
+    const url = `${this.baseUrl}/get_pix`;
+
+    const payload = {
+      id_fatura: faturaId,
+      retornar_qrcode: "S",
+    };
+
+    try {
+      ixcLogger.operation(`Get PIX Fatura ${faturaId}`, "start");
+      const response = await this.axiosInstance.post(url, payload);
+      const pixData = response.data;
+
+      if (!pixData || (!pixData.pix_qrcode && !pixData.pix_copia_e_cola)) {
+        ixcLogger.warn(`Resposta PIX inválida para fatura ${faturaId}`, {
+          responseData: pixData,
+        });
+        return null;
+      }
+
+      ixcLogger.operation(`Get PIX Fatura ${faturaId}`, "success");
+      return {
+        qrCode: pixData.pix_qrcode_url || null,
+        qrCodeText: pixData.pix_copia_e_cola || pixData.pix_qrcode,
+        valor: parseFloat(pixData.valor) || null,
+        status: pixData.status || "pendente",
+      };
+    } catch (error) {
+      ixcLogger.operation(`Get PIX Fatura ${faturaId}`, "error", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      throw this.handleError(error, "getPixFatura");
+    }
+  }
+
   // ==========================================================================
   // LOGINS
   // ==========================================================================
@@ -381,7 +416,7 @@ export class IxcService {
       });
 
       // Invalidar cache do cliente
-      invalidateClienteCache(payload.id_cliente);
+      invalidateClienteCache(Number(payload.id_cliente));
 
       return {
         id: response.data.id || response.data.retorno_id || response.data.protocolo,

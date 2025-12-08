@@ -3,7 +3,7 @@
     "target": "ES2021",
     "module": "CommonJS",
     "outDir": "dist",
-    "rootDir": "src",
+
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -15,6 +15,6 @@
       "@shared/*": ["../../shared/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "../shared"],
   "exclude": ["node_modules", "dist"]
 }

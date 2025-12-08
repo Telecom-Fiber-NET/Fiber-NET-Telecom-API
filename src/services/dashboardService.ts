@@ -1,6 +1,7 @@
+import "dotenv/config";
 import { ixcService } from "./ixcService";
 import { cacheGet, cacheSet } from "./cache/supabaseClient";
-import { Gemini } from "./ai/gemini";
+import { GeminiProvider } from "./ai/providers/GeminiProvider"; // Import GeminiProvider
 import { DashboardData } from "../types/dashboard/DashboardData";
 
 // Função auxiliar para formatar bytes (mantida)
@@ -12,6 +13,11 @@ function formatBytes(bytes: number, decimals = 2): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
+
+const geminiDashboardProvider = new GeminiProvider({
+  apiKey: process.env.GOOGLE_API_KEY || '',
+  model: 'gemini-1.5-flash', // Usar o modelo flash para análise de dashboard (mais barato)
+});
 
 export class DashboardService {
   constructor(private ixc = ixcService) {}
@@ -154,8 +160,35 @@ export class DashboardService {
     }
 
     try {
-      const ai = await Gemini.analyzeDashboard(dashboard);
-      dashboard.notas = [{ id: "ai-insights", ...ai } as any];
+      const prompt = `
+        Aja como um Assistente Técnico Amigável da Fiber Net Telecom.
+        
+        SEU OBJETIVO:
+        Gerar 3 dicas úteis e curtas para o cliente baseadas nos dados do dashboard.
+        
+        REGRAS ABSOLUTAS (PROIBIDO):
+        - NÃO fale sobre "risco", "cancelamento", "churn", "atraso" ou "bloqueio".
+        - NÃO use tom de alerta ou aviso. Use tom de "Curiosidade" ou "Dica".
+        
+        DADOS DO CLIENTE:
+        ${JSON.stringify(dashboard, null, 2)}
+        
+        FORMATO JSON OBRIGATÓRIO:
+        {
+          "summary": "Uma frase de boas-vindas motivadora.",
+          "insights": [
+            {
+              "type": "positive", 
+              "title": "TÍTULO CURTO (Ex: Dica Wi-Fi, Streaming, Segurança)",
+              "message": "Uma dica prática de até 15 palavras."
+            }
+          ]
+        }
+      `;
+
+      const aiResponse = await geminiDashboardProvider.chat([{ role: 'user', content: prompt }]);
+      const parsedAi = JSON.parse(aiResponse.content);
+      dashboard.notas = [{ id: "ai-insights", ...parsedAi } as any];
     } catch (e) {
       dashboard.notas = [];
     }

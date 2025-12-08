@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ixcService } from "../../services/ixcService";
 import { error } from "console";
-import { members } from './../../../node_modules/typedoc-plugin-markdown/dist/theme/context/partials/container.members';
+
 
 export async function executarAcaoLogin(req: Request, res: Response) {
     try {
