@@ -5,7 +5,17 @@ import { ixcService } from "../../services/ixcService";
 export async function handleChat(req: Request, res: Response) {
   try {
     const { message } = req.body;
-    const userId = req.user?.ids?.[0]; // Pega o ID do usuário logado
+    const rawUserId = req.user?.ids?.[0]; // Pega o ID do usuário logado como string | undefined
+
+    if (!rawUserId) {
+      return res.status(401).json({ error: "Usuário não autenticado." });
+    }
+
+    const userId = parseInt(rawUserId, 10);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: "ID de usuário inválido." });
+    }
 
     if (!message) return res.status(400).json({ error: "Mensagem vazia." });
 
