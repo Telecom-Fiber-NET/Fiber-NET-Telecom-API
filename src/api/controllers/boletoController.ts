@@ -144,20 +144,31 @@ export async function buscarPixBoleto(req: Request, res: Response) {
     const { id } = req.params;
     if (!id)
       return res.status(400).json({ error: "ID da fatura é obrigatório" });
+
+    console.log(`[API] Buscando Pix para boleto ID: ${id}`); // LOG 1
+
     const dadosPix = await ixcService.buscarPixDetalhado(Number(id));
 
-    if (dadosPix?.pix?.qrCode) {
+    // LOG 2: Veja o que chegou no console
+    console.log("[API] Dados retornados do Service:", dadosPix);
+
+    // Verificação robusta
+    if (dadosPix && dadosPix.pix && dadosPix.pix.qrCode) {
       return res.json({
         success: true,
         pixCopiaECola: dadosPix.pix.qrCode.qrcode,
         pixImagem: dadosPix.pix.qrCode.imagemQrcode,
       });
     }
+
+    // Se falhar, avisa no console por que falhou
+    console.warn("[API] Estrutura do Pix inválida ou vazia.");
+
     return res
       .status(404)
       .json({ error: "Pix não disponível para este boleto." });
   } catch (error) {
-    console.error("Erro ao buscar pix:", error);
+    console.error("Erro crítico ao buscar pix:", error);
     return res.status(500).json({
       error: "Erro ao buscar pix",
     });
