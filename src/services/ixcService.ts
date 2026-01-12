@@ -1,3 +1,4 @@
+// spell:disable
 import "dotenv/config";
 import axios from "axios";
 import { Cliente } from "../resources/clientes/types";
@@ -113,19 +114,61 @@ export const ixcService = {
   // ==========================================================================
 
   /**
-   * Busca clientes por CPF/CNPJ
-   * @param cpfCnpj - CPF ou CNPJ formatado (com pontos e traços)
+   * Busca clientes por CPF/CNPJ (Híbrido: Com e Sem formatação)
+   * @param cpfCnpj - CPF ou CNPJ
    */
   async buscarClientesPorCpf(cpfCnpj: string): Promise<Cliente[]> {
-    return (await fetchIxc("cliente", {
+    // 1. Tenta buscar APENAS NÚMEROS (Limpo)
+    const cpfLimpo = cpfCnpj.replace(/\D/g, "");
+
+    // Primeira tentativa: CPF Limpo
+    let clientes = (await fetchIxc("cliente", {
       qtype: "cliente.cnpj_cpf",
-      query: cpfCnpj,
+      query: cpfLimpo,
       oper: "=",
       page: "1",
       rp: "100",
       sortname: "cliente.id",
       sortorder: "desc",
     })) as Cliente[];
+
+    // 2. Se não achou nada, tenta buscar COM FORMATAÇÃO (Ex: 123.456.789-00)
+    if (clientes.length === 0) {
+      let cpfFormatado = cpfLimpo;
+
+      if (cpfLimpo.length === 11) {
+        // Formata CPF
+        cpfFormatado = cpfLimpo.replace(
+          /(\d{3})(\d{3})(\d{3})(\d{2})/,
+          "$1.$2.$3-$4"
+        );
+      } else if (cpfLimpo.length === 14) {
+        // Formata CNPJ
+        cpfFormatado = cpfLimpo.replace(
+          /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+          "$1.$2.$3/$4-$5"
+        );
+      }
+
+      // Só busca de novo se a formatação mudou algo
+      if (cpfFormatado !== cpfLimpo) {
+        const clientesFormatados = (await fetchIxc("cliente", {
+          qtype: "cliente.cnpj_cpf",
+          query: cpfFormatado,
+          oper: "=",
+          page: "1",
+          rp: "100",
+          sortname: "cliente.id",
+          sortorder: "desc",
+        })) as Cliente[];
+
+        if (clientesFormatados.length > 0) {
+          clientes = clientesFormatados;
+        }
+      }
+    }
+
+    return clientes;
   },
 
   /**
