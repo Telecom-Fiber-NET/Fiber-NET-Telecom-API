@@ -1,6 +1,7 @@
+// spell:disable
 // src/api/controllers/boletoController.ts
 import { Request, Response } from "express";
-import { z } from "zod";
+import { number, z } from "zod";
 import { ixcService } from "../../services/ixcService";
 
 // Schema de validação para CPF/CNPJ
@@ -122,6 +123,33 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
   }
 }
 
+export async function buscarPixBoleto(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    if (!id)
+      return res.status(400).json({ error: "ID da fatura é obrigatório" });
+    const dadosPix = await ixcService.buscarPixDetalhado(Number(id));
+
+    if (dadosPix?.pix?.qrCode) {
+      return res.json({
+        sucess: true,
+        pixCopiaECola: dadosPix.pix.qrCode.qrcode,
+        pixImagem: dadosPix.pix.qrCode.imagemQrcode,
+      });
+    }
+    return res
+      .status(404)
+      .json({ error: "Pix não disponível para este boleto." });
+  } catch (error) {
+    console.error("Erro ao buscar pix:", error);
+    return res.status(500).json({
+      error: "Erro ao buscar pix",
+    });
+  }
+}
+
+//)
+
 /**
  * Gera segunda via de boleto (Baixa PDF e retorna Base64)
  */
@@ -143,7 +171,7 @@ export async function gerarSegundaVia(req: Request, res: Response) {
       let pertence = false;
       // Verifica em todos os clientes vinculados ao login do usuário
       for (const idCliente of userIds) {
-        const faturas = await ixcService.financeiroListar(idCliente);
+        const faturas = await ixcService.financeiroListar(Number(idCliente));
         // Verifica se o ID da fatura existe na lista deste cliente
         if (faturas.some((f: any) => String(f.id) === String(fatura_id))) {
           pertence = true;

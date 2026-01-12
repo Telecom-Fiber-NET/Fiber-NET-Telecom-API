@@ -1,6 +1,6 @@
 // spell:disable
-import "dotenv/config";
 import axios from "axios";
+import "dotenv/config";
 import { Cliente } from "../resources/clientes/types";
 
 // ============================================================================
@@ -298,17 +298,39 @@ export const ixcService = {
   /**
    * Obtém dados PIX de uma fatura
    */
-  async getPixFatura(faturaId: number): Promise<any | null> {
-    // TODO: Implementar a lógica real para buscar dados PIX do IXC
-    console.warn(
-      `[IXC Service] getPixFatura(${faturaId}) not implemented. Returning dummy data.`
-    );
-    return {
-      qrCode: "dummy_qr_code_base64",
-      qrCodeText: "dummy_qr_code_text",
-      valor: 123.45,
-      status: "pendente",
-    };
+  /**
+   * Busca os dados detalhados do PIX (QR Code e Copia e Cola)
+   * Baseado no endpoint que retorna a estrutura { gateway: ..., pix: ... }
+   * @param idReceber ID da fatura (conta a receber)
+   */
+  /**
+   * Busca os dados detalhados do PIX (QR Code e Copia e Cola)
+   * Endpoint: get_pix
+   */
+  async buscarPixDetalhado(idReceber: number): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/get_pix`;
+
+    try {
+      // Payload padrão para geração do PIX no IXC
+      const payload = {
+        id_receber: String(idReceber),
+        tipo_boleto: "boletopix",
+      };
+
+      const resp = await axios.post(url, payload, { headers: getHeaders() });
+
+      // Retorna o objeto completo (gateway, pix, type) para o controller tratar
+      return resp.data;
+    } catch (error: any) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
+      console.error(
+        `Erro ao buscar PIX detalhado (ID: ${idReceber}):`,
+        errorMessage
+      );
+      return null;
+    }
   },
 
   // ==========================================================================
