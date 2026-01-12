@@ -132,7 +132,7 @@ export async function buscarPixBoleto(req: Request, res: Response) {
 
     if (dadosPix?.pix?.qrCode) {
       return res.json({
-        sucess: true,
+        success: true,
         pixCopiaECola: dadosPix.pix.qrCode.qrcode,
         pixImagem: dadosPix.pix.qrCode.imagemQrcode,
       });
