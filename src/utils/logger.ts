@@ -3,13 +3,6 @@ import path from "path";
 
 /**
  * CONFIGURAÇÃO DE LOGGING PROFISSIONAL
- * 
- * Níveis de log:
- * - error: Erros críticos que precisam atenção imediata
- * - warn: Avisos importantes mas não críticos
- * - info: Informações gerais de operação
- * - http: Logs de requisições HTTP
- * - debug: Informações detalhadas para debug
  */
 
 // ============================================================================
@@ -22,12 +15,12 @@ const customFormat = winston.format.combine(
   winston.format.metadata({ fillExcept: ["message", "level", "timestamp"] }),
   winston.format.printf(({ level, message, timestamp, metadata }) => {
     let log = `${timestamp} [${level.toUpperCase()}]: ${message}`;
-    
+
     // Adicionar metadata se existir
     if (metadata && Object.keys(metadata).length > 0) {
       log += `\n${JSON.stringify(metadata, null, 2)}`;
     }
-    
+
     return log;
   })
 );
@@ -43,38 +36,45 @@ const productionFormat = winston.format.combine(
 // TRANSPORTES (ONDE OS LOGS VÃO)
 // ============================================================================
 
+// Começamos apenas com o Console (Funciona em Dev e Prod/Vercel)
 const transports: winston.transport[] = [
-  // Console - sempre ativo em desenvolvimento
   new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize(),
-      customFormat
+      customFormat // Usando customFormat mesmo no console para facilitar leitura na Vercel
     ),
   }),
-
-  // Arquivo de erros
-  new winston.transports.File({
-    filename: path.join("logs", "error.log"),
-    level: "error",
-    maxsize: 5242880, // 5MB
-    maxFiles: 5,
-  }),
-
-  // Arquivo de todos os logs
-  new winston.transports.File({
-    filename: path.join("logs", "combined.log"),
-    maxsize: 5242880, // 5MB
-    maxFiles: 5,
-  }),
-
-  // Arquivo específico para IXC API
-  new winston.transports.File({
-    filename: path.join("logs", "ixc-api.log"),
-    level: "info",
-    maxsize: 5242880, // 5MB
-    maxFiles: 3,
-  }),
 ];
+
+// Só adicionamos arquivos se NÃO estivermos na Vercel (Produção)
+// A Vercel define NODE_ENV como 'production'.
+// Para garantir, verificamos se não estamos em produção ou se explicitamente queremos arquivos.
+if (process.env.NODE_ENV !== "production") {
+  transports.push(
+    // Arquivo de erros
+    new winston.transports.File({
+      filename: path.join("logs", "error.log"),
+      level: "error",
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+    }),
+
+    // Arquivo de todos os logs
+    new winston.transports.File({
+      filename: path.join("logs", "combined.log"),
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+    }),
+
+    // Arquivo específico para IXC API
+    new winston.transports.File({
+      filename: path.join("logs", "ixc-api.log"),
+      level: "info",
+      maxsize: 5242880, // 5MB
+      maxFiles: 3,
+    })
+  );
+}
 
 // ============================================================================
 // CRIAÇÃO DO LOGGER
@@ -82,9 +82,8 @@ const transports: winston.transport[] = [
 
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "info",
-  format: process.env.NODE_ENV === "production" 
-    ? productionFormat 
-    : customFormat,
+  // Usamos customFormat no console também para facilitar leitura nos logs da Vercel
+  format: customFormat,
   transports,
   exitOnError: false,
 });
@@ -130,11 +129,14 @@ export function logError(
   context?: Record<string, any>
 ) {
   logger.error(message, {
-    error: error instanceof Error ? {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-    } : error,
+    error:
+      error instanceof Error
+        ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          }
+        : error,
     ...context,
   });
 }
@@ -148,7 +150,7 @@ export function logIxcOperation(
   details?: Record<string, any>
 ) {
   const level = status === "error" ? "error" : "info";
-  
+
   logger.log(level, `IXC ${operation}`, {
     operation,
     status,
@@ -187,20 +189,24 @@ export const ixcLogger = {
   info: (message: string, meta?: any) => {
     logger.info(`[IXC] ${message}`, meta);
   },
-  
+
   error: (message: string, error: Error | unknown, meta?: any) => {
     logError(`[IXC] ${message}`, error, meta);
   },
-  
+
   warn: (message: string, meta?: any) => {
     logger.warn(`[IXC] ${message}`, meta);
   },
-  
+
   debug: (message: string, meta?: any) => {
     logger.debug(`[IXC] ${message}`, meta);
   },
-  
-  operation: (operation: string, status: "start" | "success" | "error", details?: any) => {
+
+  operation: (
+    operation: string,
+    status: "start" | "success" | "error",
+    details?: any
+  ) => {
     logIxcOperation(operation, status, details);
   },
 };
