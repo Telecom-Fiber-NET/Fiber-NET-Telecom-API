@@ -1,7 +1,7 @@
 // spell:disable
 // src/api/controllers/boletoController.ts
 import { Request, Response } from "express";
-import { number, z } from "zod";
+import { z } from "zod";
 import { ixcService } from "../../services/ixcService";
 
 // Schema de validação para CPF/CNPJ
@@ -50,7 +50,23 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
 
       // Filtrar apenas boletos em aberto ou vencidos
       const boletosCliente = faturas
-        .filter((f: any) => f.status === "A") // Apenas abertos
+        .filter((f: any) => {
+          if (f.status !== "A") return false;
+
+          const dataVenc = new Date(f.data_vencimento);
+          const hoje = new Date();
+
+          // Define o último dia do mês atual (ex: 31/01/2026)
+          const fimDoMesAtual = new Date(
+            hoje.getFullYear(),
+            hoje.getMonth() + 1,
+            0
+          );
+
+          // Retorna verdadeiro se a data for anterior ou igual ao fim deste mês
+          // Isso inclui: Vencidos (passado) + A vencer (neste mês)
+          return dataVenc <= fimDoMesAtual;
+        })
         .map((fatura: any) => ({
           id: fatura.id,
           clienteId: cliente.id,
