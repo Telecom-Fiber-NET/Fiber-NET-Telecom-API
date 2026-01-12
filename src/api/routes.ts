@@ -62,7 +62,7 @@ router.post("/logins/:id/:action", verifyToken, executarAcaoLogin);
 // ==================== BOLETOS ====================
 router.post("/boletos/buscar-cpf", buscarBoletosPorCpf);
 router.get("/boletos/:fatura_id/segunda-via", gerarSegundaVia);
-router.post("/boletos/:id/pix", buscarPixBoleto);
+router.get("/boletos/:id/pix", buscarPixBoleto);
 
 // ==================== SISTEMA ====================
 router.get("/", (_, res) =>
