@@ -1,30 +1,32 @@
+// spell:disable
 import { Router } from "express";
 import { verifyToken } from "../middleware/authMiddleware";
 
 // Controllers
-import authRoutes from "./routes/authRoutes";
-import dashboardRoutes from "./routes/dashboardRoutes";
-import { supportRoutes } from "./routes/supportRoutes";
 import {
-  listarOrdensServico,
+  buscarBoletosPorCpf,
+  buscarPixBoleto,
+  gerarSegundaVia,
+} from "./controllers/boletoController";
+import { handleChat } from "./controllers/chatController"; // <--- ADICIONADO
+import { executarAcaoLogin } from "./controllers/loginsController";
+import {
   buscarOrdemServico,
+  listarOrdensServico,
 } from "./controllers/ordensServicoController";
 import {
-  criarTicket,
-  listarTiposAtendimento,
-  listarTickets,
-} from "./controllers/ticketsController";
-import {
-  trocarSenha,
   solicitarRecuperacaoSenha,
+  trocarSenha,
   validarForcaSenha,
 } from "./controllers/senhaController";
 import {
-  buscarBoletosPorCpf,
-  gerarSegundaVia,
-} from "./controllers/boletoController";
-import { executarAcaoLogin } from "./controllers/loginsController";
-import { handleChat } from "./controllers/chatController"; // <--- ADICIONADO
+  criarTicket,
+  listarTickets,
+  listarTiposAtendimento,
+} from "./controllers/ticketsController";
+import authRoutes from "./routes/authRoutes";
+import dashboardRoutes from "./routes/dashboardRoutes";
+import { supportRoutes } from "./routes/supportRoutes";
 
 const router = Router();
 
@@ -60,6 +62,7 @@ router.post("/logins/:id/:action", verifyToken, executarAcaoLogin);
 // ==================== BOLETOS ====================
 router.post("/boletos/buscar-cpf", buscarBoletosPorCpf);
 router.get("/boletos/:fatura_id/segunda-via", gerarSegundaVia);
+router.post("/boletos/:id/pix", buscarPixBoleto);
 
 // ==================== SISTEMA ====================
 router.get("/", (_, res) =>
