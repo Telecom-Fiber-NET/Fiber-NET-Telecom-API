@@ -1,5 +1,7 @@
 # IXC REST API Gateway
+
 ## O que este repo contém
+
 - API Express em TypeScript
 - Rota `/api/dashboard` que agrega dados do IXC e retorna um `DashboardData`
 - Cache usando Supabase (tabela `cache`)
@@ -7,6 +9,7 @@
 - Scripts: `npm run dev`, `npm run build`, `npm run test`
 
 ## Variáveis de ambiente
+
 Copie `.env.example` para `.env` e preencha:
 
 ```
@@ -21,6 +24,7 @@ API_BASE_URL=
 ```
 
 ## Tabela `cache` (SQL)
+
 ```sql
 create table cache (
   key text primary key,
@@ -30,6 +34,7 @@ create table cache (
 ```
 
 ## Rodando localmente
+
 ```bash
 npm install
 # preencha .env
@@ -44,6 +49,7 @@ npm run dev
 `GET /api/dashboard` — retorna `DashboardData`. Requer `Authorization: Bearer <token>` (token DEV retornado pelo `/auth/login`).
 
 ## Exemplo (curl)
+
 ```bash
 # login dev
 curl -X POST http://localhost:3333/api/auth/login -H "Content-Type: application/json" -d '{"email":"dev@fibernet.com","password":"dev"}'
