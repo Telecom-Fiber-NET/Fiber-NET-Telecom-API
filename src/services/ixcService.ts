@@ -314,7 +314,7 @@ export const ixcService = {
     try {
       // Payload padrão para geração do PIX no IXC
       const payload = {
-        id_receber: String(idReceber),
+        id_areceber: String(idReceber),
         tipo_boleto: "boletopix",
       };
 

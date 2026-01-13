@@ -154,11 +154,7 @@ export async function buscarPixBoleto(req: Request, res: Response) {
 
     // Verificação robusta
     if (dadosPix && dadosPix.pix && dadosPix.pix.qrCode) {
-      return res.json({
-        success: true,
-        pixCopiaECola: dadosPix.pix.qrCode.qrcode,
-        pixImagem: dadosPix.pix.qrCode.imagemQrcode,
-      });
+      return res.json(dadosPix);
     }
 
     // Se falhar, avisa no console por que falhou
