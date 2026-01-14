@@ -315,7 +315,6 @@ export const ixcService = {
       // Payload padrão para geração do PIX no IXC
       const payload = {
         id_areceber: String(idReceber),
-        tipo_boleto: "boletopix",
       };
 
       const resp = await axios.post(url, payload, { headers: getHeaders() });
