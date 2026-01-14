@@ -48,60 +48,70 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
     for (const cliente of clientes) {
       const faturas = await ixcService.financeiroListar(cliente.id);
 
-      // Filtrar apenas boletos em aberto ou vencidos
       const boletosCliente = faturas
         .filter((f: any) => {
-          if (f.status !== "A") return false;
-
-          const dataVenc = new Date(f.data_vencimento);
-          const hoje = new Date();
-
-          // Define o último dia do mês atual (ex: 31/01/2026)
-          const fimDoMesAtual = new Date(
-            hoje.getFullYear(),
-            hoje.getMonth() + 1,
-            0
-          );
-
-          // Retorna verdadeiro se a data for anterior ou igual ao fim deste mês
-          // Isso inclui: Vencidos (passado) + A vencer (neste mês)
-          return dataVenc <= fimDoMesAtual;
+          // Filtra apenas o que interessa ao cliente (Aberto ou Parcial)
+          // Status 'R' (Recebido) e 'C' (Cancelado) são ignorados nesta visualização
+          return f.status === "A" || f.status === "P";
         })
-        .map((fatura: any) => ({
-          id: fatura.id,
-          clienteId: cliente.id,
-          clienteNome: cliente.razao || cliente.fantasia,
-          documento: fatura.documento,
-          vencimento: fatura.data_vencimento,
-          vencimentoFormatado: formatarData(fatura.data_vencimento),
-          valor: parseFloat(fatura.valor),
-          valorFormatado: formatarValor(fatura.valor),
-          linhaDigitavel: fatura.linha_digitavel,
-          pixCopiaECola: fatura.pix_txid || null,
-          boleto_pdf_link: fatura.boleto || null,
-          status: getStatusPagamento(fatura.data_vencimento),
-          statusCor: getStatusCor(fatura.data_vencimento),
-          diasVencimento: calcularDiasVencimento(fatura.data_vencimento),
-        }));
+        .map((fatura: any) => {
+          // LÓGICA DE VALOR (Baseada no seu JSON):
+          // Se for Parcial ('P') e tiver valor_aberto, usa o aberto. Senão, usa o valor total.
+          const valorAExibir =
+            fatura.status === "P" && Number(fatura.valor_aberto) > 0
+              ? parseFloat(fatura.valor_aberto)
+              : parseFloat(fatura.valor);
+
+          return {
+            id: fatura.id,
+            clienteId: cliente.id,
+            // Mapeamento baseado no JSON fornecido (id_contrato é o padrão do IXC)
+            contrato_id: fatura.id_contrato || fatura.contrato_id,
+            clienteNome: cliente.razao || cliente.fantasia,
+            documento: fatura.documento || `Fat-${fatura.id}`,
+
+            // Datas
+            vencimento: fatura.data_vencimento,
+            vencimentoFormatado: formatarData(fatura.data_vencimento),
+
+            // Valores calculados
+            valor: valorAExibir,
+            valorFormatado: formatarValor(valorAExibir.toString()),
+            valorOriginal: parseFloat(fatura.valor), // Útil se quiser mostrar "De R$ 100 por R$ 50"
+
+            // Dados de Pagamento
+            linhaDigitavel: fatura.linha_digitavel,
+            pixCopiaECola: fatura.pix_txid || null, // Campo confirmado no JSON
+            boleto_pdf_link: fatura.boleto || null,
+
+            // Status e Metadados
+            status: fatura.status, // A ou P
+            statusDescricao:
+              fatura.status === "P"
+                ? "Pagamento Parcial"
+                : getStatusPagamento(fatura.data_vencimento),
+            diasVencimento: calcularDiasVencimento(fatura.data_vencimento),
+          };
+        });
 
       todosOsBoletos.push(...boletosCliente);
     }
 
-    // 4. Ordenar por data de vencimento (mais recentes primeiro)
+    // 4. Ordenar: Vencidos primeiro (urgência), depois os futuros
     todosOsBoletos.sort((a, b) => {
       return (
-        new Date(b.vencimento).getTime() - new Date(a.vencimento).getTime()
+        new Date(a.vencimento).getTime() - new Date(b.vencimento).getTime()
       );
     });
 
-    // 5. Calcular resumo
+    // 5. Calcular resumo financeiro
     const totalEmAberto = todosOsBoletos.reduce((sum, b) => sum + b.valor, 0);
     const boletosVencidos = todosOsBoletos.filter(
-      (b) => b.status === "Vencido"
-    );
+      (b) => b.diasVencimento < 0
+    ).length;
     const boletosAVencer = todosOsBoletos.filter(
-      (b) => b.status === "A Vencer"
-    );
+      (b) => b.diasVencimento >= 0
+    ).length;
 
     return res.json({
       success: true,
@@ -110,8 +120,8 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
         totalBoletos: todosOsBoletos.length,
         totalEmAberto: totalEmAberto,
         totalEmAbertoFormatado: formatarValor(totalEmAberto.toString()),
-        boletosVencidos: boletosVencidos.length,
-        boletosAVencer: boletosAVencer.length,
+        boletosVencidos: boletosVencidos,
+        boletosAVencer: boletosAVencer,
       },
       boletos: todosOsBoletos,
       clientes: clientes.map((c) => ({
@@ -122,20 +132,19 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
     });
   } catch (error: unknown) {
     console.error("Erro ao buscar boletos:", error);
-
-    // Tratamento específico para erros conhecidos
     if (error instanceof Error) {
-      if (error.message?.includes("IXC")) {
+      // Erro de conexão ou timeout do IXC
+      if (
+        error.message?.includes("IXC") ||
+        error.message?.includes("connect")
+      ) {
         return res.status(502).json({
-          error: "Erro ao comunicar com o sistema",
+          error: "Sistema financeiro indisponível temporariamente",
           detalhes: "Tente novamente em alguns instantes",
         });
       }
     }
-
-    return res.status(500).json({
-      error: "Erro ao buscar boletos",
-    });
+    return res.status(500).json({ error: "Erro interno ao buscar boletos" });
   }
 }
 
