@@ -47,11 +47,11 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
 
       const boletosCliente = faturas
         .filter((f: any) => {
-          // ACEITA 'A' (Aberto) OU 'P' (Parcial). Ignora 'R' (Recebido) ou 'C' (Cancelado)
-          return f.status === "A" || f.status === "P";
+          // CORREÇÃO 1: Adicionei "R" para permitir mostrar o histórico de Pagas
+          return f.status === "A" || f.status === "P" || f.status === "R";
         })
         .map((fatura: any) => {
-          // LÓGICA DE VALOR REAL: Se for parcial, usa o valor que falta (valor_aberto)
+          // LÓGICA DE VALOR REAL: Se for parcial, usa o valor que falta
           const valorAExibir =
             fatura.status === "P" && Number(fatura.valor_aberto) > 0
               ? parseFloat(fatura.valor_aberto)
@@ -65,7 +65,13 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
             documento: fatura.documento || `Fat-${fatura.id}`,
             vencimento: fatura.data_vencimento,
             vencimentoFormatado: formatarData(fatura.data_vencimento),
-            valor: valorAExibir, // Envia o valor correto (parcial ou total)
+
+            valor: valorAExibir,
+            // CORREÇÃO 2: Adicionando os campos que o Frontend precisa para o Histórico
+            valor_recebido:
+              fatura.valor_recebido || fatura.valor_pago || "0.00",
+            data_pagamento: fatura.data_pagamento || null,
+
             valorFormatado: formatarValor(valorAExibir.toString()),
             linhaDigitavel: fatura.linha_digitavel,
             pixCopiaECola: fatura.pix_txid || null,
