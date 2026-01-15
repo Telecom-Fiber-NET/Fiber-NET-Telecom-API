@@ -42,6 +42,12 @@ router.use("/support", supportRoutes);
 // ==================== CHAT IA (NOVO) ====================
 router.post("/chat", verifyToken, handleChat); // <--- ADICIONADO
 
+// ==================== BUSCA PUBLICA (NOVO) ====================
+router.post("/buscar", buscarBoletosPorCpf);
+
+// ==================== rota pix ====================
+router.get("/pix/:id", buscarPixBoleto);
+
 // ==================== ORDENS DE SERVIÇO ====================
 router.get("/ordens-servico", verifyToken, listarOrdensServico);
 router.get("/ordens-servico/:id", verifyToken, buscarOrdemServico);
@@ -63,6 +69,7 @@ router.post("/logins/:id/:action", verifyToken, executarAcaoLogin);
 router.post("/boletos/buscar-cpf", buscarBoletosPorCpf);
 router.get("/boletos/:fatura_id/segunda-via", gerarSegundaVia);
 router.get("/boletos/:id/pix", buscarPixBoleto);
+router.get("/segunda-via/:fatura_id", verifyToken, gerarSegundaVia);
 
 // ==================== SISTEMA ====================
 router.get("/", (_, res) =>
