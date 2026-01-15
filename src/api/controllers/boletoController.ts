@@ -13,9 +13,6 @@ const buscarBoletoSchema = z.object({
     .regex(/^\d+$/, "CPF/CNPJ deve conter apenas números"),
 });
 
-/**
- * Busca boletos por CPF/CNPJ (endpoint público)
- */
 export async function buscarBoletosPorCpf(req: Request, res: Response) {
   try {
     // 1. Validar CPF/CNPJ
@@ -50,13 +47,11 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
 
       const boletosCliente = faturas
         .filter((f: any) => {
-          // Filtra apenas o que interessa ao cliente (Aberto ou Parcial)
-          // Status 'R' (Recebido) e 'C' (Cancelado) são ignorados nesta visualização
+          // ACEITA 'A' (Aberto) OU 'P' (Parcial). Ignora 'R' (Recebido) ou 'C' (Cancelado)
           return f.status === "A" || f.status === "P";
         })
         .map((fatura: any) => {
-          // LÓGICA DE VALOR (Baseada no seu JSON):
-          // Se for Parcial ('P') e tiver valor_aberto, usa o aberto. Senão, usa o valor total.
+          // LÓGICA DE VALOR REAL: Se for parcial, usa o valor que falta (valor_aberto)
           const valorAExibir =
             fatura.status === "P" && Number(fatura.valor_aberto) > 0
               ? parseFloat(fatura.valor_aberto)
@@ -65,27 +60,17 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
           return {
             id: fatura.id,
             clienteId: cliente.id,
-            // Mapeamento baseado no JSON fornecido (id_contrato é o padrão do IXC)
             contrato_id: fatura.id_contrato || fatura.contrato_id,
             clienteNome: cliente.razao || cliente.fantasia,
             documento: fatura.documento || `Fat-${fatura.id}`,
-
-            // Datas
             vencimento: fatura.data_vencimento,
             vencimentoFormatado: formatarData(fatura.data_vencimento),
-
-            // Valores calculados
-            valor: valorAExibir,
+            valor: valorAExibir, // Envia o valor correto (parcial ou total)
             valorFormatado: formatarValor(valorAExibir.toString()),
-            valorOriginal: parseFloat(fatura.valor), // Útil se quiser mostrar "De R$ 100 por R$ 50"
-
-            // Dados de Pagamento
             linhaDigitavel: fatura.linha_digitavel,
-            pixCopiaECola: fatura.pix_txid || null, // Campo confirmado no JSON
+            pixCopiaECola: fatura.pix_txid || null,
             boleto_pdf_link: fatura.boleto || null,
-
-            // Status e Metadados
-            status: fatura.status, // A ou P
+            status: fatura.status,
             statusDescricao:
               fatura.status === "P"
                 ? "Pagamento Parcial"
@@ -97,14 +82,14 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
       todosOsBoletos.push(...boletosCliente);
     }
 
-    // 4. Ordenar: Vencidos primeiro (urgência), depois os futuros
+    // 4. Ordenar: Vencidos primeiro
     todosOsBoletos.sort((a, b) => {
       return (
         new Date(a.vencimento).getTime() - new Date(b.vencimento).getTime()
       );
     });
 
-    // 5. Calcular resumo financeiro
+    // 5. Calcular resumo
     const totalEmAberto = todosOsBoletos.reduce((sum, b) => sum + b.valor, 0);
     const boletosVencidos = todosOsBoletos.filter(
       (b) => b.diasVencimento < 0
@@ -132,17 +117,14 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
     });
   } catch (error: unknown) {
     console.error("Erro ao buscar boletos:", error);
-    if (error instanceof Error) {
-      // Erro de conexão ou timeout do IXC
-      if (
-        error.message?.includes("IXC") ||
-        error.message?.includes("connect")
-      ) {
-        return res.status(502).json({
-          error: "Sistema financeiro indisponível temporariamente",
-          detalhes: "Tente novamente em alguns instantes",
-        });
-      }
+    if (
+      error instanceof Error &&
+      (error.message?.includes("IXC") || error.message?.includes("connect"))
+    ) {
+      return res.status(502).json({
+        error: "Sistema financeiro indisponível temporariamente",
+        detalhes: "Tente novamente em alguns instantes",
+      });
     }
     return res.status(500).json({ error: "Erro interno ao buscar boletos" });
   }
