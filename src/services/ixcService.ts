@@ -332,6 +332,33 @@ export const ixcService = {
     }
   },
 
+  /**
+   * Busca as baixas (pagamentos) de uma fatura específica.
+   */
+  async buscarBaixasDaFatura(idFatura: number | string) {
+    const url = "fn_areceber_baixas";
+
+    const body = {
+      qtype: "id_receber",
+      query: String(idFatura),
+      oper: "=",
+      page: "1",
+      rp: "100",
+      sortname: "data",
+      sortorder: "desc",
+    };
+
+    try {
+      // CORREÇÃO 1: Usar 'fetchIxc' em vez de 'listar'
+      // CORREÇÃO 2: fetchIxc já devolve os registros, não precisa acessar .registros
+      const registros = await fetchIxc(url, body);
+      return registros;
+    } catch (error) {
+      console.error(`[IxcService] Erro ao buscar baixas ${idFatura}:`, error);
+      return [];
+    }
+  },
+
   // ==========================================================================
   // LOGINS E CONEXÕES
   // ==========================================================================

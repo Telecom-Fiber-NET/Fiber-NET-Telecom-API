@@ -45,13 +45,47 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
     for (const cliente of clientes) {
       const faturas = await ixcService.financeiroListar(cliente.id);
 
-      const boletosCliente = faturas
-        .filter((f: any) => {
-          // CORREÇÃO 1: Adicionei "R" para permitir mostrar o histórico de Pagas
-          return f.status === "A" || f.status === "P" || f.status === "R";
-        })
-        .map((fatura: any) => {
-          // LÓGICA DE VALOR REAL: Se for parcial, usa o valor que falta
+      // Filtramos apenas os relevantes para processar
+      const faturasParaProcessar = faturas.filter((f: any) =>
+        ["A", "P", "R", "C"].includes(f.status)
+      );
+
+      // 🔥 USAMOS PROMISE.ALL PARA BUSCAR AS BAIXAS EM PARALELO (RÁPIDO)
+      const boletosProcessados = await Promise.all(
+        faturasParaProcessar.map(async (fatura: any) => {
+          let valorRecebidoReal = 0;
+          let dataPagamentoReal = null;
+
+          // SE ESTIVER PAGO/PARCIAL/RECEBIDO, BUSCAMOS A VERDADE NA TABELA DE BAIXAS
+          if (fatura.status === "P" || fatura.status === "R") {
+            try {
+              // 1. Tenta buscar nas baixas (Robustez)
+              const baixas = await ixcService.buscarBaixasDaFatura(fatura.id);
+
+              if (baixas.length > 0) {
+                // Soma o valor REAL baixado (inclui juros/descontos processados)
+                valorRecebidoReal = baixas.reduce(
+                  (acc: number, b: any) => acc + parseFloat(b.valor || 0),
+                  0
+                );
+                dataPagamentoReal = baixas[0].data; // Data da baixa mais recente
+              } else {
+                // Fallback: Se não achar baixa, tenta usar o campo 'pagamento_valor' que vimos no seu JSON
+                valorRecebidoReal = parseFloat(
+                  fatura.pagamento_valor || fatura.valor_recebido || "0"
+                );
+                dataPagamentoReal =
+                  fatura.pagamento_data || fatura.data_pagamento;
+              }
+            } catch (err) {
+              console.warn(`Erro ao processar baixa fatura ${fatura.id}`);
+            }
+          } else {
+            // Se estiver aberto, usa o valor padrão
+            valorRecebidoReal = parseFloat(fatura.valor_recebido || "0");
+          }
+
+          // Define valor a exibir (Lógica de parcial)
           const valorAExibir =
             fatura.status === "P" && Number(fatura.valor_aberto) > 0
               ? parseFloat(fatura.valor_aberto)
@@ -60,17 +94,17 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
           return {
             id: fatura.id,
             clienteId: cliente.id,
-            contrato_id: fatura.id_contrato || fatura.contrato_id,
+            contrato_id: fatura.id_contrato,
             clienteNome: cliente.razao || cliente.fantasia,
             documento: fatura.documento || `Fat-${fatura.id}`,
             vencimento: fatura.data_vencimento,
             vencimentoFormatado: formatarData(fatura.data_vencimento),
 
             valor: valorAExibir,
-            // CORREÇÃO 2: Adicionando os campos que o Frontend precisa para o Histórico
-            valor_recebido:
-              fatura.valor_recebido || fatura.valor_pago || "0.00",
-            data_pagamento: fatura.data_pagamento || null,
+
+            // 🔥 DADOS REAIS DE PAGAMENTO INJETADOS AQUI
+            valor_recebido: valorRecebidoReal,
+            data_pagamento: dataPagamentoReal,
 
             valorFormatado: formatarValor(valorAExibir.toString()),
             linhaDigitavel: fatura.linha_digitavel,
@@ -83,9 +117,10 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
                 : getStatusPagamento(fatura.data_vencimento),
             diasVencimento: calcularDiasVencimento(fatura.data_vencimento),
           };
-        });
+        })
+      );
 
-      todosOsBoletos.push(...boletosCliente);
+      todosOsBoletos.push(...boletosProcessados);
     }
 
     // 4. Ordenar: Vencidos primeiro
