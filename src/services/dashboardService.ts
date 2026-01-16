@@ -15,8 +15,8 @@ function formatBytes(bytes: number, decimals = 2): string {
 }
 
 const geminiDashboardProvider = new GeminiProvider({
-  apiKey: process.env.GOOGLE_API_KEY || '',
-  model: 'gemini-1.5-flash', // Usar o modelo flash para análise de dashboard (mais barato)
+  apiKey: process.env.GOOGLE_API_KEY || "",
+  model: "gemini-2.5-flash", // Usar o modelo flash para análise de dashboard (mais barato)
 });
 
 export class DashboardService {
@@ -25,7 +25,7 @@ export class DashboardService {
   // Alteração: Adicionado parâmetro clientIp
   async gerarDashboard(
     clientIds: number[],
-    clientIp: string = ""
+    clientIp: string = "",
   ): Promise<DashboardData> {
     const cacheKey = `dashboard:${clientIds.join(",")}`;
 
@@ -104,7 +104,7 @@ export class DashboardService {
           plano: c.descricao_aux_plano_venda,
           status: c.status,
           pdf_link: `/contrato/${c.id}`,
-        })
+        }),
       );
 
       r.faturas.forEach((f: any) =>
@@ -112,10 +112,12 @@ export class DashboardService {
           id: f.id,
           vencimento: f.data_vencimento || f.vencimento,
           valor: f.valor,
+          valor_recebido:
+            f.valor_recebido || f.valor_pago || f.pagamento_valor || 0,
           status: f.status === "A" ? "aberto" : "pago",
           pix_code: f.pix_txid,
           linha_digitavel: f.linha_digitavel,
-        })
+        }),
       );
 
       r.logins.forEach((l: any) =>
@@ -131,7 +133,7 @@ export class DashboardService {
           // --- NOVOS CAMPOS ---
           ip_privado: l.ip || "Não atribuído", // IP vindo do cadastro do IXC
           ip_publico: clientIp, // IP detectado da requisição
-        })
+        }),
       );
 
       dashboard.ordensServico.push(...r.ordens);
@@ -142,7 +144,7 @@ export class DashboardService {
     const allLogins = dashboard.logins;
     if (allLogins.length > 0) {
       const consumoPromises = allLogins.map((ln: any) =>
-        this.ixc.getConsumoCompleto(ln)
+        this.ixc.getConsumoCompleto(ln),
       );
       const consumoResults = await Promise.all(consumoPromises);
       for (const c of consumoResults) {
@@ -152,10 +154,10 @@ export class DashboardService {
         dashboard.consumo.history.monthly.push(...(c.history?.monthly || []));
       }
       dashboard.consumo.total_download = formatBytes(
-        dashboard.consumo.total_download_bytes
+        dashboard.consumo.total_download_bytes,
       );
       dashboard.consumo.total_upload = formatBytes(
-        dashboard.consumo.total_upload_bytes
+        dashboard.consumo.total_upload_bytes,
       );
     }
 
@@ -186,7 +188,9 @@ export class DashboardService {
         }
       `;
 
-      const aiResponse = await geminiDashboardProvider.chat([{ role: 'user', content: prompt }]);
+      const aiResponse = await geminiDashboardProvider.chat([
+        { role: "user", content: prompt },
+      ]);
       const parsedAi = JSON.parse(aiResponse.content);
       dashboard.notas = [{ id: "ai-insights", ...parsedAi } as any];
     } catch (e) {
