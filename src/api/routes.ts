@@ -71,6 +71,12 @@ router.get("/boletos/:fatura_id/segunda-via", gerarSegundaVia);
 router.get("/boletos/:id/pix", buscarPixBoleto);
 router.get("/segunda-via/:fatura_id", verifyToken, gerarSegundaVia);
 
+// ==================== BOLETOS PIX ====================
+
+router.post("/faturas", buscarBoletosPorCpf);
+router.get("/faturas/:id/pix", buscarPixBoleto);
+router.get("/faturas/:fatura_id/segunda-via", gerarSegundaVia);
+
 // ==================== SISTEMA ====================
 router.get("/", (_, res) =>
   res.json({
