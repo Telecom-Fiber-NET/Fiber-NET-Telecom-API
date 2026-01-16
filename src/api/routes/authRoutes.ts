@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Router, Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import jwt from "jsonwebtoken";
 import { ixcService } from "../../services/ixcService";
 
@@ -37,12 +37,12 @@ router.post("/login", async (req: Request, res: Response) => {
     if (clientePrincipal.cnpj_cpf) {
       try {
         console.log(
-          `Buscando contratos vinculados ao CPF: ${clientePrincipal.cnpj_cpf}`
+          `Buscando contratos vinculados ao CPF: ${clientePrincipal.cnpj_cpf}`,
         );
 
         // Busca todos os clientes com o mesmo documento
         const clientesVinculados = await ixcService.buscarClientesPorCpf(
-          clientePrincipal.cnpj_cpf
+          clientePrincipal.cnpj_cpf,
         );
 
         if (clientesVinculados && clientesVinculados.length > 0) {
@@ -51,8 +51,8 @@ router.post("/login", async (req: Request, res: Response) => {
 
           console.log(
             `Login unificado com sucesso. IDs encontrados: ${todosIds.join(
-              ", "
-            )}`
+              ", ",
+            )}`,
           );
         }
       } catch (err) {
@@ -68,7 +68,7 @@ router.post("/login", async (req: Request, res: Response) => {
         email: clientePrincipal.email || email,
       },
       process.env.JWT_SECRET || "secret_padrao_seguro",
-      { expiresIn: "1d" }
+      { expiresIn: "1h" },
     );
 
     return res.json({
