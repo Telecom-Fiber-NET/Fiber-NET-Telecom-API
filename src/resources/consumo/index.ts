@@ -1,19 +1,61 @@
-import { QueryBase, QueryBody } from '../base';
-import { ConsumoDiario, ConsumoMensal, ConsumoGeral, ConsumoHistory, Consumo } from './types';
-import { Login } from '../logins/types'; // Import Login type
+import { QueryBase, QueryBody, ResponseBody } from '../base';
+import { Consumo, ConsumoAttrs, ConsumoDiario, ConsumoMensal } from './types';
+
+const resourceName = "radusuarios_consumo";
 
 /**
- * Recurso para interagir com os dados de consumo de internet (radusuarios) da API IXC.
+ * Recurso para interagir com o Consumo (radusuarios_consumo) da API IXC.
  */
 export class ConsumoResource extends QueryBase {
-    private resourceName = "radusuarios"; // Base para radusuarios_consumo_d, _m, etc.
+    /**
+     * Lista/Filtra consumos.
+     */
+    async listar(
+        attr: { [K in ConsumoAttrs]?: string | number | boolean },
+        oper: '>' | '<' | '=' | 'like' = '=',
+        page: number = 1,
+        sortAttr: ConsumoAttrs = 'id',
+        sortorder: 'desc' | 'asc' = 'desc'
+    ): Promise<Consumo[]> {
+        const key = Object.keys(attr)[0] as ConsumoAttrs;
+        const value = attr[key];
+
+        const query: QueryBody = {
+            qtype: `${resourceName}.${key}`,
+            query: String(value),
+            oper,
+            page: page.toString(),
+            sortname: `${resourceName}.${String(sortAttr)}`,
+            sortorder,
+        };
+
+        const response = await this.request<ResponseBody<Consumo>>(resourceName, query);
+        return response.registros || [];
+    }
+
+    /**
+     * Cria um novo registro de consumo.
+     */
+    public async criar(payload: Partial<Consumo>): Promise<{ id: number; message: string }> {
+        return this.create<Partial<Consumo>, any>(resourceName, payload);
+    }
+
+    /**
+     * Atualiza um registro de consumo existente.
+     */
+    public async editar(id: number, payload: Partial<Consumo>): Promise<{ id: number; message: string }> {
+        return this.update<Partial<Consumo>, any>(resourceName, id, payload);
+    }
+
+    /**
+     * Remove um registro de consumo.
+     */
+    public async deletar(id: number): Promise<{ message: string }> {
+        return this.remove<any>(resourceName, id);
+    }
 
     /**
      * Busca o consumo diário para um login específico.
-     * @param loginId ID do login (radusuario)
-     * @param page Página da requisição (string)
-     * @param rp Resultados por página (string)
-     * @returns Lista de ConsumoDiario
      */
     public async buscarConsumoDiario(loginId: number, page: string = '1', rp: string = '100'): Promise<ConsumoDiario[]> {
         const query: QueryBody = {
@@ -25,8 +67,7 @@ export class ConsumoResource extends QueryBase {
             sortname: 'data',
             sortorder: 'desc',
         };
-        const response = await this.request<any>(`${this.resourceName}_consumo_d`, query);
-        // Assumindo que a API retorna um array de objetos com download_bytes, upload_bytes e data
+        const response = await this.request<any>(`radusuarios_consumo_d`, query);
         return response.registros.map((registro: any) => ({
             data: registro.data,
             download_bytes: parseFloat(registro.download_bytes),
@@ -36,10 +77,6 @@ export class ConsumoResource extends QueryBase {
 
     /**
      * Busca o consumo mensal para um login específico.
-     * @param loginId ID do login (radusuario)
-     * @param page Página da requisição (string)
-     * @param rp Resultados por página (string)
-     * @returns Lista de ConsumoMensal
      */
     public async buscarConsumoMensal(loginId: number, page: string = '1', rp: string = '100'): Promise<ConsumoMensal[]> {
         const query: QueryBody = {
@@ -51,35 +88,11 @@ export class ConsumoResource extends QueryBase {
             sortname: 'mes_ano',
             sortorder: 'desc',
         };
-        const response = await this.request<any>(`${this.resourceName}_consumo_m`, query);
-        // Assumindo que a API retorna um array de objetos com download_bytes, upload_bytes e mes_ano
+        const response = await this.request<any>(`radusuarios_consumo_m`, query);
         return response.registros.map((registro: any) => ({
             mes_ano: registro.mes_ano,
             download_bytes: parseFloat(registro.download_bytes),
             upload_bytes: parseFloat(registro.upload_bytes),
         }));
-    }
-
-    /**
-     * Agrega todos os dados de consumo para um login específico.
-     * @param loginData Objeto Login contendo id, upload_atual e download_atual.
-     * @returns Objeto Consumo completo
-     */
-    public async getConsumoCompleto(loginData: Login): Promise<Consumo> {
-        const [diario, mensal] = await Promise.all([
-            this.buscarConsumoDiario(loginData.id),
-            this.buscarConsumoMensal(loginData.id),
-        ]);
-
-        const history: ConsumoHistory = {
-            daily: diario,
-            monthly: mensal,
-        };
-
-        return {
-            total_download_bytes: parseFloat(loginData.download_atual || '0'),
-            total_upload_bytes: parseFloat(loginData.upload_atual || '0'),
-            history: history,
-        };
     }
 }

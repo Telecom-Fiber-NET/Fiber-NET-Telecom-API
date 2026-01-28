@@ -1,29 +1,28 @@
+import { ResponseBody } from "../base";
+
+export type Consumo = {
+    id: number;
+    id_login: number;
+    data_inicial: string;
+    data_final: string;
+    download: string;
+    upload: string;
+    download_bytes: string;
+    upload_bytes: string;
+    [key: string]: any;
+};
+
+export type ConsumoAttrs = keyof Consumo;
+export type ConsumoResponse = ResponseBody<Consumo>;
+
 export type ConsumoDiario = {
-    data: string; // Ex: "2025-11-24"
+    data: string;
     download_bytes: number;
     upload_bytes: number;
 };
 
 export type ConsumoMensal = {
-    mes_ano: string; // Ex: "2025-11"
+    mes_ano: string;
     download_bytes: number;
     upload_bytes: number;
-};
-
-export type ConsumoGeral = {
-    total_download_bytes: number;
-    total_upload_bytes: number;
-    // Pode incluir outros campos como média diária, etc.
-};
-
-export type ConsumoHistory = {
-    daily: ConsumoDiario[];
-    monthly: ConsumoMensal[];
-    // Pode incluir weekly, annual se a API IXC fornecer
-};
-
-export type Consumo = {
-    total_download_bytes: number;
-    total_upload_bytes: number;
-    history: ConsumoHistory;
 };

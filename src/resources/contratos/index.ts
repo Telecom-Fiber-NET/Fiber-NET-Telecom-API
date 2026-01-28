@@ -1,90 +1,63 @@
-import { QueryBase, QueryBody } from "../base";
-import { Contrato, ContratoAttrs, ContratoResponse } from "./types";
+import { QueryBase, QueryBody, ResponseBody } from '../base';
+import { Contrato, ContratoAttrs } from './types';
 
 const resourceName = "cliente_contrato";
 
-
 /**
- * Classe para gerenciar contratos.
+ * Recurso para interagir com os Contratos (cliente_contrato) da API IXC.
  */
-export class Contratos extends QueryBase {
-
-    constructor(config: { token: string; baseUrl: string; }) {
-        super(config);
-    }
-
+export class ContratosResource extends QueryBase {
     /**
-     * Filtra contratos com base em um atributo.
+     * Lista/Filtra contratos.
      */
-    async filtrarContratos(
+    async listar(
         attr: { [K in ContratoAttrs]?: string | number | boolean },
-        oper: '>' | '<' | '=' | 'like' = '=',  
-        page: number = 1,  
-        sortAttr: ContratoAttrs = 'id_cliente',  
+        oper: '>' | '<' | '=' | 'like' = '=',
+        page: number = 1,
+        sortAttr: ContratoAttrs = 'id',
         sortorder: 'desc' | 'asc' = 'desc'
     ): Promise<Contrato[]> {
-
         const key = Object.keys(attr)[0] as ContratoAttrs;
         const value = attr[key];
 
-        const response = await this.request<{ registros: Contrato[] }>(resourceName, {
-            qtype: `contrato.${key}`,
-            query: value as string,
-            oper: oper,
+        const query: QueryBody = {
+            qtype: `${resourceName}.${key}`,
+            query: String(value),
+            oper,
             page: page.toString(),
-            sortname: `contrato.${sortAttr as string}`,
-            sortorder: sortorder
-        });
+            sortname: `${resourceName}.${String(sortAttr)}`,
+            sortorder,
+        };
 
-        return response.registros;
+        const response = await this.request<ResponseBody<Contrato>>(resourceName, query);
+        return response.registros || [];
     }
 
     /**
-     * Busca um contrato pelo seu id.
+     * Cria um novo contrato.
      */
-    async buscarContratosPorId(id: number): Promise<Contrato> {
-        const query: QueryBody = {
-            qtype: 'cliente_contrato.id',
-            query: id.toString(),
-            oper: '=',
-            page: '1',
-            sortname: 'cliente_contrato.id',
-            sortorder: 'asc',
-        };
-
-        const response = await this.request<ContratoResponse>('v1/cliente_contrato', query);
-        return response.registros[0];
+    public async criar(payload: Partial<Contrato>): Promise<{ id: number; message: string }> {
+        return this.create<Partial<Contrato>, any>(resourceName, payload);
     }
 
     /**
-     * Busca contratos por id de cliente.
+     * Atualiza um contrato existente.
      */
-    async buscarContratosPorIdCliente(id: number): Promise<Contrato[]> {
-        const query: QueryBody = {
-            qtype: 'cliente_contrato.id_cliente',
-            query: id.toString(),
-            oper: '=',
-            page: '1',
-            sortname: 'cliente_contrato.id',
-            sortorder: 'asc'
-        }
+    public async editar(id: number, payload: Partial<Contrato>): Promise<{ id: number; message: string }> {
+        return this.update<Partial<Contrato>, any>(resourceName, id, payload);
+    }
 
-        const contratos = await this.request<ContratoResponse>(resourceName, query);
-
-        if (!contratos || !contratos.registros || contratos.registros.length === 0) {
-            return [];
-        };
-
-        return contratos.registros;
+    /**
+     * Remove um contrato.
+     */
+    public async deletar(id: number): Promise<{ message: string }> {
+        return this.remove<any>(resourceName, id);
     }
 
     /**
      * Solicita o desbloqueio de confiança para um contrato.
-     * @param id - O ID do contrato.
      */
     async desbloqueioConfianca(id: number): Promise<any> {
-        // A API IXC para desbloqueio geralmente envolve um PUT com um campo específico.
-        // Simulando a atualização do campo `desbloqueio_confianca` para 'S'.
         return this.update(resourceName, id, { desbloqueio_confianca: 'S' });
     }
 }

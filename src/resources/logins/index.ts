@@ -1,16 +1,12 @@
-import { QueryBase, QueryBody } from "../base";
-import { Login, LoginAttrs, LoginResponse } from "./types";
+import { QueryBase, QueryBody, ResponseBody } from '../base';
+import { Login, LoginAttrs } from './types';
 
 const resourceName = "radusuarios";
 
 /**
- * Classe para gerenciar logins de conexão (radusuarios).
+ * Recurso para interagir com os Logins (radusuarios) da API IXC.
  */
-export class Logins extends QueryBase {
-    constructor(config: { token: string; baseUrl: string; }) {
-        super(config);
-    }
-
+export class LoginsResource extends QueryBase {
     /**
      * Lista/Filtra logins.
      */
@@ -25,16 +21,37 @@ export class Logins extends QueryBase {
         const value = attr[key];
 
         const query: QueryBody = {
-            qtype: `radusuarios.${key}`,
+            qtype: `${resourceName}.${key}`,
             query: String(value),
             oper,
             page: page.toString(),
-            sortname: `radusuarios.${String(sortAttr)}`,
+            sortname: `${resourceName}.${String(sortAttr)}`,
             sortorder,
         };
 
-        const response = await this.request<LoginResponse>(resourceName, query);
+        const response = await this.request<ResponseBody<Login>>(resourceName, query);
         return response.registros || [];
+    }
+
+    /**
+     * Cria um novo login.
+     */
+    public async criar(payload: Partial<Login>): Promise<{ id: number; message: string }> {
+        return this.create<Partial<Login>, any>(resourceName, payload);
+    }
+
+    /**
+     * Atualiza um login existente.
+     */
+    public async editar(id: number, payload: Partial<Login>): Promise<{ id: number; message: string }> {
+        return this.update<Partial<Login>, any>(resourceName, id, payload);
+    }
+
+    /**
+     * Remove um login.
+     */
+    public async deletar(id: number): Promise<{ message: string }> {
+        return this.remove<any>(resourceName, id);
     }
 
     /**
@@ -48,23 +65,6 @@ export class Logins extends QueryBase {
      * Desconecta a sessão de um usuário.
      */
     async desconectarSessao(id: number): Promise<any> {
-        // Esta é uma rota especial no IXC
         return this.update(resourceName, id, { acao: 'desconectar' });
-    }
-    
-    /**
-     * Obtém um diagnóstico em tempo real do login.
-     */
-    async obterDiagnostico(id: number): Promise<Login> {
-         // O diagnóstico geralmente é uma leitura (GET), mas no IXC pode ser um POST para o mesmo ID
-        const response = await this.request<LoginResponse>(resourceName, {
-            qtype: 'radusuarios.id',
-            query: String(id),
-            oper: '=',
-            page: '1',
-            sortname: 'radusuarios.id',
-            sortorder: 'asc'
-        });
-        return response.registros[0];
     }
 }
