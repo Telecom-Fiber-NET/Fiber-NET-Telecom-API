@@ -1,37 +1,39 @@
-export type TicketCreatePayload = {
-    protocolo?: string; // Id do protocolo
+import { ResponseBody } from "../base";
+
+export type Ticket = {
+    id: number;
+    protocolo?: string;
     id_circuito?: string;
-    id_cliente: string; // Id do cliente
-    id_login?: string;
-    id_contrato?: string;
-    id_assunto?: string;
-    titulo: string; // Descrição do assunto
-    origem_endereco?: 'M' | 'L' | 'C' | 'E'; // M: Manual, L: Login, C: Cliente, E: Estrutura
+    id_cliente: number;
+    id_login?: number;
+    id_contrato?: number;
+    id_assunto?: number;
+    titulo: string;
+    origem_endereco?: 'M' | 'L' | 'C' | 'E';
     endereco?: string;
     latitude?: string;
     longitude?: string;
-    id_wfl_processo?: string;
-    id_ticket_setor?: string;
-    id_responsavel_tecnico?: string;
-    prioridade?: 'B' | 'N' | 'M' | 'A' | 'U'; // Baixa, Normal, Média, Alta, Urgente
-    id_ticket_origem?: 'I' | 'T' | 'E' | 'O'; // I: Interno, T: Telefone, E: Email, O: Outros
-    id_usuarios?: string;
-    id_resposta?: string;
-    menssagem: string; // Mensagem de Obs
+    id_wfl_processo?: number;
+    id_ticket_setor?: number;
+    id_responsavel_tecnico?: number;
+    prioridade?: 'B' | 'N' | 'M' | 'A' | 'U';
+    id_ticket_origem?: 'I' | 'T' | 'E' | 'O';
+    id_usuarios?: number;
+    id_resposta?: number;
+    menssagem: string;
     interacao_pendente?: 'S' | 'N';
     su_status?: 'S' | 'N';
-    id_evento_status_processo?: string;
-    status?: 'A' | 'T' | 'F' | 'C'; // A: Aberto, T: Em Atendimento, F: Fechado, C: Cancelado
-    id_su_diagnostico?: string;
+    id_evento_status_processo?: number;
+    status?: 'A' | 'T' | 'F' | 'C';
+    id_su_diagnostico?: number;
     atualizar_cliente?: 'S' | 'N';
     latitude_cli?: string;
     longitude_cli?: string;
     atualizar_login?: 'S' | 'N';
     latitude_login?: string;
     longitude_login?: string;
+    [key: string]: any;
 };
 
-export type TicketCreateResponse = {
-    id: string; // ID do ticket criado
-    // Outros campos que a API possa retornar após a criação
-};
+export type TicketAttrs = keyof Ticket;
+export type TicketResponse = ResponseBody<Ticket>;

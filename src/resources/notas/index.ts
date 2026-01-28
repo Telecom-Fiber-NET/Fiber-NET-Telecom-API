@@ -1,36 +1,75 @@
-import { QueryBase, QueryBody } from '../base';
-import { NotaImprimirResponse } from './types';
+import { QueryBase, QueryBody, ResponseBody } from '../base';
+import { Nota, NotaAttrs, NotaImprimirResponse } from './types';
+
+const resourceName = "vd_saida";
 
 /**
- * Recurso para interagir com as Notas (imprimir_nota) da API IXC.
+ * Recurso para interagir com as Notas Fiscais (vd_saida) da API IXC.
  */
 export class NotasResource extends QueryBase {
-    private resourceName = "imprimir_nota";
+    /**
+     * Lista/Filtra notas fiscais.
+     */
+    async listar(
+        attr: { [K in NotaAttrs]?: string | number | boolean },
+        oper: '>' | '<' | '=' | 'like' = '=',
+        page: number = 1,
+        sortAttr: NotaAttrs = 'id',
+        sortorder: 'desc' | 'asc' = 'desc'
+    ): Promise<Nota[]> {
+        const key = Object.keys(attr)[0] as NotaAttrs;
+        const value = attr[key];
+
+        const query: QueryBody = {
+            qtype: `${resourceName}.${key}`,
+            query: String(value),
+            oper,
+            page: page.toString(),
+            sortname: `${resourceName}.${String(sortAttr)}`,
+            sortorder,
+        };
+
+        const response = await this.request<ResponseBody<Nota>>(resourceName, query);
+        return response.registros || [];
+    }
 
     /**
-     * Imprime uma nota específica, retornando o documento em base64.
-     * @param id ID da nota/venda.
-     * @param base64 Se 'S', retorna o documento em base64.
-     * @returns O documento da nota em base64.
+     * Cria uma nova nota fiscal.
      */
-    public async imprimirNota(id: number, base64: 'S' | 'N' = 'S'): Promise<NotaImprimirResponse> {
+    public async criar(payload: Partial<Nota>): Promise<{ id: number; message: string }> {
+        return this.create<Partial<Nota>, any>(resourceName, payload);
+    }
+
+    /**
+     * Atualiza uma nota fiscal existente.
+     */
+    public async editar(id: number, payload: Partial<Nota>): Promise<{ id: number; message: string }> {
+        return this.update<Partial<Nota>, any>(resourceName, id, payload);
+    }
+
+    /**
+     * Remove uma nota fiscal.
+     */
+    public async deletar(id: number): Promise<{ message: string }> {
+        return this.remove<any>(resourceName, id);
+    }
+
+    /**
+     * Imprime uma nota fiscal.
+     */
+    public async imprimir(id: number): Promise<NotaImprimirResponse> {
         const query: QueryBody = {
-            qtype: 'id', // Assumindo que o qtype para buscar por ID é 'id'
+            qtype: 'id',
             query: id.toString(),
             oper: '=',
             page: '1',
-            rp: '1', // Apenas um registro
+            rp: '1',
             sortname: 'id',
             sortorder: 'desc',
-            // Adiciona o parâmetro base64 diretamente na query, se a API aceitar assim
-            // Ou pode ser um parâmetro de URL, dependendo da API
-            // Para este caso, vamos assumir que é um parâmetro de query
-            base64: base64, // IXC API expects this as a query parameter
-        } as any; // Cast to any to allow 'base64' property
+            base64: 'S',
+        } as any;
 
-        const response = await this.request<any>(this.resourceName, query);
-        // Assumindo que a API retorna o base64 diretamente no corpo ou em um campo específico
-        // Se a API retornar um objeto com um campo 'base64_document', ajuste aqui
+        const response = await this.request<any>('imprimir_nota', query);
         return { base64_document: response.base64_document || response.registros?.[0]?.base64_document || response.conteudo_base64 || response.conteudo };
     }
 }

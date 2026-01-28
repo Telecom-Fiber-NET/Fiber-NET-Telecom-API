@@ -1,20 +1,21 @@
-export type LoginAttrs = 'id' | 'login' | 'id_cliente' | 'online' | 'sinal_ultimo_atendimento' | 'tempo_conectado' | 'id_contrato';
+import { ResponseBody } from "../base";
 
 export type Login = {
     id: number;
-    login: string;
     id_cliente: number;
-    online: 'S' | 'N';
-    sinal_ultimo_atendimento: string;
-    tempo_conectado: string;
     id_contrato: number;
-    upload_atual: string; // Adicionado
-    download_atual: string; // Adicionado
+    login: string;
+    senha?: string;
+    online: 'S' | 'N';
     ip?: string;
-    // Adicione outros campos relevantes para o login, se houver
+    mac?: string;
+    status: 'A' | 'I' | 'C'; // A:Ativo, I:Inativo, C:Cancelado
+    download_atual?: string;
+    upload_atual?: string;
+    tempo_conectado?: string;
+    sinal_ultimo_atendimento?: string;
+    [key: string]: any;
 };
 
-export type LoginResponse = {
-    registros: Login[];
-    total: number;
-};
+export type LoginAttrs = keyof Login;
+export type LoginResponse = ResponseBody<Login>;

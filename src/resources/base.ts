@@ -36,7 +36,7 @@ export declare type QueryBody = {
 export abstract class QueryBase {
     private apiKey: string;
     private baseUrl: string;
-    private commonHeaders: Record<string, string>;
+    protected commonHeaders: Record<string, string>;
 
     constructor(config: Config) {
         this.apiKey = config.token;
@@ -48,7 +48,7 @@ export abstract class QueryBase {
         };
     }
 
-    private async performRequest<T>(endpoint: string, options: RequestInit): Promise<T> {
+    protected async performRequest<T>(endpoint: string, options: RequestInit): Promise<T> {
         const url = `${this.baseUrl}${endpoint}`;
         console.log('IXC API Request URL:', url);
         console.log('IXC API Request Options:', options);

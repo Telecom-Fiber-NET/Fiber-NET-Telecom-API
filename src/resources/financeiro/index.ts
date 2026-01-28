@@ -6,8 +6,6 @@ const resourceName = "fn_areceber";
 /**
  * Classe para gerenciar o financeiro (contas a receber).
  */
-// FIX: Renamed class to 'Financeiros' (plural) to follow the convention of other resource classes 
-// (e.g., Clientes, Contratos) and to resolve the naming conflict with the 'Financeiro' type import.
 export class Financeiros extends QueryBase {
     constructor(config: { token: string; baseUrl: string; }) {
         super(config);
@@ -37,5 +35,37 @@ export class Financeiros extends QueryBase {
 
         const response = await this.request<FinanceiroResponse>(resourceName, query);
         return response.registros || [];
+    }
+
+    /**
+     * Cria um novo registro financeiro.
+     */
+    async criar(data: Partial<Financeiro>): Promise<{ id: number; message: string }> {
+        return this.create<Partial<Financeiro>, any>(resourceName, data);
+    }
+
+    /**
+     * Atualiza um registro financeiro existente.
+     */
+    async editar(id: number, data: Partial<Financeiro>): Promise<{ id: number; message: string }> {
+        return this.update<Partial<Financeiro>, any>(resourceName, id, data);
+    }
+
+    /**
+     * Remove um registro financeiro.
+     */
+    async deletar(id: number): Promise<{ message: string }> {
+        return this.remove<any>(resourceName, id);
+    }
+
+    /**
+     * Obtém o link do Pix para um registro financeiro.
+     */
+    async getPix(id_areceber: number): Promise<{ pix_code: string; pix_image: string }> {
+        return this.performRequest<{ pix_code: string; pix_image: string }>(`${resourceName}/get_pix`, {
+            method: 'POST',
+            headers: this.commonHeaders,
+            body: JSON.stringify({ id_areceber }),
+        });
     }
 }
