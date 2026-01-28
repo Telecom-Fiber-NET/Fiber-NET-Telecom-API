@@ -447,6 +447,17 @@ export const ixcService = {
 
       const login = registros[0];
 
+      // Busca diagnóstico detalhado do IXC
+      const diagnosticoIxc = await fetchIxc("su_diagnostico", {
+        qtype: "id_login",
+        query: String(id),
+        oper: "=",
+        page: "1",
+        rp: "1",
+        sortname: "id",
+        sortorder: "desc",
+      });
+
       // Retorna uma estrutura simplificada para o diagnóstico
       return {
         consumo: {
@@ -455,11 +466,50 @@ export const ixcService = {
         },
         status: login.online === "S" ? "Online" : "Offline",
         ip: login.ip_concentrador || login.ip,
+        sinal: login.sinal_ultimo_atendimento || "N/A",
+        detalhes: diagnosticoIxc[0] || null,
         message: "Diagnóstico realizado com sucesso.",
       };
     } catch (error: any) {
       console.error(`Erro no diagnóstico (ID: ${id}):`, error.message);
       throw new Error("Falha ao realizar diagnóstico.");
+    }
+  },
+
+  /**
+   * Lista termos/contratos pendentes de assinatura
+   */
+  async listarTermosPendentes(id_contrato: number): Promise<any[]> {
+    return await fetchIxc("cliente_contrato_termo", {
+      qtype: "id_contrato",
+      query: String(id_contrato),
+      oper: "=",
+      page: "1",
+      rp: "10",
+      sortname: "id",
+      sortorder: "desc",
+    });
+  },
+
+  /**
+   * Realiza a assinatura digital de um termo
+   */
+  async assinarTermo(id_termo: number, ip: string): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/cliente_contrato_termo/${id_termo}`;
+
+    try {
+      const payload = {
+        status: "A", // Aceito
+        data_aceite: new Date().toISOString().slice(0, 19).replace("T", " "),
+        ip_aceite: ip,
+      };
+
+      const resp = await axios.put(url, payload, { headers: getHeaders() });
+      return resp.data;
+    } catch (error: any) {
+      console.error(`Erro ao assinar termo (ID: ${id_termo}):`, error.message);
+      throw new Error("Falha ao realizar assinatura digital.");
     }
   },
 

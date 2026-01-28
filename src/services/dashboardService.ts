@@ -54,13 +54,29 @@ export class DashboardService {
         const ordens = await this.ixc.ordensServicoListar(id);
         const tickets = await this.ixc.ticketsListar(id);
 
+        // Busca termos pendentes para cada contrato
+        const termosPromises = contratos.map((c: any) =>
+          this.ixc.listarTermosPendentes(c.id)
+        );
+        const termosResults = await Promise.all(termosPromises);
+        const termos = termosResults.flat();
+
         const ontInfo = [];
         for (const l of logins) {
           const ont = await this.ixc.ontListar(l.id);
           ontInfo.push(...(ont || []));
         }
 
-        return { cliente, contratos, faturas, logins, ordens, tickets, ontInfo };
+        return {
+          cliente,
+          contratos,
+          faturas,
+          logins,
+          ordens,
+          tickets,
+          termos,
+          ontInfo,
+        };
       } catch (error) {
         console.error(`Erro ao processar cliente ${id}:`, error);
         return null;
@@ -77,6 +93,7 @@ export class DashboardService {
       notas: [],
       ordensServico: [],
       tickets: [],
+      termos: [],
       ontInfo: [],
       consumo: {
         total_download_bytes: 0,
@@ -141,6 +158,8 @@ export class DashboardService {
       dashboard.ordensServico.push(...r.ordens);
       dashboard.tickets = dashboard.tickets || [];
       dashboard.tickets.push(...(r.tickets || []));
+      dashboard.termos = dashboard.termos || [];
+      dashboard.termos.push(...(r.termos || []));
       dashboard.ontInfo.push(...r.ontInfo);
     }
 

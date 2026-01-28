@@ -15,6 +15,10 @@ import {
   listarOrdensServico,
 } from "./controllers/ordensServicoController";
 import {
+  assinarContrato,
+  listarTermos,
+} from "./controllers/contratosController";
+import {
   solicitarRecuperacaoSenha,
   trocarSenha,
   validarForcaSenha,
@@ -51,6 +55,10 @@ router.get("/pix/:id", buscarPixBoleto);
 // ==================== ORDENS DE SERVIÇO ====================
 router.get("/ordens-servico", verifyToken, listarOrdensServico);
 router.get("/ordens-servico/:id", verifyToken, buscarOrdemServico);
+
+// ==================== CONTRATOS E ASSINATURA ====================
+router.get("/contratos/:id_contrato/termos", verifyToken, listarTermos);
+router.post("/contratos/assinar/:id_termo", verifyToken, assinarContrato);
 
 // ==================== TICKETS ====================
 router.post("/tickets", verifyToken, criarTicket);
