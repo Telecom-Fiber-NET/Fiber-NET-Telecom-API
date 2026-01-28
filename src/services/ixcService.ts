@@ -533,6 +533,20 @@ export const ixcService = {
   },
 
   /**
+   * Busca o assunto de uma OS pelo ID
+   */
+  async buscarAssuntoOS(id_assunto: number): Promise<any> {
+    const registros = await fetchIxc("su_oss_assunto", {
+      qtype: "id",
+      query: String(id_assunto),
+      oper: "=",
+      page: "1",
+      rp: "1",
+    });
+    return registros[0] || null;
+  },
+
+  /**
    * Lista tickets do cliente
    */
   async ticketsListar(id_cliente: number): Promise<any[]> {
@@ -545,6 +559,20 @@ export const ixcService = {
       sortname: "su_ticket.id",
       sortorder: "desc",
     });
+  },
+
+  /**
+   * Busca o assunto de um Ticket pelo ID
+   */
+  async buscarAssuntoTicket(id_assunto: number): Promise<any> {
+    const registros = await fetchIxc("su_assunto", {
+      qtype: "id",
+      query: String(id_assunto),
+      oper: "=",
+      page: "1",
+      rp: "1",
+    });
+    return registros[0] || null;
   },
 
   /**

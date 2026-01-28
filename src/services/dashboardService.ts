@@ -51,8 +51,36 @@ export class DashboardService {
         const contratos = await this.ixc.buscarContratosPorIdCliente(id);
         const faturas = await this.ixc.financeiroListar(id);
         const logins = await this.ixc.loginsListar(id);
-        const ordens = await this.ixc.ordensServicoListar(id);
-        const tickets = await this.ixc.ticketsListar(id);
+        const ordensRaw = await this.ixc.ordensServicoListar(id);
+        const ticketsRaw = await this.ixc.ticketsListar(id);
+
+        // Mapeia OS com nomes de assuntos
+        const ordens = await Promise.all(
+          ordensRaw.map(async (os: any) => {
+            const assunto = os.id_assunto
+              ? await this.ixc.buscarAssuntoOS(os.id_assunto)
+              : null;
+            return {
+              ...os,
+              assunto_nome: assunto ? assunto.assunto : "Ordem de Serviço",
+              resolucao: os.mensagem_resposta || os.mensagem || "",
+            };
+          }),
+        );
+
+        // Mapeia Tickets com nomes de assuntos
+        const tickets = await Promise.all(
+          ticketsRaw.map(async (t: any) => {
+            const assunto = t.id_assunto
+              ? await this.ixc.buscarAssuntoTicket(t.id_assunto)
+              : null;
+            return {
+              ...t,
+              assunto_nome: assunto ? assunto.assunto : t.titulo || "Atendimento",
+              resolucao: t.resposta || t.menssagem || "",
+            };
+          }),
+        );
 
         // Busca termos pendentes para cada contrato
         const termosPromises = contratos.map((c: any) =>
