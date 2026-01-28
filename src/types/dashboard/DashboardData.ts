@@ -34,6 +34,7 @@ export interface DashboardData {
   logins: DashboardLogin[];
   notas: any[];
   ordensServico: any[];
+  tickets: any[];
   ontInfo: any[];
   consumo: DashboardConsumo;
 }

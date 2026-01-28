@@ -52,6 +52,7 @@ export class DashboardService {
         const faturas = await this.ixc.financeiroListar(id);
         const logins = await this.ixc.loginsListar(id);
         const ordens = await this.ixc.ordensServicoListar(id);
+        const tickets = await this.ixc.ticketsListar(id);
 
         const ontInfo = [];
         for (const l of logins) {
@@ -59,7 +60,7 @@ export class DashboardService {
           ontInfo.push(...(ont || []));
         }
 
-        return { cliente, contratos, faturas, logins, ordens, ontInfo };
+        return { cliente, contratos, faturas, logins, ordens, tickets, ontInfo };
       } catch (error) {
         console.error(`Erro ao processar cliente ${id}:`, error);
         return null;
@@ -75,6 +76,7 @@ export class DashboardService {
       logins: [],
       notas: [],
       ordensServico: [],
+      tickets: [],
       ontInfo: [],
       consumo: {
         total_download_bytes: 0,
@@ -137,6 +139,8 @@ export class DashboardService {
       );
 
       dashboard.ordensServico.push(...r.ordens);
+      dashboard.tickets = dashboard.tickets || [];
+      dashboard.tickets.push(...(r.tickets || []));
       dashboard.ontInfo.push(...r.ontInfo);
     }
 

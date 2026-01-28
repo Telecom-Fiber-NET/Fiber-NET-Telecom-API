@@ -483,6 +483,21 @@ export const ixcService = {
   },
 
   /**
+   * Lista tickets do cliente
+   */
+  async ticketsListar(id_cliente: number): Promise<any[]> {
+    return await fetchIxc("su_ticket", {
+      qtype: "su_ticket.id_cliente",
+      query: String(id_cliente),
+      oper: "=",
+      page: "1",
+      rp: "20",
+      sortname: "su_ticket.id",
+      sortorder: "desc",
+    });
+  },
+
+  /**
    * Cria um novo ticket de atendimento
    */
   async criarTicket(payload: TicketPayload): Promise<TicketResponse> {

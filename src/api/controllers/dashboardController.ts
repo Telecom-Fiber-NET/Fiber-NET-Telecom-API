@@ -13,7 +13,8 @@ export async function getDashboard(req: any, res: Response) {
       return res.status(400).json({ error: "Nenhum client id fornecido (no token ou query param ids)" });
     }
 
-    const data = await dashboardService.gerarDashboard(ids);
+    const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
+    const data = await dashboardService.gerarDashboard(ids, String(clientIp));
     return res.json(data);
   } catch (err) {
     console.error("Erro controller getDashboard:", err);
