@@ -16,7 +16,7 @@ const IXC_TOKEN = process.env.IXC_ADMIN_TOKEN || process.env.IXC_AUTH_BASIC;
 
 if (!getBaseUrl() || !IXC_TOKEN) {
   console.warn(
-    "⚠️ Variáveis de ambiente do IXC não configuradas corretamente."
+    "⚠️ Variáveis de ambiente do IXC não configuradas corretamente.",
   );
 }
 
@@ -140,13 +140,13 @@ export const ixcService = {
         // Formata CPF
         cpfFormatado = cpfLimpo.replace(
           /(\d{3})(\d{3})(\d{3})(\d{2})/,
-          "$1.$2.$3-$4"
+          "$1.$2.$3-$4",
         );
       } else if (cpfLimpo.length === 14) {
         // Formata CNPJ
         cpfFormatado = cpfLimpo.replace(
           /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-          "$1.$2.$3/$4-$5"
+          "$1.$2.$3/$4-$5",
         );
       }
 
@@ -287,7 +287,7 @@ export const ixcService = {
       if (axios.isAxiosError(error) && error.response) {
         console.error(
           "Detalhes do erro API:",
-          JSON.stringify(error.response.data)
+          JSON.stringify(error.response.data),
         );
       }
 
@@ -326,7 +326,7 @@ export const ixcService = {
         error instanceof Error ? error.message : "Erro desconhecido";
       console.error(
         `Erro ao buscar PIX detalhado (ID: ${idReceber}):`,
-        errorMessage
+        errorMessage,
       );
       return null;
     }
@@ -477,6 +477,35 @@ export const ixcService = {
   },
 
   /**
+   * Gera o PDF do contrato
+   */
+  async imprimirContrato(id: number): Promise<string | null> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/cliente_contrato_1_imprimir`;
+
+    const payload = {
+      id: id,
+      imprimir_layout: "S",
+      base64: "S",
+    };
+
+    try {
+      const resp = await axios.post(url, payload, { headers: getHeaders() });
+
+      if (resp.data && resp.data.base64) {
+        return resp.data.base64;
+      }
+      return null;
+    } catch (error: any) {
+      console.error(
+        `Erro ao gerar PDF do contrato (ID: ${id}):`,
+        error.message,
+      );
+      return null;
+    }
+  },
+
+  /**
    * Lista termos/contratos pendentes de assinatura
    */
   async listarTermosPendentes(id_contrato: number): Promise<any[]> {
@@ -613,7 +642,7 @@ export const ixcService = {
    */
   async alterarSenhaHotsite(
     clienteId: number,
-    novaSenha: string
+    novaSenha: string,
   ): Promise<any> {
     const baseUrl = getBaseUrl();
     if (!baseUrl) {
