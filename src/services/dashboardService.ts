@@ -1,8 +1,8 @@
 import "dotenv/config";
-import { ixcService } from "./ixcService";
-import { cacheGet, cacheSet } from "./cache/supabaseClient";
-import { GeminiProvider } from "./ai/providers/GeminiProvider"; // Import GeminiProvider
 import { DashboardData } from "../types/dashboard/DashboardData";
+import { GeminiProvider } from "./ai/providers/GeminiProvider"; // Import GeminiProvider
+import { cacheGet, cacheSet } from "./cache/supabaseClient";
+import { ixcService } from "./ixcService";
 
 // Função auxiliar para formatar bytes (mantida)
 function formatBytes(bytes: number, decimals = 2): string {
@@ -22,20 +22,14 @@ const geminiDashboardProvider = new GeminiProvider({
 export class DashboardService {
   constructor(private ixc = ixcService) {}
 
-  // Alteração: Adicionado parâmetro clientIp
   async gerarDashboard(
     clientIds: number[],
     clientIp: string = "",
   ): Promise<DashboardData> {
     const cacheKey = `dashboard:${clientIds.join(",")}`;
 
-    // Nota: O cache deve ser usado com cuidado aqui se o IP público mudar muito,
-    // mas como o IP público é do cliente acessando, ele não deve ser cacheado globalmente
-    // dentro do objeto dashboard se múltiplos usuários usarem o mesmo ID (raro).
     const cached = await cacheGet<DashboardData>(cacheKey);
     if (cached) {
-      // Se pegou do cache, injeta o IP público atual da requisição nos logins
-      // para garantir que o "Meu IP" esteja sempre atualizado
       cached.logins = cached.logins.map((l) => ({
         ...l,
         ip_publico: clientIp,
@@ -51,7 +45,70 @@ export class DashboardService {
         const contratos = await this.ixc.buscarContratosPorIdCliente(id);
         const faturas = await this.ixc.financeiroListar(id);
         const logins = await this.ixc.loginsListar(id);
-        const ordens = await this.ixc.ordensServicoListar(id);
+        const ordensRaw = await this.ixc.ordensServicoListar(id);
+        const ticketsRaw = await this.ixc.ticketsListar(id);
+
+        // Mapeia OS com nomes de assuntos
+        const ordens = await Promise.all(
+          ordensRaw.map(async (os: any) => {
+            let assuntoNome = "";
+
+            // 1. Tenta buscar o nome do assunto via relacionamento
+            if (os.id_assunto) {
+              try {
+                const assunto = await this.ixc.buscarAssuntoOS(os.id_assunto);
+                if (assunto && assunto.assunto) {
+                  assuntoNome = assunto.assunto;
+                }
+              } catch (e) {
+                // Silencia erro para não quebrar o dashboard, usa fallback
+              }
+            }
+
+            // 2. Se não achou no relacionamento, tenta campo assunto da própria OS
+            if (!assuntoNome && os.assunto) {
+              assuntoNome = os.assunto;
+            }
+
+            // 3. Se ainda vazio, tenta o Tipo da OS
+            if (!assuntoNome && os.tipo) {
+              assuntoNome = os.tipo; // Ex: 'Manutenção', 'Instalação'
+            }
+
+            // 4. Fallback final
+            if (!assuntoNome) {
+              assuntoNome = "Ordem de Serviço";
+            }
+
+            return {
+              ...os,
+              assunto_nome: assuntoNome,
+              resolucao: os.mensagem_resposta || os.mensagem || "",
+            };
+          }),
+        );
+        // Mapeia Tickets com nomes de assuntos
+        const tickets = await Promise.all(
+          ticketsRaw.map(async (t: any) => {
+            const assunto = t.id_assunto
+              ? await this.ixc.buscarAssuntoTicket(t.id_assunto)
+              : null;
+            return {
+              ...t,
+              assunto_nome: assunto
+                ? assunto.assunto
+                : t.titulo || "Atendimento",
+              resolucao: t.resposta || t.menssagem || "",
+            };
+          }),
+        );
+
+        // Busca termos pendentes para cada contrato
+        const termosPromises = contratos.map((c: any) =>
+          this.ixc.listarTermosPendentes(c.id),
+        );
+        const termosResults = await Promise.all(termosPromises);
+        const termos = termosResults.flat();
 
         const ontInfo = [];
         for (const l of logins) {
@@ -59,7 +116,16 @@ export class DashboardService {
           ontInfo.push(...(ont || []));
         }
 
-        return { cliente, contratos, faturas, logins, ordens, ontInfo };
+        return {
+          cliente,
+          contratos,
+          faturas,
+          logins,
+          ordens,
+          tickets,
+          termos,
+          ontInfo,
+        };
       } catch (error) {
         console.error(`Erro ao processar cliente ${id}:`, error);
         return null;
@@ -75,6 +141,8 @@ export class DashboardService {
       logins: [],
       notas: [],
       ordensServico: [],
+      tickets: [],
+      termos: [],
       ontInfo: [],
       consumo: {
         total_download_bytes: 0,
@@ -137,6 +205,10 @@ export class DashboardService {
       );
 
       dashboard.ordensServico.push(...r.ordens);
+      dashboard.tickets = dashboard.tickets || [];
+      dashboard.tickets.push(...(r.tickets || []));
+      dashboard.termos = dashboard.termos || [];
+      dashboard.termos.push(...(r.termos || []));
       dashboard.ontInfo.push(...r.ontInfo);
     }
 

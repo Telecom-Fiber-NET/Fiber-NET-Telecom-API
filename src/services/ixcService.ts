@@ -16,7 +16,7 @@ const IXC_TOKEN = process.env.IXC_ADMIN_TOKEN || process.env.IXC_AUTH_BASIC;
 
 if (!getBaseUrl() || !IXC_TOKEN) {
   console.warn(
-    "⚠️ Variáveis de ambiente do IXC não configuradas corretamente."
+    "⚠️ Variáveis de ambiente do IXC não configuradas corretamente.",
   );
 }
 
@@ -140,13 +140,13 @@ export const ixcService = {
         // Formata CPF
         cpfFormatado = cpfLimpo.replace(
           /(\d{3})(\d{3})(\d{3})(\d{2})/,
-          "$1.$2.$3-$4"
+          "$1.$2.$3-$4",
         );
       } else if (cpfLimpo.length === 14) {
         // Formata CNPJ
         cpfFormatado = cpfLimpo.replace(
           /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-          "$1.$2.$3/$4-$5"
+          "$1.$2.$3/$4-$5",
         );
       }
 
@@ -287,7 +287,7 @@ export const ixcService = {
       if (axios.isAxiosError(error) && error.response) {
         console.error(
           "Detalhes do erro API:",
-          JSON.stringify(error.response.data)
+          JSON.stringify(error.response.data),
         );
       }
 
@@ -326,7 +326,7 @@ export const ixcService = {
         error instanceof Error ? error.message : "Erro desconhecido";
       console.error(
         `Erro ao buscar PIX detalhado (ID: ${idReceber}):`,
-        errorMessage
+        errorMessage,
       );
       return null;
     }
@@ -447,6 +447,17 @@ export const ixcService = {
 
       const login = registros[0];
 
+      // Busca diagnóstico detalhado do IXC
+      const diagnosticoIxc = await fetchIxc("su_diagnostico", {
+        qtype: "id_login",
+        query: String(id),
+        oper: "=",
+        page: "1",
+        rp: "1",
+        sortname: "id",
+        sortorder: "desc",
+      });
+
       // Retorna uma estrutura simplificada para o diagnóstico
       return {
         consumo: {
@@ -455,11 +466,79 @@ export const ixcService = {
         },
         status: login.online === "S" ? "Online" : "Offline",
         ip: login.ip_concentrador || login.ip,
+        sinal: login.sinal_ultimo_atendimento || "N/A",
+        detalhes: diagnosticoIxc[0] || null,
         message: "Diagnóstico realizado com sucesso.",
       };
     } catch (error: any) {
       console.error(`Erro no diagnóstico (ID: ${id}):`, error.message);
       throw new Error("Falha ao realizar diagnóstico.");
+    }
+  },
+
+  /**
+   * Gera o PDF do contrato
+   */
+  async imprimirContrato(id: number): Promise<string | null> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/cliente_contrato_1_imprimir`;
+
+    const payload = {
+      id: id,
+      imprimir_layout: "S",
+      base64: "S",
+    };
+
+    try {
+      const resp = await axios.post(url, payload, { headers: getHeaders() });
+
+      if (resp.data && resp.data.base64) {
+        return resp.data.base64;
+      }
+      return null;
+    } catch (error: any) {
+      console.error(
+        `Erro ao gerar PDF do contrato (ID: ${id}):`,
+        error.message,
+      );
+      return null;
+    }
+  },
+
+  /**
+   * Lista termos/contratos pendentes de assinatura
+   */
+  async listarTermosPendentes(id_contrato: number): Promise<any[]> {
+    return await fetchIxc("cliente_contrato_termo", {
+      qtype: "id_contrato",
+      query: String(id_contrato),
+      oper: "=",
+      page: "1",
+      rp: "10",
+      sortname: "id",
+      sortorder: "desc",
+    });
+  },
+
+  /**
+   * Realiza a assinatura digital de um termo
+   */
+  async assinarTermo(id_termo: number, ip: string): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/cliente_contrato_termo/${id_termo}`;
+
+    try {
+      const payload = {
+        status: "A", // Aceito
+        data_aceite: new Date().toISOString().slice(0, 19).replace("T", " "),
+        ip_aceite: ip,
+      };
+
+      const resp = await axios.put(url, payload, { headers: getHeaders() });
+      return resp.data;
+    } catch (error: any) {
+      console.error(`Erro ao assinar termo (ID: ${id_termo}):`, error.message);
+      throw new Error("Falha ao realizar assinatura digital.");
     }
   },
 
@@ -480,6 +559,49 @@ export const ixcService = {
       sortname: "su_oss_chamado.id",
       sortorder: "desc",
     });
+  },
+
+  /**
+   * Busca o assunto de uma OS pelo ID
+   */
+  async buscarAssuntoOS(id_assunto: number): Promise<any> {
+    const registros = await fetchIxc("su_oss_assunto", {
+      qtype: "id",
+      query: String(id_assunto),
+      oper: "=",
+      page: "1",
+      rp: "1",
+    });
+    return registros[0] || null;
+  },
+
+  /**
+   * Lista tickets do cliente
+   */
+  async ticketsListar(id_cliente: number): Promise<any[]> {
+    return await fetchIxc("su_ticket", {
+      qtype: "su_ticket.id_cliente",
+      query: String(id_cliente),
+      oper: "=",
+      page: "1",
+      rp: "20",
+      sortname: "su_ticket.id",
+      sortorder: "desc",
+    });
+  },
+
+  /**
+   * Busca o assunto de um Ticket pelo ID
+   */
+  async buscarAssuntoTicket(id_assunto: number): Promise<any> {
+    const registros = await fetchIxc("su_assunto", {
+      qtype: "id",
+      query: String(id_assunto),
+      oper: "=",
+      page: "1",
+      rp: "1",
+    });
+    return registros[0] || null;
   },
 
   /**
@@ -520,7 +642,7 @@ export const ixcService = {
    */
   async alterarSenhaHotsite(
     clienteId: number,
-    novaSenha: string
+    novaSenha: string,
   ): Promise<any> {
     const baseUrl = getBaseUrl();
     if (!baseUrl) {

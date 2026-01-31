@@ -9,6 +9,11 @@ import {
   gerarSegundaVia,
 } from "./controllers/boletoController";
 import { handleChat } from "./controllers/chatController"; // <--- ADICIONADO
+import {
+  assinarContrato,
+  gerarPdfContrato,
+  listarTermos,
+} from "./controllers/contratosController";
 import { executarAcaoLogin } from "./controllers/loginsController";
 import {
   buscarOrdemServico,
@@ -52,6 +57,11 @@ router.get("/pix/:id", buscarPixBoleto);
 router.get("/ordens-servico", verifyToken, listarOrdensServico);
 router.get("/ordens-servico/:id", verifyToken, buscarOrdemServico);
 
+// ==================== CONTRATOS E ASSINATURA ====================
+router.get("/contratos/:id_contrato/termos", verifyToken, listarTermos);
+router.post("/contratos/assinar/:id_termo", verifyToken, assinarContrato);
+router.get("/contratos/:id/pdf", verifyToken, gerarPdfContrato);
+
 // ==================== TICKETS ====================
 router.post("/tickets", verifyToken, criarTicket);
 router.get("/tickets", verifyToken, listarTickets);
@@ -84,7 +94,7 @@ router.get("/", (_, res) =>
     message: "IXC API Gateway is running",
     version: "2.0.0",
     timestamp: new Date().toISOString(),
-  })
+  }),
 );
 
 router.get("/health", (_, res) =>
@@ -92,7 +102,7 @@ router.get("/health", (_, res) =>
     status: "healthy",
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-  })
+  }),
 );
 
 export default router;
