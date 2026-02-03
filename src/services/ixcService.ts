@@ -481,7 +481,7 @@ export const ixcService = {
    */
   async imprimirContrato(id: number): Promise<string | null> {
     const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/cliente_contrato_1_imprimir`;
+    const url = `${baseUrl}/cliente_contrato_imprimir_contrato_17678`;
 
     const payload = {
       id: id,
