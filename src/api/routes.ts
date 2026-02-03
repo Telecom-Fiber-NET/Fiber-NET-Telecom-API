@@ -60,7 +60,7 @@ router.get("/ordens-servico/:id", verifyToken, buscarOrdemServico);
 // ==================== CONTRATOS E ASSINATURA ====================
 router.get("/contratos/:id_contrato/termos", verifyToken, listarTermos);
 router.post("/contratos/assinar/:id_termo", verifyToken, assinarContrato);
-router.get("/contratos/:id/pdf", verifyToken, gerarPdfContrato);
+router.post("/contratos/:id/pdf", verifyToken, gerarPdfContrato);
 
 // ==================== TICKETS ====================
 router.post("/tickets", verifyToken, criarTicket);

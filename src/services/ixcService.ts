@@ -484,16 +484,15 @@ export const ixcService = {
     const url = `${baseUrl}/cliente_contrato_imprimir_contrato_17678`;
 
     const payload = {
-      id: id,
-      imprimir_layout: "S",
-      base64: "S",
+      id: String(id),
     };
 
     try {
       const resp = await axios.post(url, payload, { headers: getHeaders() });
 
-      if (resp.data && resp.data.base64) {
-        return resp.data.base64;
+      // Tenta obter o base64 de diferentes formas possíveis na resposta
+      if (resp.data) {
+        return resp.data.base64 || resp.data;
       }
       return null;
     } catch (error: any) {
