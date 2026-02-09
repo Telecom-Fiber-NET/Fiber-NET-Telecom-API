@@ -4,30 +4,31 @@ import { verifyToken } from "../middleware/authMiddleware";
 
 // Controllers
 import {
-  buscarBoletosPorCpf,
-  buscarPixBoleto,
-  gerarSegundaVia,
+    buscarBoletosPorCpf,
+    buscarPixBoleto,
+    gerarSegundaVia,
 } from "./controllers/boletoController";
 import { handleChat } from "./controllers/chatController"; // <--- ADICIONADO
 import {
-  assinarContrato,
-  gerarPdfContrato,
-  listarTermos,
+    assinarContrato,
+    executarAutoDesbloqueio,
+    gerarPdfContrato,
+    listarTermos,
 } from "./controllers/contratosController";
 import { executarAcaoLogin } from "./controllers/loginsController";
 import {
-  buscarOrdemServico,
-  listarOrdensServico,
+    buscarOrdemServico,
+    listarOrdensServico,
 } from "./controllers/ordensServicoController";
 import {
-  solicitarRecuperacaoSenha,
-  trocarSenha,
-  validarForcaSenha,
+    solicitarRecuperacaoSenha,
+    trocarSenha,
+    validarForcaSenha,
 } from "./controllers/senhaController";
 import {
-  criarTicket,
-  listarTickets,
-  listarTiposAtendimento,
+    criarTicket,
+    listarTickets,
+    listarTiposAtendimento,
 } from "./controllers/ticketsController";
 import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
@@ -61,6 +62,7 @@ router.get("/ordens-servico/:id", verifyToken, buscarOrdemServico);
 router.get("/contratos/:id_contrato/termos", verifyToken, listarTermos);
 router.post("/contratos/assinar/:id_termo", verifyToken, assinarContrato);
 router.post("/contratos/:id/pdf", verifyToken, gerarPdfContrato);
+router.post("/contratos/:id/desbloqueio", verifyToken, executarAutoDesbloqueio);
 
 // ==================== TICKETS ====================
 router.post("/tickets", verifyToken, criarTicket);

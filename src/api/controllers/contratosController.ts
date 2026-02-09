@@ -66,3 +66,27 @@ export async function listarTermos(req: any, res: Response) {
     return res.status(500).json({ error: "Erro ao listar termos" });
   }
 }
+
+export async function executarAutoDesbloqueio(req: any, res: Response) {
+  try {
+    const { id } = req.params; // ID do contrato
+    
+    if (!id) {
+      return res.status(400).json({ error: "ID do contrato é obrigatório." });
+    }
+
+    // Chama o serviço
+    const resultado = await ixcService.desbloqueioConfianca(Number(id));
+
+    return res.json({
+      success: true,
+      message: "Desbloqueio de confiança realizado com sucesso! Reinicie seu equipamento em 2 minutos.",
+      data: resultado
+    });
+  } catch (error: any) {
+    return res.status(400).json({ 
+      error: true, 
+      message: error.message || "Erro ao processar desbloqueio." 
+    });
+  }
+}

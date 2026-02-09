@@ -229,6 +229,26 @@ export const ixcService = {
   // ==========================================================================
 
   /**
+   * Realiza o Desbloqueio de Confiança (Liberação Provisória)
+   */
+  async desbloqueioConfianca(id_contrato: number): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/cliente_contrato_desbloqueio_confianca/${id_contrato}`;
+
+    try {
+      // O IXC exige um POST, mesmo que o corpo seja vazio
+      const resp = await axios.post(url, {}, { headers: getHeaders() });
+      
+      // O IXC retorna status "sucesso" ou erro se já foi usado
+      return resp.data;
+    } catch (error: any) {
+      console.error(`[IXC] Erro ao desbloquear contrato ${id_contrato}:`, error.message);
+      // Repassa a mensagem exata do IXC (ex: "Limite de desbloqueios atingido")
+      throw new Error(error.response?.data?.message || "Não foi possível realizar o desbloqueio no momento.");
+    }
+  },
+
+  /**
    * Lista faturas e boletos do cliente
    */
   async financeiroListar(id_cliente: number): Promise<any[]> {
