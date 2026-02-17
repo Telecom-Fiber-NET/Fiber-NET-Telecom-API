@@ -408,7 +408,8 @@ export async function listarFinanceiroPorContrato(req: Request, res: Response) {
           linhaDigitavel: fatura.linha_digitavel,
           pixCopiaECola: fatura.pix_txid || null,
           boleto_pdf: fatura.boleto || null,
-          link_pagamento: fatura.link_pagamento || null // Expose payment link if available
+          link_pagamento: fatura.link_pagamento || null, // Expose payment link if available
+          data_pagamento: dataPagamentoReal || null // Data do pagamento se houver
         };
       })
     );
