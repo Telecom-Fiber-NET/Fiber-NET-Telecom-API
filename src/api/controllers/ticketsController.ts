@@ -171,7 +171,7 @@ export async function listarTickets(req: any, res: Response) {
       statusCor: getStatusCor(ticket.status),
       prioridadeCor: getPrioridadeCor(ticket.prioridade),
       dataAbertura: ticket.data_abertura,
-      podeFechar: ['N', 'A', 'P', 'E'].includes(ticket.status), // Permite fechar se não estiver finalizado
+      podeFechar: ['N', 'A', 'P', 'E', 'S'].includes(ticket.status), // Permite fechar se não estiver finalizado
       // dataConclusao: ticket.data_conclusao, // Pode não vir no ticket simples
     }));
 
@@ -237,7 +237,7 @@ export async function buscarTicket(req: any, res: Response) {
       tipo: formatarTipo(ticket.id_ticket_origem),
       dataAbertura: ticket.data_abertura,
       dataFechamento: ticket.data_fechamento, // data_fechamento no ticket
-      podeFechar: ['N', 'A', 'P', 'E'].includes(ticket.status),
+      podeFechar: ['N', 'A', 'P', 'E', 'S'].includes(ticket.status),
       interacoes: interacoesFormatadas,
     };
 

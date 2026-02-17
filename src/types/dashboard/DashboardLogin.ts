@@ -10,4 +10,5 @@ export interface DashboardLogin {
   // Novos campos
   ip_privado?: string;
   ip_publico?: string;
+  ipv4?: string;
 }

@@ -20,7 +20,7 @@ const geminiDashboardProvider = new GeminiProvider({
 });
 
 export class DashboardService {
-  constructor(private ixc = ixcService) {}
+  constructor(private ixc = ixcService) { }
 
   async gerarDashboard(
     clientIds: number[],
@@ -160,9 +160,8 @@ export class DashboardService {
         id: r.cliente.id,
         nome:
           r.cliente.razao || r.cliente.fantasia || `Cliente ${r.cliente.id}`,
-        endereco: `${r.cliente.endereco || ""}${
-          r.cliente.numero ? ", " + r.cliente.numero : ""
-        }`,
+        endereco: `${r.cliente.endereco || ""}${r.cliente.numero ? ", " + r.cliente.numero : ""
+          }`,
         cpn_cnpj: r.cliente.cnpj_cpf,
       });
 
@@ -199,14 +198,21 @@ export class DashboardService {
           download_atual: l.download_atual,
           upload_atual: l.upload_atual,
           // --- NOVOS CAMPOS ---
-          ip_privado: l.ip || "Não atribuído", // IP vindo do cadastro do IXC
+          ip_privado: l.ip || l.ip_concentrador || "Não atribuído", // IP vindo do cadastro do IXC
           ip_publico: clientIp, // IP detectado da requisição
+          ipv4: l.ip_concentrador || l.ip || null, // IPv4 secundário
         }),
       );
 
+      // Mapear tickets com campo podeFechar
+      const ticketsMapped = (r.tickets || []).map((t: any) => ({
+        ...t,
+        podeFechar: ["N", "A", "P", "E", "S"].includes(t.status),
+      }));
+
       dashboard.ordensServico.push(...r.ordens);
       dashboard.tickets = dashboard.tickets || [];
-      dashboard.tickets.push(...(r.tickets || []));
+      dashboard.tickets.push(...ticketsMapped);
       dashboard.termos = dashboard.termos || [];
       dashboard.termos.push(...(r.termos || []));
       dashboard.ontInfo.push(...r.ontInfo);
