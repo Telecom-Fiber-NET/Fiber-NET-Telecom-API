@@ -68,7 +68,7 @@ router.post("/login", async (req: Request, res: Response) => {
         email: clientePrincipal.email || email,
       },
       process.env.JWT_SECRET || "secret_padrao_seguro",
-      { expiresIn: "1h" },
+      { expiresIn: "5m" },
     );
 
     return res.json({

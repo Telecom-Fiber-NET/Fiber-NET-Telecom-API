@@ -1,0 +1,57 @@
+--- TESTE DE DEBUG CONSUMO ---
+Tentando listar ├║ltimos 5 registros de radusuarios_consumo_d...
+[DEBUG] Request para https://centralfiber.online/webservice/v1/radusuarios_consumo_d
+[DEBUG] Payload: {"qtype":"radusuarios_consumo_d.id","query":"0","oper":">","page":"1","rp":"5","sortname":"radusuarios_consumo_d.id","sortorder":"desc"}
+[DEBUG] Status: 200
+[DEBUG] Total registros: 107600
+Registros encontrados: [
+  {
+    id: '3898636',
+    data: '2026-02-16 00:00:00',
+    consumo: '4756953443',
+    consumo_upload: '1612611138',
+    id_login: '5615'
+  },
+  {
+    id: '3898635',
+    data: '2026-02-16 00:00:00',
+    consumo: '19869582',
+    consumo_upload: '2296535',
+    id_login: '5614'
+  },
+  {
+    id: '3898634',
+    data: '2026-02-16 00:00:00',
+    consumo: '828193',
+    consumo_upload: '137',
+    id_login: '5613'
+  },
+  {
+    id: '3898633',
+    data: '2026-02-16 00:00:00',
+    consumo: '2144203',
+    consumo_upload: '437150',
+    id_login: '5611'
+  },
+  {
+    id: '3898632',
+    data: '2026-02-16 00:00:00',
+    consumo: '16689886',
+    consumo_upload: '4945150',
+    id_login: '5610'
+  }
+]
+Estrutura do primeiro registro: {
+  "id": "3898636",
+  "data": "2026-02-16 00:00:00",
+  "consumo": "4756953443",
+  "consumo_upload": "1612611138",
+  "id_login": "5615"
+}
+
+Tentando filtrar pelo id_login 5615 encontrado...
+[DEBUG] Request para https://centralfiber.online/webservice/v1/radusuarios_consumo_d
+[DEBUG] Payload: {"qtype":"id_login","query":"5615","oper":"=","page":"1","rp":"5","sortname":"data","sortorder":"desc"}
+[DEBUG] Status: 200
+[DEBUG] Total registros: 15
+Resultado por login: 5

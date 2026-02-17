@@ -475,6 +475,135 @@ export const ixcService = {
     }
   },
 
+  /**
+   * Gera o PDF da Nota Fiscal
+   */
+  async imprimirNotaFiscal(id: number): Promise<string | null> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/get_nf`; // Endpoint correto para NF no IXC (verificado documentação padrão)
+
+    const payload = {
+      id_saida: String(id), // ID da nota fiscal na tabela fn_saida
+      base64: "S"
+    };
+
+    try {
+      const resp = await axios.post(url, payload, { headers: getHeaders() });
+      if (resp.data) {
+        return resp.data.base64 || resp.data;
+      }
+      return null;
+    } catch (error: any) {
+      console.error(`Erro ao gerar PDF da NF (ID: ${id}):`, error.message);
+      return null;
+    }
+  },
+
+  /**
+   * Gera o PDF de um Termo de Contrato
+   */
+  async imprimirTermo(id: number): Promise<string | null> {
+    const baseUrl = getBaseUrl();
+    // Endpoint padrão para impressão de termo. O sufixo _17678 pode ser específico de versão, 
+    // mas vamos tentar o padrão ou manter o padrão visto em imprimirContrato se aplicável.
+    // O endpoint correto geralmente é cliente_contrato_termo_imprimir_termo
+    const url = `${baseUrl}/cliente_contrato_termo_imprimir_termo`;
+
+    const payload = {
+      id: String(id),
+      base64: "S" // Forçar retorno base64
+    };
+
+    try {
+      const resp = await axios.post(url, payload, { headers: getHeaders() });
+      if (resp.data) {
+        return resp.data.base64 || resp.data;
+      }
+      return null;
+    } catch (error: any) {
+      console.error(`Erro ao gerar PDF do Termo (ID: ${id}):`, error.message);
+      return null;
+    }
+  },
+
+  /**
+   * Obtém um resumo financeiro do cliente ou contrato
+   * Retorna Média de Pagamento, Média Diária, Total Pago, etc.
+   */
+  async getResumoFinanceiro(id_cliente: number, id_contrato?: number) {
+    // 1. Determine contracts to process (with resolved address)
+    let contratos = await this.buscarContratosDetalhados(id_cliente);
+
+    // If specific contract requested, filter it
+    if (id_contrato) {
+      contratos = contratos.filter((c) => String(c.id) === String(id_contrato));
+    }
+
+    if (!contratos.length) {
+      return [];
+    }
+
+    // 2. Process each contract
+    const resultados = await Promise.all(
+      contratos.map(async (contrato) => {
+        // Fetch financials for this contract
+        const faturas = await this.financeiroListar(id_cliente, contrato.id);
+
+        // Filter paid invoices
+        const faturasPagas = faturas.filter(
+          (f: any) =>
+            f.status === "R" || parseFloat(f.valor_recebido || "0") > 0,
+        );
+
+        let metrics = {
+          media_pagamento: 0,
+          media_diaria: 0,
+          total_pago: 0,
+          qtd_faturas: 0,
+        };
+
+        if (faturasPagas.length > 0) {
+          const totalPago = faturasPagas.reduce(
+            (acc: number, f: any) =>
+              acc + parseFloat(f.valor_recebido || f.valor || "0"),
+            0,
+          );
+          const qtd = faturasPagas.length;
+          const mediaPagamento = totalPago / qtd;
+          const mediaDiaria = mediaPagamento / 30; // Arranged monthly average
+
+          metrics = {
+            media_pagamento: parseFloat(mediaPagamento.toFixed(2)),
+            media_diaria: parseFloat(mediaDiaria.toFixed(2)),
+            total_pago: parseFloat(totalPago.toFixed(2)),
+            qtd_faturas: qtd,
+          };
+        }
+
+        // Fetch logins for this contract
+        const logins = await this.loginsListar(id_cliente, contrato.id);
+
+        return {
+          id_contrato: contrato.id,
+          contrato: contrato.contrato, // Description/Name
+          endereco: {
+            endereco: contrato.endereco,
+            numero: contrato.numero,
+            bairro: contrato.bairro,
+            cidade: contrato.cidade,
+            uf: contrato.uf,
+            cep: contrato.cep,
+            complemento: contrato.complemento,
+          },
+          financeiro: metrics,
+          logins: logins,
+        };
+      }),
+    );
+
+    return resultados;
+  },
+
   // ==========================================================================
   // LOGINS E CONEXÕES
   // ==========================================================================
@@ -482,8 +611,8 @@ export const ixcService = {
   /**
    * Lista logins (conexões) do cliente
    */
-  async loginsListar(id_cliente: number): Promise<any[]> {
-    return await fetchIxc("radusuarios", {
+  async loginsListar(id_cliente: number, id_contrato?: number): Promise<any[]> {
+    const payload: any = {
       qtype: "radusuarios.id_cliente",
       query: String(id_cliente),
       oper: "=",
@@ -491,7 +620,14 @@ export const ixcService = {
       rp: "20",
       sortname: "radusuarios.id",
       sortorder: "desc",
-    });
+    };
+
+    if (id_contrato) {
+      payload.qtype = "radusuarios.id_contrato";
+      payload.query = String(id_contrato);
+    }
+
+    return await fetchIxc("radusuarios", payload);
   },
 
   /**
@@ -759,6 +895,44 @@ export const ixcService = {
         error instanceof Error ? error.message : "Erro desconhecido";
       console.error("Erro ao criar ticket no IXC:", errorMessage);
       throw new Error("IXC: Falha ao criar ticket");
+    }
+  },
+
+  /**
+   * Lista interações (mensagens) de um ticket
+   */
+  async listarInteracoesTicket(id_ticket: number): Promise<any[]> {
+    return await fetchIxc("su_ticket_interacao", {
+      qtype: "id_ticket",
+      query: String(id_ticket),
+      oper: "=",
+      page: "1",
+      rp: "100",
+      sortname: "data",
+      sortorder: "asc",
+    });
+  },
+
+  /**
+   * Fecha um ticket
+   */
+  async fecharTicket(id_ticket: number, mensagem: string = "Ticket fechado pelo cliente"): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/su_ticket/${id_ticket}`;
+
+    try {
+      // Atualiza status para F (Finalizado)
+      // Nota: Algumas versões do IXC podem exigir endpoint específico ou interação.
+      // Tentando PUT direto no ticket.
+      await axios.put(url, {
+        status: "F",
+        menssagem: mensagem // Alguns IXC exigem mensagem ao fechar
+      }, { headers: getHeaders() });
+
+      return { success: true };
+    } catch (error: any) {
+      console.error(`Erro ao fechar ticket ${id_ticket}:`, error.message);
+      throw new Error("Falha ao fechar ticket.");
     }
   },
 

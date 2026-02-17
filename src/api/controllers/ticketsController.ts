@@ -158,22 +158,21 @@ export async function listarTickets(req: any, res: Response) {
     }
 
     // Buscar tickets do IXC
-    const tickets = await ixcService.ordensServicoListar(clienteId);
+    // CORREÇÃO: Usar ticketsListar em vez de ordensServicoListar
+    const tickets = await ixcService.ticketsListar(clienteId);
 
     // Formatar resposta
     const ticketsFormatados = tickets.map((ticket: any) => ({
       id: ticket.id,
       protocolo: ticket.protocolo,
       assunto: ticket.assunto || ticket.titulo,
-      descricao: ticket.descricao || ticket.menssagem,
+      descricao: ticket.menssagem || ticket.descricao, // IXC usa menssagem no ticket
       status: formatarStatus(ticket.status),
       statusCor: getStatusCor(ticket.status),
-      prioridade: formatarPrioridade(ticket.prioridade),
       prioridadeCor: getPrioridadeCor(ticket.prioridade),
       dataAbertura: ticket.data_abertura,
-      dataAgendamento: ticket.data_agendamento,
-      dataConclusao: ticket.data_conclusao,
-      tecnicoResponsavel: ticket.tecnico_responsavel,
+      podeFechar: ['N', 'A', 'P', 'E'].includes(ticket.status), // Permite fechar se não estiver finalizado
+      // dataConclusao: ticket.data_conclusao, // Pode não vir no ticket simples
     }));
 
     return res.json({
@@ -204,11 +203,10 @@ export async function buscarTicket(req: any, res: Response) {
       });
     }
 
-    // Buscar todos os tickets do cliente
-    const tickets = await ixcService.ordensServicoListar(clienteId);
-
-    // Encontrar o ticket específico
-    const ticket = tickets.find((t: any) => t.id === parseInt(ticketId));
+    // Buscar ticket específico ou listar e filtrar
+    // O ideal é buscar direto se tiver método, mas listar e find funciona para MVP
+    const tickets = await ixcService.ticketsListar(clienteId);
+    const ticket = tickets.find((t: any) => t.id === ticketId || t.id === parseInt(ticketId));
 
     if (!ticket) {
       return res.status(404).json({
@@ -216,28 +214,31 @@ export async function buscarTicket(req: any, res: Response) {
       });
     }
 
+    // Buscar interações
+    const interacoes = await ixcService.listarInteracoesTicket(ticket.id);
+
+    const interacoesFormatadas = interacoes.map((i: any) => ({
+      id: i.id,
+      data: i.data,
+      mensagem: i.mensagem || i.texto || i.menssagem,
+      operador: i.operador || "Sistema", // Se vier nome do operador
+      origem: i.origem_endereco === "C" ? "Cliente" : "Atendente" // Ajustar conforme padrão IXC
+    }));
+
     // Formatar resposta detalhada
     const ticketDetalhado = {
       id: ticket.id,
       protocolo: ticket.protocolo,
       assunto: ticket.assunto || ticket.titulo,
-      descricao: ticket.descricao || ticket.menssagem,
+      descricao: ticket.menssagem,
       status: formatarStatus(ticket.status),
       statusCor: getStatusCor(ticket.status),
       prioridade: formatarPrioridade(ticket.prioridade),
-      prioridadeCor: getPrioridadeCor(ticket.prioridade),
       tipo: formatarTipo(ticket.id_ticket_origem),
       dataAbertura: ticket.data_abertura,
-      dataAberturaCFormatado: formatarDataHora(ticket.data_abertura),
-      dataAgendamento: ticket.data_agendamento,
-      dataConclusao: ticket.data_conclusao,
-      tecnicoResponsavel: ticket.tecnico_responsavel,
-      observacoes: ticket.observacao,
-      cliente: {
-        id: clienteId,
-        contrato: ticket.id_contrato,
-        login: ticket.id_login,
-      },
+      dataFechamento: ticket.data_fechamento, // data_fechamento no ticket
+      podeFechar: ['N', 'A', 'P', 'E'].includes(ticket.status),
+      interacoes: interacoesFormatadas,
     };
 
     return res.json({
@@ -250,6 +251,40 @@ export async function buscarTicket(req: any, res: Response) {
     return res.status(500).json({
       error: "Erro ao buscar ticket",
     });
+  }
+}
+
+/**
+ * Fecha um ticket
+ */
+export async function fecharTicket(req: any, res: Response) {
+  try {
+    const { id } = req.params;
+    const clienteId = req.user?.ids?.[0];
+    const { mensagem } = req.body;
+
+    if (!clienteId) return res.status(401).json({ error: "Usuário não autenticado" });
+
+    // Validar propriedade (opcional, seria bom buscar antes)
+    const tickets = await ixcService.ticketsListar(clienteId);
+    const ticket = tickets.find((t: any) => t.id === id || t.id === parseInt(id));
+
+    if (!ticket) return res.status(404).json({ error: "Ticket não encontrado" });
+
+    if (ticket.status === 'F' || ticket.status === 'C') {
+      return res.status(400).json({ error: "Ticket já está fechado ou cancelado" });
+    }
+
+    await ixcService.fecharTicket(Number(id), mensagem);
+
+    return res.json({
+      success: true,
+      message: "Ticket fechado com sucesso"
+    });
+
+  } catch (error) {
+    console.error("Erro ao fechar ticket:", error);
+    return res.status(500).json({ error: "Erro ao fechar ticket" });
   }
 }
 
@@ -296,30 +331,30 @@ export default listarTiposAtendimento;
 /**
  * Formata status do ticket para exibição
  */
+// Mapeamento de Status
 function formatarStatus(status: string): string {
   const statusMap: Record<string, string> = {
+    N: "Novo",
     A: "Aberto",
     E: "Em Atendimento",
     P: "Pendente",
-    F: "Finalizado",
+    F: "Fechado",
     C: "Cancelado",
-    S: "Suspenso",
+    S: "Solucionado",
   };
 
   return statusMap[status] || status;
 }
 
-/**
- * Retorna cor do status para UI
- */
 function getStatusCor(status: string): string {
   const corMap: Record<string, string> = {
-    A: "primary", // Azul
-    E: "warning", // Amarelo
-    P: "warning", // Amarelo
-    F: "success", // Verde
-    C: "danger", // Vermelho
-    S: "secondary", // Cinza
+    N: "info",      // Novo - Azul claro
+    A: "primary",   // Aberto - Azul
+    E: "warning",   // Em atendimento - Amarelo
+    P: "warning",   // Pendente - Amarelo
+    F: "secondary", // Fechado - Cinza
+    C: "danger",    // Cancelado - Vermelho
+    S: "success",   // Solucionado - Verde
   };
 
   return corMap[status] || "secondary";

@@ -70,7 +70,7 @@ export async function listarTermos(req: any, res: Response) {
 export async function executarAutoDesbloqueio(req: any, res: Response) {
   try {
     const { id } = req.params; // ID do contrato
-    
+
     if (!id) {
       return res.status(400).json({ error: "ID do contrato é obrigatório." });
     }
@@ -84,9 +84,34 @@ export async function executarAutoDesbloqueio(req: any, res: Response) {
       data: resultado
     });
   } catch (error: any) {
-    return res.status(400).json({ 
-      error: true, 
-      message: error.message || "Erro ao processar desbloqueio." 
+    return res.status(400).json({
+      error: true,
+      message: error.message || "Erro ao processar desbloqueio."
+    });
+  }
+}
+
+export async function imprimirTermo(req: any, res: Response) {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: "ID do termo é obrigatório" });
+    }
+
+    const base64 = await ixcService.imprimirTermo(Number(id));
+
+    if (!base64) {
+      return res.status(404).json({
+        error: "PDF do termo indisponível ou erro na geração.",
+      });
+    }
+
+    return res.json({ base64_document: base64 });
+  } catch (error: any) {
+    console.error("Erro ao imprimir termo:", error);
+    return res.status(500).json({
+      error: "Erro interno ao processar termo.",
     });
   }
 }
