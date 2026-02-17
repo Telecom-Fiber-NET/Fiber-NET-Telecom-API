@@ -19,7 +19,11 @@ import {
   listarTermos,
 } from "./controllers/contratosController";
 import { getResumo } from "./controllers/financeiroController";
-import { executarAcaoLogin } from "./controllers/loginsController";
+import {
+  buscarConsumoDiario,
+  buscarConsumoMensal,
+  executarAcaoLogin,
+} from "./controllers/loginsController";
 import {
   buscarOrdemServico,
   listarOrdensServico,
@@ -87,8 +91,11 @@ router.post("/senha/validar", validarForcaSenha);
 
 // ==================== LOGINS ====================
 router.post("/logins/:id/:action", verifyToken, executarAcaoLogin);
+router.get("/logins/:id/consumo/diario", verifyToken, buscarConsumoDiario); // <--- NOVA ROTA CONSUMO DIARIO
+router.get("/logins/:id/consumo/mensal", verifyToken, buscarConsumoMensal); // <--- NOVA ROTA CONSUMO MENSAL
 
 // ==================== BOLETOS E NOTAS ====================
+
 router.post("/boletos/buscar-cpf", buscarBoletosPorCpf);
 router.get("/boletos/:fatura_id/segunda-via", gerarSegundaVia); // Mantém rota pública/velha se necessário, ou protege
 router.get("/boletos/:id/pix", buscarPixBoleto);

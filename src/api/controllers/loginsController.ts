@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { ixcService } from "../../services/ixcService";
-import { error } from "console";
 
 
 export async function executarAcaoLogin(req: Request, res: Response) {
@@ -44,5 +43,39 @@ export async function executarAcaoLogin(req: Request, res: Response) {
         return res.status(500).json({
             error: error.message || "Erro interno ao executar ação."
         });
+    }
+}
+
+export async function buscarConsumoDiario(req: Request, res: Response) {
+    try {
+        const { id } = req.params;
+        const loginId = Number(id);
+
+        if (!loginId || isNaN(loginId)) {
+            return res.status(400).json({ error: "ID do login inválido." });
+        }
+
+        const consumo = await ixcService.getConsumoDiario(loginId);
+        return res.json(consumo);
+    } catch (error: any) {
+        console.error("Erro ao buscar consumo diário:", error);
+        return res.status(500).json({ error: "Erro ao buscar consumo diário." });
+    }
+}
+
+export async function buscarConsumoMensal(req: Request, res: Response) {
+    try {
+        const { id } = req.params;
+        const loginId = Number(id);
+
+        if (!loginId || isNaN(loginId)) {
+            return res.status(400).json({ error: "ID do login inválido." });
+        }
+
+        const consumo = await ixcService.getConsumoMensal(loginId);
+        return res.json(consumo);
+    } catch (error: any) {
+        console.error("Erro ao buscar consumo mensal:", error);
+        return res.status(500).json({ error: "Erro ao buscar consumo mensal." });
     }
 }
