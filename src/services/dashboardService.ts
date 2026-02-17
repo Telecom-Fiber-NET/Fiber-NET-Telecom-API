@@ -174,20 +174,45 @@ export class DashboardService {
         }),
       );
 
-      r.faturas.forEach((f: any) =>
+      r.faturas.forEach((f: any) => {
+        const valorRecebido = f.valor_recebido || f.valor_pago || f.pagamento_valor || "0";
+        const valorNum = parseFloat(f.valor);
+        const valorRecebidoNum = parseFloat(valorRecebido.toString());
+
+        // Se estiver pago (status diferente de 'A'), e tivermos valor recebido, usamos ele como valor principal
+        // para evitar mostrar juros teóricos em faturas já liquidadas.
+        const valorExibir = (f.status !== "A" && valorRecebidoNum > 0)
+          ? valorRecebidoNum.toString()
+          : f.valor;
+
         dashboard.faturas.push({
           id: f.id,
           vencimento: f.data_vencimento || f.vencimento,
-          valor: f.valor,
-          valor_recebido:
-            f.valor_recebido || f.valor_pago || f.pagamento_valor || 0,
+          valor: valorExibir,
+          valor_recebido: valorRecebido.toString(),
+          data_pagamento: f.data_pagamento || f.pagamento_data || null,
           status: f.status === "A" ? "aberto" : "pago",
           pix_code: f.pix_txid,
           linha_digitavel: f.linha_digitavel,
-        }),
-      );
+        });
+      });
 
-      r.logins.forEach((l: any) =>
+      for (const l of r.logins) {
+        // Encontra o contrato deste login para pegar endereço e plano
+        const contrato = r.contratos.find((c: any) => String(c.id) === String(l.id_contrato));
+        const endereco = contrato
+          ? `${contrato.endereco || ""}${contrato.numero ? ", " + contrato.numero : ""}`
+          : "Endereço não encontrado";
+        const plano = contrato ? contrato.descricao_aux_plano_venda : "Plano não encontrado";
+
+        // Busca consumo para este login específico
+        const consumoRaw = await this.ixc.getConsumoCompleto(l);
+        const consumo: DashboardData['consumo'] = { // Use DashboardData['consumo'] for type safety
+          ...consumoRaw,
+          total_download: formatBytes(consumoRaw.total_download_bytes),
+          total_upload: formatBytes(consumoRaw.total_upload_bytes),
+        };
+
         dashboard.logins.push({
           raw: l.id,
           id: l.id,
@@ -198,11 +223,14 @@ export class DashboardService {
           download_atual: l.download_atual,
           upload_atual: l.upload_atual,
           // --- NOVOS CAMPOS ---
-          ip_privado: l.ip || l.ip_concentrador || "Não atribuído", // IP vindo do cadastro do IXC
-          ip_publico: clientIp, // IP detectado da requisição
-          ipv4: l.ip_concentrador || l.ip || null, // IPv4 secundário
-        }),
-      );
+          ip_privado: l.ip || l.ip_concentrador || "Não atribuído",
+          ip_publico: clientIp,
+          ipv4: l.ip_concentrador || l.ip || null,
+          endereco,
+          plano,
+          consumo,
+        });
+      }
 
       // Mapear tickets com campo podeFechar
       const ticketsMapped = (r.tickets || []).map((t: any) => ({
@@ -218,25 +246,61 @@ export class DashboardService {
       dashboard.ontInfo.push(...r.ontInfo);
     }
 
-    // ... (cálculo de consumo mantém-se igual) ...
-    const allLogins = dashboard.logins;
-    if (allLogins.length > 0) {
-      const consumoPromises = allLogins.map((ln: any) =>
-        this.ixc.getConsumoCompleto(ln),
-      );
-      const consumoResults = await Promise.all(consumoPromises);
-      for (const c of consumoResults) {
-        dashboard.consumo.total_download_bytes += c.total_download_bytes || 0;
-        dashboard.consumo.total_upload_bytes += c.total_upload_bytes || 0;
-        dashboard.consumo.history.daily.push(...(c.history?.daily || []));
-        dashboard.consumo.history.monthly.push(...(c.history?.monthly || []));
-      }
-      dashboard.consumo.total_download = formatBytes(
-        dashboard.consumo.total_download_bytes,
-      );
-      dashboard.consumo.total_upload = formatBytes(
-        dashboard.consumo.total_upload_bytes,
-      );
+    // O consumo global agora realiza um merge inteligente por data/mês
+    if (dashboard.logins.length > 0) {
+      const dailyMap = new Map<string, { download_bytes: number; upload_bytes: number }>();
+      const weeklyMap = new Map<string, { download_bytes: number; upload_bytes: number }>();
+      const monthlyMap = new Map<string, { download_bytes: number; upload_bytes: number }>();
+
+      dashboard.logins.forEach(l => {
+        if (l.consumo) {
+          dashboard.consumo.total_download_bytes += l.consumo.total_download_bytes || 0;
+          dashboard.consumo.total_upload_bytes += l.consumo.total_upload_bytes || 0;
+
+          // Merge Daily
+          l.consumo.history?.daily?.forEach(d => {
+            const current = dailyMap.get(d.data) || { download_bytes: 0, upload_bytes: 0 };
+            dailyMap.set(d.data, {
+              download_bytes: current.download_bytes + (d.download_bytes || 0),
+              upload_bytes: current.upload_bytes + (d.upload_bytes || 0)
+            });
+          });
+
+          // Merge Weekly
+          l.consumo.history?.weekly?.forEach(w => {
+            const current = weeklyMap.get(w.data) || { download_bytes: 0, upload_bytes: 0 };
+            weeklyMap.set(w.data, {
+              download_bytes: current.download_bytes + (w.download_bytes || 0),
+              upload_bytes: current.upload_bytes + (w.upload_bytes || 0)
+            });
+          });
+
+          // Merge Monthly
+          l.consumo.history?.monthly?.forEach(m => {
+            const current = monthlyMap.get(m.mes_ano) || { download_bytes: 0, upload_bytes: 0 };
+            monthlyMap.set(m.mes_ano, {
+              download_bytes: current.download_bytes + (m.download_bytes || 0),
+              upload_bytes: current.upload_bytes + (m.upload_bytes || 0)
+            });
+          });
+        }
+      });
+
+      // Converter Map para Array e Ordenar
+      dashboard.consumo.history.daily = Array.from(dailyMap.entries())
+        .map(([data, vals]) => ({ data, ...vals }))
+        .sort((a, b) => a.data.localeCompare(b.data));
+
+      dashboard.consumo.history.weekly = Array.from(weeklyMap.entries())
+        .map(([data, vals]) => ({ data, ...vals }))
+        .sort((a, b) => a.data.localeCompare(b.data));
+
+      dashboard.consumo.history.monthly = Array.from(monthlyMap.entries())
+        .map(([mes_ano, vals]) => ({ mes_ano, ...vals }))
+        .sort((a, b) => a.mes_ano.localeCompare(b.mes_ano));
+
+      dashboard.consumo.total_download = formatBytes(dashboard.consumo.total_download_bytes);
+      dashboard.consumo.total_upload = formatBytes(dashboard.consumo.total_upload_bytes);
     }
 
     try {

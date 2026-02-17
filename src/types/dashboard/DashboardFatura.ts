@@ -6,4 +6,5 @@ export interface DashboardFatura {
   status: string;
   pix_code?: string;
   linha_digitavel?: string;
+  data_pagamento?: string;
 }

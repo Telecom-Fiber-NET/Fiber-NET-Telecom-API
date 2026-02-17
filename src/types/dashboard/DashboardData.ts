@@ -3,29 +3,9 @@ import { DashboardContrato } from "./DashboardContrato";
 import { DashboardFatura } from "./DashboardFatura";
 import { DashboardLogin } from "./DashboardLogin";
 
-export interface DashboardConsumoHistoryItem {
-  data: string;
-  download_bytes: number;
-  upload_bytes: number;
-}
+import { DashboardConsumo } from "./DashboardConsumo";
 
-export interface DashboardConsumo {
-  total_download_bytes: number;
-  total_upload_bytes: number;
-  // Novos campos formatados
-  total_download: string;
-  total_upload: string;
-
-  history: {
-    daily: DashboardConsumoHistoryItem[]; // Últimos 30 dias (ou o padrão que vier)
-    weekly: DashboardConsumoHistoryItem[]; // Últimos 7 dias
-    monthly: Array<{
-      mes_ano: string;
-      download_bytes: number;
-      upload_bytes: number;
-    }>;
-  };
-}
+export { DashboardConsumo, DashboardConsumoHistoryItem } from "./DashboardConsumo";
 
 export interface DashboardData {
   clientes: DashboardCliente[];

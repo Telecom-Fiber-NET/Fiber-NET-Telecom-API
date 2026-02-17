@@ -59,23 +59,23 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
           // SE ESTIVER PAGO/PARCIAL/RECEBIDO, BUSCAMOS A VERDADE NA TABELA DE BAIXAS
           if (fatura.status === "P" || fatura.status === "R") {
             try {
-              // 1. Tenta buscar nas baixas (Robustez)
               const baixas = await ixcService.buscarBaixasDaFatura(fatura.id);
 
               if (baixas.length > 0) {
                 // Soma o valor REAL baixado (inclui juros/descontos processados)
                 valorRecebidoReal = baixas.reduce(
-                  (acc: number, b: any) => acc + parseFloat(b.valor || 0),
+                  (acc: number, b: any) => acc + parseFloat(b.valor_pago || b.valor || b.valor_recebido || 0),
                   0
                 );
-                dataPagamentoReal = baixas[0].data; // Data da baixa mais recente
-              } else {
-                // Fallback: Se não achar baixa, tenta usar o campo 'pagamento_valor' que vimos no seu JSON
+                dataPagamentoReal = baixas[0].data || baixas[0].data_pagamento;
+              }
+
+              // Fallback se baixas não trouxerem valor ou não existirem
+              if (valorRecebidoReal === 0) {
                 valorRecebidoReal = parseFloat(
-                  fatura.pagamento_valor || fatura.valor_recebido || "0"
+                  fatura.valor_pago || fatura.pagamento_valor || fatura.valor_recebido || "0"
                 );
-                dataPagamentoReal =
-                  fatura.pagamento_data || fatura.data_pagamento;
+                if (!dataPagamentoReal) dataPagamentoReal = fatura.pagamento_data || fatura.data_pagamento;
               }
             } catch (err) {
               console.warn(`Erro ao processar baixa fatura ${fatura.id}`);
@@ -85,11 +85,13 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
             valorRecebidoReal = parseFloat(fatura.valor_recebido || "0");
           }
 
-          // Define valor a exibir (Lógica de parcial)
+          // Define valor a exibir (Lógica de parcial/pago para evitar juros exibidos indevidamente)
           const valorAExibir =
-            fatura.status === "P" && Number(fatura.valor_aberto) > 0
-              ? parseFloat(fatura.valor_aberto)
-              : parseFloat(fatura.valor);
+            (fatura.status === "R" || (fatura.status === "P" && Number(fatura.valor_aberto) === 0)) && valorRecebidoReal > 0
+              ? valorRecebidoReal
+              : fatura.status === "P" && Number(fatura.valor_aberto) > 0
+                ? parseFloat(fatura.valor_aberto)
+                : parseFloat(fatura.valor);
 
           return {
             id: fatura.id,
@@ -407,17 +409,31 @@ export async function listarFinanceiroPorContrato(req: Request, res: Response) {
           try {
             const baixas = await ixcService.buscarBaixasDaFatura(fatura.id);
             if (baixas.length > 0) {
-              valorRecebidoReal = baixas.reduce((acc: number, b: any) => acc + parseFloat(b.valor || 0), 0);
-              dataPagamentoReal = baixas[0].data;
+              console.log(`[DEBUG] Baixas encontradas para fatura ${fatura.id}: ${JSON.stringify(baixas)}`);
+              // Tenta somar usando múltiplos possíveis campos de valor no IXC
+              valorRecebidoReal = baixas.reduce((acc: number, b: any) => {
+                const v = parseFloat(b.valor_pago || b.valor || b.valor_recebido || 0);
+                return acc + v;
+              }, 0);
+              dataPagamentoReal = baixas[0].data || baixas[0].data_pagamento;
+              console.log(`[DEBUG] Fatura ${fatura.id}: valorRecebido=${valorRecebidoReal}, dataPagamento=${dataPagamentoReal}`);
             }
-          } catch (e) { }
+
+            // Se ainda for 0, tenta campos da própria fatura como fallback
+            if (valorRecebidoReal === 0) {
+              valorRecebidoReal = parseFloat(fatura.valor_pago || fatura.valor_recebido || fatura.pagamento_valor || "0");
+              if (!dataPagamentoReal) dataPagamentoReal = fatura.data_pagamento || fatura.pagamento_data;
+            }
+          } catch (e: any) {
+            console.error(`[ERROR] Erro ao processar baixas da fatura ${fatura.id}:`, e.message);
+          }
         }
 
         return {
           id: fatura.id,
           documento: fatura.documento || `Fat-${fatura.id}`,
           vencimento: fatura.data_vencimento,
-          valor: (fatura.status === 'R' && valorRecebidoReal > 0) ? valorRecebidoReal : parseFloat(fatura.valor),
+          valor: ((fatura.status === 'R' || fatura.status === 'P') && valorRecebidoReal > 0) ? valorRecebidoReal : parseFloat(fatura.valor),
           valor_original: parseFloat(fatura.valor),
           valor_recebido: valorRecebidoReal,
           status: fatura.status,

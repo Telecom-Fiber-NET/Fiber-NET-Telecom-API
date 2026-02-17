@@ -1,3 +1,5 @@
+import { DashboardConsumo } from "./DashboardConsumo";
+
 export interface DashboardLogin {
   raw: number;
   id: number;
@@ -11,4 +13,7 @@ export interface DashboardLogin {
   ip_privado?: string;
   ip_publico?: string;
   ipv4?: string;
+  endereco?: string;
+  plano?: string;
+  consumo?: DashboardConsumo;
 }

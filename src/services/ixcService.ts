@@ -1063,7 +1063,7 @@ export const ixcService = {
    */
   async getConsumoDiario(id_login: number): Promise<any[]> {
     return await fetchIxc("radusuarios_consumo_d", {
-      qtype: "radusuarios.id",
+      qtype: "id_login",
       query: String(id_login),
       oper: "=",
       page: "1",
@@ -1078,12 +1078,12 @@ export const ixcService = {
    */
   async getConsumoMensal(id_login: number): Promise<any[]> {
     return await fetchIxc("radusuarios_consumo_m", {
-      qtype: "radusuarios.id",
+      qtype: "id_login",
       query: String(id_login),
       oper: "=",
       page: "1",
       rp: "12", // Últimos 12 meses
-      sortname: "mes_ano",
+      sortname: "data",
       sortorder: "desc",
     });
   },
