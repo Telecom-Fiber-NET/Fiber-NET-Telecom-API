@@ -1053,4 +1053,39 @@ export const ixcService = {
       history: { daily, weekly, monthly },
     };
   },
+
+  // ==========================================================================
+  // CONSUMO E RELATÓRIOS
+  // ==========================================================================
+
+  /**
+   * Busca consumo diário para um login
+   */
+  async getConsumoDiario(id_login: number): Promise<any[]> {
+    return await fetchIxc("radusuarios_consumo_d", {
+      qtype: "radusuarios.id",
+      query: String(id_login),
+      oper: "=",
+      page: "1",
+      rp: "30", // Últimos 30 dias
+      sortname: "data",
+      sortorder: "desc",
+    });
+  },
+
+  /**
+   * Busca consumo mensal para um login
+   */
+  async getConsumoMensal(id_login: number): Promise<any[]> {
+    return await fetchIxc("radusuarios_consumo_m", {
+      qtype: "radusuarios.id",
+      query: String(id_login),
+      oper: "=",
+      page: "1",
+      rp: "12", // Últimos 12 meses
+      sortname: "mes_ano",
+      sortorder: "desc",
+    });
+  },
 };
+
