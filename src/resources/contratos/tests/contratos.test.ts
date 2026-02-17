@@ -1,20 +1,20 @@
 const { describe, it, expect, jest, beforeEach, afterEach } = require('@jest/globals');
+import ContratosResource from "..";
 import { QueryBase } from "../../base";
-import { Contratos } from "..";
 
 jest.mock('../../base');
 
-describe('Contratos', () => {
-    let instance: Contratos;
+describe('ContratosResource', () => {
+    let instance: ContratosResource;
     let mockRequest: any;
     let mockUpdate: any;
 
     beforeEach(() => {
-        instance = new Contratos({
+        instance = new ContratosResource({
             token: 'fake-token',
             baseUrl: 'https://fake-url.com',
         });
-        mockRequest = jest.spyOn(QueryBase.prototype, 'request').mockResolvedValue({ registros: [] }); 
+        mockRequest = jest.spyOn(QueryBase.prototype, 'request').mockResolvedValue({ registros: [] });
         mockUpdate = jest.spyOn(QueryBase.prototype, 'update').mockResolvedValue({ success: true });
     });
 

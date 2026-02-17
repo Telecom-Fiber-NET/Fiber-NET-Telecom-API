@@ -47,7 +47,7 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
 
       // Filtramos apenas os relevantes para processar
       const faturasParaProcessar = faturas.filter((f: any) =>
-        ["A", "P", "R", "C"].includes(f.status)
+        ["A", "P"].includes(f.status)
       );
 
       // 🔥 USAMOS PROMISE.ALL PARA BUSCAR AS BAIXAS EM PARALELO (RÁPIDO)
@@ -330,4 +330,106 @@ function getStatusCor(vencimento: string): string {
   if (dias === 0) return "danger"; // Vermelho
   if (dias <= 5) return "warning"; // Amarelo
   return "success"; // Verde
+}
+
+/**
+ * Lista financeiro (Boletos e NFs) de um contrato específico
+ */
+export async function listarFinanceiroPorContrato(req: Request, res: Response) {
+  try {
+    const { id_contrato } = req.params;
+    // @ts-ignore
+    const userIds = req.user?.ids; // Array de IDs de cliente vinculados ao usuário
+
+    if (!id_contrato) {
+      return res.status(400).json({ error: "ID do contrato é obrigatório" });
+    }
+
+    // Buscas em paralelo: Boletos e Notas Fiscais
+    // Opcional: Validar se o contrato pertence ao usuário (seria ideal, mas exige busca extra)
+    // Assumindo que o token JWT já validou o usuário, e se ele sabe o ID do contrato...
+    // Mas para segurança total, deveríamos buscar o contrato e checar o id_cliente.
+    // Vamos fazer isso:
+
+    let contratoValido = false;
+    let clienteDono = 0;
+
+    if (userIds && userIds.length > 0) {
+      // Busca o contrato diretamente pelo ID usando o novo método
+      const contrato = await ixcService.buscarContratoPorId(Number(id_contrato));
+
+      if (contrato && contrato.id_cliente && userIds.includes(String(contrato.id_cliente))) {
+        contratoValido = true;
+        clienteDono = Number(contrato.id_cliente);
+      }
+    }
+
+    // Se não validou (ou userIds vazio/indefinido - caso de erro no middleware?), nega.
+    if (!contratoValido) {
+      return res.status(403).json({ error: "Acesso negado: Contrato não pertence ao usuário." });
+    }
+
+    const [boletos, notasFiscais] = await Promise.all([
+      ixcService.financeiroListar(clienteDono, Number(id_contrato)),
+      ixcService.listarNotasFiscais(clienteDono, Number(id_contrato))
+    ]);
+
+    const faturasParaProcessar = boletos.filter((f: any) =>
+      ["A", "P", "R", "C"].includes(f.status)
+    );
+
+    const boletosFormatados = await Promise.all(
+      faturasParaProcessar.map(async (fatura: any) => {
+        let valorRecebidoReal = parseFloat(fatura.valor_recebido || "0");
+        let dataPagamentoReal = fatura.data_pagamento;
+
+        if (fatura.status === "P" || fatura.status === "R") {
+          try {
+            const baixas = await ixcService.buscarBaixasDaFatura(fatura.id);
+            if (baixas.length > 0) {
+              valorRecebidoReal = baixas.reduce((acc: number, b: any) => acc + parseFloat(b.valor || 0), 0);
+              dataPagamentoReal = baixas[0].data;
+            }
+          } catch (e) { }
+        }
+
+        return {
+          id: fatura.id,
+          documento: fatura.documento || `Fat-${fatura.id}`,
+          vencimento: fatura.data_vencimento,
+          valor: parseFloat(fatura.valor),
+          valor_recebido: valorRecebidoReal,
+          status: fatura.status,
+          linhaDigitavel: fatura.linha_digitavel,
+          pixCopiaECola: fatura.pix_txid || null,
+          boleto_pdf: fatura.boleto || null,
+        };
+      })
+    );
+
+    const nfsFormatadas = notasFiscais.map((nf: any) => ({
+      id: nf.id,
+      numero: nf.numero_nf,
+      serie: nf.serie,
+      data_emissao: nf.data_emissao,
+      valor: nf.valor_total,
+      status: nf.status,
+      link_xml: nf.link_xml || null,
+      chave_acesso: nf.chave_acesso
+    }));
+
+    return res.json({
+      id_contrato: id_contrato,
+      financeiro: {
+        boletos: boletosFormatados,
+        notas_fiscais: nfsFormatadas
+      }
+    });
+
+  } catch (error) {
+    console.error("Erro ao listar financeiro do contrato:", error);
+    return res.status(500).json({
+      error: "Erro ao buscar dados financeiros do contrato",
+    });
+  }
 }

@@ -61,3 +61,6 @@ export class ContratosResource extends QueryBase {
         return this.update(resourceName, id, { desbloqueio_confianca: 'S' });
     }
 }
+
+// Export default para compatibilidade com testes
+export default ContratosResource;

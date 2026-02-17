@@ -1,7 +1,7 @@
 // spell:disable
 import axios from "axios";
 import "dotenv/config";
-import { Cliente } from "../resources/clientes/types";
+import { Cliente, Contrato } from "../resources/clientes/types";
 
 // ============================================================================
 // CONFIGURAÇÃO E UTILITÁRIOS
@@ -212,7 +212,7 @@ export const ixcService = {
   /**
    * Busca contratos por ID do cliente
    */
-  async buscarContratosPorIdCliente(id_cliente: number): Promise<any[]> {
+  async buscarContratosPorIdCliente(id_cliente: number): Promise<Contrato[]> {
     return await fetchIxc("cliente_contrato", {
       qtype: "cliente_contrato.id_cliente",
       query: String(id_cliente),
@@ -223,6 +223,63 @@ export const ixcService = {
       sortorder: "desc",
     });
   },
+
+  /**
+   * Busca contratos com endereço resolvido (Híbrido: Contrato ou Cliente)
+   */
+  async buscarContratosDetalhados(id_cliente: number): Promise<Contrato[]> {
+    const contracts = (await this.buscarContratosPorIdCliente(
+      id_cliente
+    )) as Contrato[];
+    const client = await this.buscarClientesPorId(id_cliente);
+
+    return contracts.map((c) => {
+      // Se usar endereço padrão do cliente, substitui os campos
+      if (c.endereco_padrao_cliente === "S" && client) {
+        return {
+          ...c,
+          endereco: client.endereco,
+          numero: client.numero,
+          bairro: client.bairro,
+          cidade: client.cidade,
+          uf: client.uf,
+          cep: client.cep,
+          complemento: client.complemento,
+        };
+      }
+      return c;
+    });
+  },
+
+  /**
+   * Busca um contrato específico pelo ID
+   */
+  async buscarContratoPorId(id: number): Promise<Contrato | null> {
+    const registros = await fetchIxc("cliente_contrato", {
+      qtype: "cliente_contrato.id",
+      query: String(id),
+      oper: "=",
+      page: "1",
+      rp: "1",
+      sortname: "cliente_contrato.id",
+      sortorder: "desc",
+    });
+    return (registros[0] as Contrato) || null;
+  },
+
+  // ==========================================================================
+  // FINANCEIRO
+  // ==========================================================================
+
+  // ... (existing code for financeiroListar and listarNotasFiscais is fine, checking if I need to edit lines far away. No, I will just edit the block I targeted if possible? 
+  // Wait, replacing a huge block is bad. I should split edits.
+  // `buscarContratosDetalhados` is around line 230. 
+  // `ordensServicoListar` at 637
+  // `ticketsListar` at 666.
+  // I can't restart `view_file` to check exact lines easily without consuming tools.
+  // The `replace_file_content` supports strict StartLine/EndLine.
+  // I will do separate calls.)
+
 
   // ==========================================================================
   // FINANCEIRO
@@ -238,7 +295,7 @@ export const ixcService = {
     try {
       // O IXC exige um POST, mesmo que o corpo seja vazio
       const resp = await axios.post(url, {}, { headers: getHeaders() });
-      
+
       // O IXC retorna status "sucesso" ou erro se já foi usado
       return resp.data;
     } catch (error: any) {
@@ -251,8 +308,8 @@ export const ixcService = {
   /**
    * Lista faturas e boletos do cliente
    */
-  async financeiroListar(id_cliente: number): Promise<any[]> {
-    return await fetchIxc("fn_areceber", {
+  async financeiroListar(id_cliente: number, id_contrato?: number): Promise<any[]> {
+    const payload: any = {
       qtype: "fn_areceber.id_cliente",
       query: String(id_cliente),
       oper: "=",
@@ -260,7 +317,46 @@ export const ixcService = {
       rp: "50",
       sortname: "fn_areceber.data_vencimento",
       sortorder: "desc",
-    });
+    };
+
+    // Filtro adicional por contrato se fornecido
+    if (id_contrato) {
+      // IXC API grid filtering: using multiple filters requires specific syntax or just filtering client side.
+      // However, standard IXC list API (fetchIxc here) usually supports only one filter via simple fields.
+      // But we can filter client-side since we fetch limited items, OR verify if IXC supports AND.
+      // Most basic IXC integrations fetch by Client and filter in code for specific contract if the API doesn't support complex query.
+      // BUT, fn_areceber has `id_contrato`. We can query directly by `id_contrato` IF we want ONLY that contract.
+      // If we want to be safe:
+      if (id_contrato) {
+        payload.qtype = "fn_areceber.id_contrato";
+        payload.query = String(id_contrato);
+      }
+    }
+
+    return await fetchIxc("fn_areceber", payload);
+  },
+
+  /**
+   * Lista Notas Fiscais (Modelo 21/22/55/etc)
+   */
+  async listarNotasFiscais(id_cliente: number, id_contrato?: number): Promise<any[]> {
+    const payload: any = {
+      qtype: "id_cliente",
+      query: String(id_cliente),
+      oper: "=",
+      page: "1",
+      rp: "20",
+      sortname: "data_emissao",
+      sortorder: "desc",
+    };
+
+    if (id_contrato) {
+      payload.qtype = "id_contrato";
+      payload.query = String(id_contrato);
+    }
+
+    // Tenta buscar na tabela de saída de notas 
+    return await fetchIxc("fn_saida", payload);
   },
 
   /**
@@ -568,8 +664,8 @@ export const ixcService = {
   /**
    * Lista ordens de serviço do cliente
    */
-  async ordensServicoListar(id_cliente: number): Promise<any[]> {
-    return await fetchIxc("su_oss_chamado", {
+  async ordensServicoListar(id_cliente: number, id_contrato?: number): Promise<any[]> {
+    const payload: any = {
       qtype: "su_oss_chamado.id_cliente",
       query: String(id_cliente),
       oper: "=",
@@ -577,7 +673,14 @@ export const ixcService = {
       rp: "20",
       sortname: "su_oss_chamado.id",
       sortorder: "desc",
-    });
+    };
+
+    if (id_contrato) {
+      payload.qtype = "su_oss_chamado.id_contrato";
+      payload.query = String(id_contrato);
+    }
+
+    return await fetchIxc("su_oss_chamado", payload);
   },
 
   /**
@@ -597,8 +700,8 @@ export const ixcService = {
   /**
    * Lista tickets do cliente
    */
-  async ticketsListar(id_cliente: number): Promise<any[]> {
-    return await fetchIxc("su_ticket", {
+  async ticketsListar(id_cliente: number, id_contrato?: number): Promise<any[]> {
+    const payload: any = {
       qtype: "su_ticket.id_cliente",
       query: String(id_cliente),
       oper: "=",
@@ -606,7 +709,14 @@ export const ixcService = {
       rp: "20",
       sortname: "su_ticket.id",
       sortorder: "desc",
-    });
+    };
+
+    if (id_contrato) {
+      payload.qtype = "su_ticket.id_contrato";
+      payload.query = String(id_contrato);
+    }
+
+    return await fetchIxc("su_ticket", payload);
   },
 
   /**
@@ -699,7 +809,7 @@ export const ixcService = {
     }
   },
 
-  // ==========================================================================
+
   // CONSUMO E ESTATÍSTICAS
   // ==========================================================================
 

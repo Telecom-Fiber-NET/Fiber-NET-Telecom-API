@@ -1,9 +1,14 @@
-import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { ixcLogger } from '../utils/logger';
+import OpenAI from 'openai';
 import { ixcService } from '../services/ixcServiceClass'; // For fetching customer details
-import { Action } from '@shared/types/api'; // Import Action from shared types
+import { ixcLogger } from '../utils/logger';
+
+// Define Action interface locally
+interface Action {
+  type: string;
+  label: string;
+}
 
 interface LLMProvider {
   name: string;
@@ -52,13 +57,13 @@ export class MultiLLMOrchestrator {
   async getWelcomeMessage(customerId: string): Promise<string> {
     ixcLogger.info('Generating welcome message', { customerId });
     try {
-        const customerIdNum = parseInt(customerId);
-        const customer = await ixcService.buscarClientePorId(customerIdNum);
-        const customerName = customer?.razao || customer?.fantasia || 'Cliente';
-        return `Olá, ${customerName}! Sou o seu assistente virtual da Fiber.Net. Em que posso ajudar hoje?`;
+      const customerIdNum = parseInt(customerId);
+      const customer = await ixcService.buscarClientePorId(customerIdNum);
+      const customerName = customer?.razao || customer?.fantasia || 'Cliente';
+      return `Olá, ${customerName}! Sou o seu assistente virtual da Fiber.Net. Em que posso ajudar hoje?`;
     } catch (error) {
-        ixcLogger.error('Failed to fetch customer for welcome message', { customerId, error });
-        return "Olá! Sou o seu assistente virtual da Fiber.Net. Em que posso ajudar hoje?";
+      ixcLogger.error('Failed to fetch customer for welcome message', { customerId, error });
+      return "Olá! Sou o seu assistente virtual da Fiber.Net. Em que posso ajudar hoje?";
     }
   }
 
@@ -146,7 +151,7 @@ export class MultiLLMOrchestrator {
     }));
 
     const chat = model.startChat({
-        history: fullHistory,
+      history: fullHistory,
     });
 
     const result = await chat.sendMessage(prompt);
@@ -207,7 +212,7 @@ AÇÕES DISPONÍVEIS (se relevante, sugira ao usuário):
     if (lowerResponse.includes('ticket') || lowerResponse.includes('suporte') || lowerResponse.includes('técnico')) {
       actions.push({ type: 'open_ticket', label: '🎫 Abrir Ticket' });
     }
-    
+
     // Exemplo: Agendar visita técnica se houver um problema claro de conexão
     // if (lowerResponse.includes('visita') && context.activeConnections === 0) {
     //   actions.push({ type: 'schedule_tech', label: '🗓️ Agendar Visita Técnica' });

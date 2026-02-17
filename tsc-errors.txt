@@ -1,0 +1,4 @@
+src/api/controllers/boletoController.ts(361,63): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/api/routes.ts(63,63): error TS2304: Cannot find name 'listarFinanceiroPorContrato'.
+src/orchestrator/index.ts(6,24): error TS2307: Cannot find module '@shared/types/api' or its corresponding type declarations.
+src/resources/contratos/tests/contratos.test.ts(3,10): error TS2305: Module '".."' has no exported member 'Contratos'.
