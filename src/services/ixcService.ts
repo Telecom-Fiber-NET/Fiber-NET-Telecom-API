@@ -1026,6 +1026,7 @@ export const ixcService = {
       }),
     ]);
 
+
     // Processar dados diários
     const daily: ConsumoDaily[] = dailyRes
       .map((d: any) => ({
@@ -1033,10 +1034,47 @@ export const ixcService = {
         download_bytes: parseFloat(d.consumo || "0"),
         upload_bytes: parseFloat(d.consumo_upload || "0"),
       }))
-      .reverse();
+      .reverse(); // Now descending (latest first) or ascending?
+    // fetchIxc sorts by 'data' desc. So [0] is today/yesterday.
+    // .reverse() makes it Ascending (oldest first)?
+    // Wait. The original code did .reverse().
+    // If dailyRes is DESC (Today...Oldest), then .reverse() makes it (Oldest...Today).
+    // Let's keep it (Oldest...Today) for the Daily Chart.
 
-    // Últimos 7 dias para visualização semanal
-    const weekly: ConsumoDaily[] = daily.slice(-7);
+    // Weekly: Calculate 7 in 7 days from the Daily data
+    // We want to group by 7 days.
+    // If daily is Ascending (Oldest...Today), we should group from the end (Today backwards) or start?
+    // User ref: "calculated of 7 in 7 days". Usually standard weeks or rolling backwards.
+    // Let's do Rolling 7-day chunks starting from the latest date backwards.
+
+    // We need a copy of daily sorted Descending to chunk easily
+    const dailyDesc = [...daily].reverse();
+    const weekly: ConsumoDaily[] = [];
+
+    for (let i = 0; i < dailyDesc.length; i += 7) {
+      const chunk = dailyDesc.slice(i, i + 7);
+      if (chunk.length === 0) break;
+
+      // Sum up
+      const totalDown = chunk.reduce((acc, curr) => acc + curr.download_bytes, 0);
+      const totalUp = chunk.reduce((acc, curr) => acc + curr.upload_bytes, 0);
+
+      // Date label: Start Date of the chunk (or End Date).
+      // Provide the range or just the start date.
+      // Let's use the date of the FIRST item in the chunk (Latest date in the week) or Last?
+      // Usually "Week of <Start Date>". 
+      // In this chunk (Descending), the last item is the oldest.
+      const weekLabel = chunk[chunk.length - 1].data; // Start date of the week
+
+      weekly.push({
+        data: weekLabel, // Represents the week starting on this date
+        download_bytes: totalDown,
+        upload_bytes: totalUp
+      });
+    }
+
+    // Reverse weekly to be Ascending (Oldest Week ... Latest Week)
+    weekly.reverse();
 
     // Processar dados mensais
     const monthly: ConsumoMonthly[] = monthlyRes
