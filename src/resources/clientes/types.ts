@@ -7,6 +7,7 @@ export type Cliente = {
     email: string;
     senha?: string;
     hotsite_email?: string;
+    hotsite_senha?: string;
     endereco?: string;
     numero?: string;
     bairro?: string;

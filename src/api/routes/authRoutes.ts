@@ -21,8 +21,9 @@ router.post("/login", async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Cliente não encontrado" });
     }
 
-    // 3. Valida a senha
-    if (clientePrincipal.senha !== password) {
+    // 3. Valida a senha (com fallback para 'senha' antigo)
+    const senhaValida = clientePrincipal.hotsite_senha || clientePrincipal.senha;
+    if (senhaValida !== password) {
       return res.status(401).json({ error: "Senha incorreta" });
     }
 
