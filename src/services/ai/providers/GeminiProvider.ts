@@ -14,7 +14,8 @@ export class GeminiProvider implements IAIProvider {
       ...config,
     };
 
-    this.client = new GoogleGenerativeAI(this.config.apiKey);
+    const apiKey = this.config.apiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "";
+    this.client = new GoogleGenerativeAI(apiKey);
   }
 
   async chat(messages: AIMessage[], customConfig?: Partial<AIProviderConfig>): Promise<AIResponse> {

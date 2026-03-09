@@ -15,8 +15,8 @@ function formatBytes(bytes: number, decimals = 2): string {
 }
 
 const geminiDashboardProvider = new GeminiProvider({
-  apiKey: process.env.GOOGLE_API_KEY || "",
-  model: "gemini-2.5-flash", // Usar o modelo flash para análise de dashboard (mais barato)
+  apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "",
+  model: "gemini-1.5-flash-latest", // Nome de modelo mais atualizado
 });
 
 export class DashboardService {
