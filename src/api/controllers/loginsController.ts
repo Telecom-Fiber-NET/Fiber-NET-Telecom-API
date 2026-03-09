@@ -46,6 +46,38 @@ export async function executarAcaoLogin(req: Request, res: Response) {
     }
 }
 
+/**
+ * Busca informações do Wi-Fi (SSID)
+ */
+export async function buscarWifi(req: Request, res: Response) {
+    try {
+        const { id } = req.params;
+        const result = await ixcService.getWifiInfo(Number(id));
+        return res.json(result);
+    } catch (error: any) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+/**
+ * Altera configurações de Wi-Fi
+ */
+export async function alterarWifi(req: Request, res: Response) {
+    try {
+        const { id } = req.params;
+        const { ssid, senha } = req.body;
+
+        if (!ssid || !senha) {
+            return res.status(400).json({ error: "SSID e Senha são obrigatórios" });
+        }
+
+        const result = await ixcService.alterarWifi(Number(id), ssid, senha);
+        return res.json(result);
+    } catch (error: any) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 export async function buscarConsumoDiario(req: Request, res: Response) {
     try {
         const { id } = req.params;

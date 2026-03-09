@@ -20,12 +20,12 @@ if (!getBaseUrl() || !IXC_TOKEN) {
   );
 }
 
-const getHeaders = () => {
+const getHeaders = (action: "listar" | "novo" | "editar" | "deletar" = "listar") => {
   const token = IXC_TOKEN?.includes("Basic") ? IXC_TOKEN : `Basic ${IXC_TOKEN}`;
   return {
     "Content-Type": "application/json",
     Authorization: token,
-    ixcsoft: "listar",
+    ixcsoft: action,
   };
 };
 
@@ -42,7 +42,7 @@ const fetchIxc = async (endpoint: string, payload: any): Promise<any[]> => {
   const url = `${baseUrl}/${endpoint}`;
 
   try {
-    const resp = await axios.post(url, payload, { headers: getHeaders() });
+    const resp = await axios.post(url, payload, { headers: getHeaders("listar") });
     return resp.data.registros || [];
   } catch (error: unknown) {
     const errorMessage =
@@ -290,18 +290,57 @@ export const ixcService = {
    */
   async desbloqueioConfianca(id_contrato: number): Promise<any> {
     const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/cliente_contrato_desbloqueio_confianca/${id_contrato}`;
-
+    
+    // Tentativa 1: Via endpoint de comando (mais seguro)
+    const urlComando = `${baseUrl}/cliente_contrato_desbloqueio_confianca/${id_contrato}`;
+    
     try {
-      // O IXC exige um POST, mesmo que o corpo seja vazio
-      const resp = await axios.post(url, {}, { headers: getHeaders() });
-
-      // O IXC retorna status "sucesso" ou erro se já foi usado
+      console.log(`[IXC] Tentando desbloqueio via comando para contrato ${id_contrato}...`);
+      const resp = await axios.post(urlComando, {}, { headers: getHeaders("novo") });
       return resp.data;
     } catch (error: any) {
-      console.error(`[IXC] Erro ao desbloquear contrato ${id_contrato}:`, error.message);
-      // Repassa a mensagem exata do IXC (ex: "Limite de desbloqueios atingido")
-      throw new Error(error.response?.data?.message || "Não foi possível realizar o desbloqueio no momento.");
+      console.warn(`[IXC] Comando de desbloqueio falhou, tentando via atualização de campo...`);
+      
+      // Tentativa 2: Via atualização direta no registro do contrato (conforme seu esquema)
+      const urlUpdate = `${baseUrl}/cliente_contrato/${id_contrato}`;
+      const payload = {
+        desbloqueio_confianca_ativo: "S",
+        status_internet: "A", // Força para Ativo
+        liberacao_bloqueio_manual: "S"
+      };
+      
+      try {
+        const resp = await axios.put(urlUpdate, payload, { headers: getHeaders("editar") });
+        return resp.data;
+      } catch (err: any) {
+        console.error(`[IXC] Erro fatal no desbloqueio:`, err.message);
+        throw new Error(err.response?.data?.message || "Limite de desbloqueios atingido ou erro no sistema.");
+      }
+    }
+  },
+
+  /**
+   * Realiza a assinatura digital de um contrato (Tabela cliente_contrato)
+   */
+  async assinarContratoDigital(id_contrato: number, ip: string): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/cliente_contrato/${id_contrato}`;
+
+    try {
+      // Campos baseados no seu esquema para validar assinatura
+      const payload = {
+        assinatura_digital: "S",
+        status_internet: "A", // Muda de AA (Aguardando Assinatura) para A (Ativo)
+        status: "A", // Garante que o contrato esteja Ativo
+        data_ativacao: new Date().toLocaleDateString("pt-BR"),
+        obs_contrato: `Assinado digitalmente via Central do Assinante em ${new Date().toLocaleString()} - IP: ${ip}`
+      };
+
+      const resp = await axios.put(url, payload, { headers: getHeaders("editar") });
+      return resp.data;
+    } catch (error: any) {
+      console.error(`Erro ao assinar contrato digital (ID: ${id_contrato}):`, error.message);
+      throw new Error("Falha ao processar assinatura do contrato.");
     }
   },
 
@@ -654,7 +693,7 @@ export const ixcService = {
 
     try {
       // No IXC, limpar MAC é um PUT enviando string vazia
-      await axios.put(url, { mac: "" }, { headers: getHeaders() });
+      await axios.put(url, { mac: "" }, { headers: getHeaders("editar") });
       return { success: true, message: "MAC address limpo com sucesso." };
     } catch (error: any) {
       console.error(`Erro ao limpar MAC (ID: ${id}):`, error.message);
@@ -672,7 +711,7 @@ export const ixcService = {
     try {
       // Tenta forçar a desconexão alterando o status online ou via comando específico
       // Nota: A API padrão do IXC pode variar. O método comum é PUT com online: 'N'
-      await axios.put(url, { online: "N" }, { headers: getHeaders() });
+      await axios.put(url, { online: "N" }, { headers: getHeaders("editar") });
       return { success: true, message: "Comando de desconexão enviado." };
     } catch (error: any) {
       console.error(`Erro ao desconectar (ID: ${id}):`, error.message);
@@ -785,7 +824,7 @@ export const ixcService = {
         ip_aceite: ip,
       };
 
-      const resp = await axios.put(url, payload, { headers: getHeaders() });
+      const resp = await axios.put(url, payload, { headers: getHeaders("editar") });
       return resp.data;
     } catch (error: any) {
       console.error(`Erro ao assinar termo (ID: ${id_termo}):`, error.message);
@@ -882,7 +921,7 @@ export const ixcService = {
 
     try {
       const resp = await axios.post(url, payload, {
-        headers: getHeaders(),
+        headers: getHeaders("novo"),
       });
 
       return {
@@ -927,7 +966,7 @@ export const ixcService = {
       await axios.put(url, {
         status: "F",
         menssagem: mensagem // Alguns IXC exigem mensagem ao fechar
-      }, { headers: getHeaders() });
+      }, { headers: getHeaders("editar") });
 
       return { success: true };
     } catch (error: any) {
@@ -972,7 +1011,7 @@ export const ixcService = {
       console.log(`[IXC] Atualizando senha do cliente ${clienteId}...`);
 
       // 3. Envia o objeto completo via PUT
-      const resp = await axios.put(url, payload, { headers: getHeaders() });
+      const resp = await axios.put(url, payload, { headers: getHeaders("editar") });
 
       return resp.data;
     } catch (error: unknown) {
@@ -1124,6 +1163,117 @@ export const ixcService = {
       sortname: "data",
       sortorder: "desc",
     });
+  },
+
+  // ==========================================================================
+  // COMANDOS AVANÇADOS (MELHORIAS SITE ANTIGO)
+  // ==========================================================================
+
+  /**
+   * Suspende temporariamente o contrato
+   */
+  async suspenderContrato(id_contrato: number, data_retomada: string): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/cliente_contrato/${id_contrato}`;
+
+    try {
+      const payload = {
+        contrato_suspenso: "S",
+        data_inicial_suspensao: new Date().toLocaleDateString("pt-BR"),
+        data_final_suspensao: data_retomada,
+        status_internet: "D", // Desativado
+      };
+
+      const resp = await axios.put(url, payload, { headers: getHeaders("editar") });
+      return { success: true, message: "Contrato suspenso com sucesso.", data: resp.data };
+    } catch (error: any) {
+      console.error(`Erro ao suspender contrato ${id_contrato}:`, error.message);
+      throw new Error("Falha ao processar suspensão temporária.");
+    }
+  },
+
+  /**
+   * Reativa um contrato suspenso
+   */
+  async reativarContrato(id_contrato: number): Promise<any> {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/cliente_contrato/${id_contrato}`;
+
+    try {
+      const payload = {
+        contrato_suspenso: "N",
+        status_internet: "A", // Ativo
+        data_retomada_contrato: new Date().toLocaleDateString("pt-BR"),
+      };
+
+      const resp = await axios.put(url, payload, { headers: getHeaders("editar") });
+      return { success: true, message: "Contrato reativado com sucesso.", data: resp.data };
+    } catch (error: any) {
+      console.error(`Erro ao reativar contrato ${id_contrato}:`, error.message);
+      throw new Error("Falha ao reativar contrato.");
+    }
+  },
+
+  /**
+   * Busca informações de Wi-Fi do login (se suportado pelo roteador no IXC)
+   */
+  async getWifiInfo(id_login: number): Promise<any> {
+    // No IXC, informações de Wi-Fi costumam ficar em radpop_radio_cliente_fibra ou radusuarios
+    const registros = await fetchIxc("radpop_radio_cliente_fibra", {
+      qtype: "id_login",
+      query: String(id_login),
+      oper: "=",
+      page: "1",
+      rp: "1",
+    });
+
+    if (registros.length > 0) {
+      const ont = registros[0];
+      return {
+        ssid: ont.ssid_24ghz || ont.wifi_nome || "Não disponível",
+        canal: ont.canal_24ghz || "Auto",
+        sinal: ont.sinal_dbm || "N/A",
+        modelo: ont.modelo || "ONT/ONU",
+      };
+    }
+    return null;
+  },
+
+  /**
+   * Altera SSID e Senha do Wi-Fi
+   */
+  async alterarWifi(id_login: number, novaSsid: string, novaSenha: string): Promise<any> {
+    const baseUrl = getBaseUrl();
+    // O endpoint de comando de Wi-Fi pode variar conforme a versão do IXC e integração (SNMP/TR-069)
+    // Geralmente é uma edição na tabela de rádio/fibra
+    const wifiData = await fetchIxc("radpop_radio_cliente_fibra", {
+      qtype: "id_login",
+      query: String(id_login),
+      oper: "=",
+      page: "1",
+      rp: "1",
+    });
+
+    if (wifiData.length === 0) {
+      throw new Error("Equipamento não localizado para este login.");
+    }
+
+    const id_radio = wifiData[0].id;
+    const url = `${baseUrl}/radpop_radio_cliente_fibra/${id_radio}`;
+
+    try {
+      const payload = {
+        wifi_nome: novaSsid,
+        wifi_senha: novaSenha,
+        transmitir_configuracao: "S", // Comando para o IXC enviar ao roteador
+      };
+
+      await axios.put(url, payload, { headers: getHeaders("editar") });
+      return { success: true, message: "Comando de alteração de Wi-Fi enviado ao roteador." };
+    } catch (error: any) {
+      console.error(`Erro ao alterar Wi-Fi do login ${id_login}:`, error.message);
+      throw new Error("Falha ao enviar comando para o roteador.");
+    }
   },
 };
 

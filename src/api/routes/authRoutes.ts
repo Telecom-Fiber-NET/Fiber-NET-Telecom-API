@@ -6,7 +6,12 @@ import { ixcService } from "../../services/ixcService";
 const router = Router();
 
 router.post("/login", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  console.log("--- NOVO LOGIN ---");
+  console.log("Raw Body:", JSON.stringify(req.body));
+  
+  // Aceita 'password' ou 'senha' para compatibilidade com o Frontend
+  const email = req.body.email;
+  const password = req.body.password || req.body.senha;
 
   if (!email || !password) {
     return res.status(400).json({ error: "Email e senha são obrigatórios" });
@@ -15,6 +20,7 @@ router.post("/login", async (req: Request, res: Response) => {
   try {
     // 1. Busca o cliente "principal" no IXC pelo email para validar a senha
     const clientePrincipal = await ixcService.buscarClientePorEmail(email);
+    console.log("Cliente Principal:", clientePrincipal);
 
     // 2. Verifica se encontrou
     if (!clientePrincipal) {
@@ -22,8 +28,23 @@ router.post("/login", async (req: Request, res: Response) => {
     }
 
     // 3. Valida a senha (com fallback para 'senha' antigo)
-    const senhaValida = clientePrincipal.hotsite_senha || clientePrincipal.senha;
-    if (senhaValida !== password) {
+    const hotsite_senha = (clientePrincipal as any).hotsite_senha;
+    const senha_legada = (clientePrincipal as any).senha;
+    
+    // Fallback robusto: Prioriza hotsite_senha se existir e não for vazia, senão usa senha_legada
+    const senhaValida = (hotsite_senha && String(hotsite_senha).trim() !== "") 
+      ? hotsite_senha 
+      : senha_legada;
+
+    console.log(`Debug Login:`, {
+      email,
+      hotsite_senha: hotsite_senha || "VAZIO",
+      senha_legada: senha_legada || "VAZIO",
+      senha_escolhida_para_validar: senhaValida,
+      match: senhaValida === password,
+    });
+
+    if (!senhaValida || senhaValida !== password) {
       return res.status(401).json({ error: "Senha incorreta" });
     }
 
