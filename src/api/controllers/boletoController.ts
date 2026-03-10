@@ -9,12 +9,17 @@ const buscarBoletoSchema = z.object({
   cpfCnpj: z
     .string()
     .min(11, "CPF/CNPJ inválido")
-    .max(14, "CPF/CNPJ inválido")
-    .regex(/^\d+$/, "CPF/CNPJ deve conter apenas números"),
+    .transform((val) => val.replace(/\D/g, ""))
+    .refine((val) => val.length === 11 || val.length === 14, {
+      message: "CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos",
+    }),
 });
 
 export async function buscarBoletosPorCpf(req: Request, res: Response) {
   try {
+    const { cpfCnpj: bodyCpf } = req.body;
+    console.log(`[DEBUG] Rota /boletos/buscar-cpf chamada com: ${bodyCpf}`);
+
     // 1. Validar CPF/CNPJ
     const validacao = buscarBoletoSchema.safeParse(req.body);
 
@@ -34,8 +39,19 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
     const clientes = await ixcService.buscarClientesPorCpf(cpfCnpj);
 
     if (!clientes || clientes.length === 0) {
-      return res.status(404).json({
-        error: "Nenhum cliente encontrado com este CPF/CNPJ",
+      console.log(`[DEBUG] Nenhum cliente encontrado para o documento: ${cpfCnpj}`);
+      return res.status(200).json({
+        success: true,
+        message: "Nenhum cliente encontrado com este CPF/CNPJ",
+        boletos: [],
+        clientes: [],
+        resumo: {
+          totalBoletos: 0,
+          totalEmAberto: 0,
+          totalEmAbertoFormatado: "R$ 0,00",
+          boletosVencidos: 0,
+          boletosAVencer: 0
+        }
       });
     }
 

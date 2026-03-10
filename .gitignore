@@ -8,6 +8,7 @@ coverage
 
 # Environment variables
 .env
+*.agent
 
 # Log files
 *.log
@@ -20,4 +21,6 @@ yarn-error.log*
 .vscode
 
 # Documentation
+.agent
 .docs/
+GEMINI.md

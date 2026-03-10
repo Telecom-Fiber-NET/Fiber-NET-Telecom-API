@@ -15,5 +15,11 @@ export interface DashboardLogin {
   ipv4?: string;
   endereco?: string;
   plano?: string;
+  wifi_ssid?: string;
+  wifi_senha?: string;
+  wifi_ssid_5g?: string;
+  wifi_senha_5g?: string;
+  sinal?: string;
+  onu_mac?: string;
   consumo?: DashboardConsumo;
 }

@@ -115,3 +115,70 @@ export async function imprimirTermo(req: any, res: Response) {
     });
   }
 }
+
+/**
+ * Assina digitalmente o contrato principal (cliente_contrato)
+ */
+export async function assinarContratoDigital(req: any, res: Response) {
+  try {
+    const { id } = req.params; // ID do contrato principal
+    const clientIp = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(',')[0].trim();
+
+    if (!id) {
+      return res.status(400).json({ error: "ID do contrato é obrigatório" });
+    }
+
+    const result = await ixcService.assinarContratoDigital(
+      Number(id),
+      String(clientIp),
+    );
+
+    return res.json({
+      success: true,
+      message: "Contrato ativado e assinado com sucesso!",
+      data: result,
+    });
+  } catch (error: any) {
+    console.error("Erro ao assinar contrato principal:", error);
+    return res.status(500).json({
+      error: error.message || "Falha ao assinar contrato principal.",
+    });
+  }
+}
+
+/**
+ * Suspende o contrato temporariamente
+ */
+export async function suspenderContrato(req: any, res: Response) {
+  try {
+    const { id } = req.params;
+    const { data_retomada } = req.body;
+
+    if (!id || !data_retomada) {
+      return res.status(400).json({ error: "ID do contrato e data de retomada são obrigatórios" });
+    }
+
+    const result = await ixcService.suspenderContrato(Number(id), data_retomada);
+    return res.json(result);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+/**
+ * Reativa um contrato que estava suspenso
+ */
+export async function reativarContrato(req: any, res: Response) {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: "ID do contrato é obrigatório" });
+    }
+
+    const result = await ixcService.reativarContrato(Number(id));
+    return res.json(result);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+}

@@ -44,6 +44,7 @@ export class DashboardService {
 
         const contratos = await this.ixc.buscarContratosPorIdCliente(id);
         const faturas = await this.ixc.financeiroListar(id);
+        const notasFiscais = await this.ixc.listarNotasFiscais(id);
         const logins = await this.ixc.loginsListar(id);
         const ordensRaw = await this.ixc.ordensServicoListar(id);
         const ticketsRaw = await this.ixc.ticketsListar(id);
@@ -120,6 +121,7 @@ export class DashboardService {
           cliente,
           contratos,
           faturas,
+          notasFiscais,
           logins,
           ordens,
           tickets,
@@ -140,6 +142,7 @@ export class DashboardService {
       faturas: [],
       logins: [],
       notas: [],
+      notas_fiscais: [],
       ordensServico: [],
       tickets: [],
       termos: [],
@@ -165,14 +168,49 @@ export class DashboardService {
         cpn_cnpj: r.cliente.cnpj_cpf,
       });
 
-      r.contratos.forEach((c: any) =>
+      r.contratos.forEach((c: any) => {
+        // Tradução do Status de Acesso baseada no esquema do IXC
+        const statusInternetMap: any = {
+          'A': 'Ativo',
+          'D': 'Desativado',
+          'CM': 'Bloqueio Manual',
+          'CA': 'Bloqueio Automático',
+          'FA': 'Financeiro em Atraso',
+          'AA': 'Aguardando Assinatura'
+        };
+
+        // --- LÓGICA DE VÍNCULO INTELIGENTE ---
+        // 1. Busca logins que pertencem a este contrato (por ID ou por Nome de Login)
+        const loginsDesteContrato = r.logins.filter((l: any) => {
+          const idMatch = String(l.id_contrato) === String(c.id);
+          const nameMatch = l.login && c.login && String(l.login).toLowerCase().includes(String(c.login).toLowerCase());
+          return idMatch || nameMatch;
+        });
+
+        // 2. Verifica se algum desses logins está bloqueado (CA, FA, CM)
+        const loginBloqueado = loginsDesteContrato.find((l: any) => 
+          ['CA', 'FA', 'CM', 'D'].includes(String(l.status_internet || l.status).toUpperCase())
+        );
+
+        // 3. Define o status final: Se o login estiver bloqueado, o contrato herda o bloqueio
+        const statusFinalInternet = loginBloqueado 
+          ? (loginBloqueado.status_internet || loginBloqueado.status) 
+          : (c.status_internet || 'A');
+
+        const isBloqueado = ['CA', 'FA', 'CM', 'D'].includes(statusFinalInternet);
+        const isPendente = statusFinalInternet === 'AA';
+
         dashboard.contratos.push({
           id: c.id,
           plano: c.descricao_aux_plano_venda,
-          status: c.status,
+          status: c.status, // Status Geral (A, I, etc)
+          status_acesso: statusInternetMap[statusFinalInternet] || 'Desconhecido',
+          status_internet: statusFinalInternet, 
+          situacao: isBloqueado ? 'bloqueado' : (isPendente ? 'pendente' : 'liberado'),
+          cor: isBloqueado ? 'red' : (isPendente ? 'orange' : 'green'),
           pdf_link: `/contrato/${c.id}`,
-        }),
-      );
+        });
+      });
 
       r.faturas.forEach((f: any) => {
         const valorRecebido = f.valor_recebido || f.valor_pago || f.pagamento_valor || "0";
@@ -228,6 +266,13 @@ export class DashboardService {
           ipv4: l.ip_concentrador || l.ip || null,
           endereco,
           plano,
+          // --- CAMPOS DE WIFI DO SEU IXC ---
+          wifi_ssid: l.ssid_router_wifi,
+          wifi_senha: l.senha_rede_sem_fio,
+          wifi_ssid_5g: l.ssid_router_wifi_5ghz,
+          wifi_senha_5g: l.senha_rede_sem_fio_5ghz,
+          sinal: l.sinal_ultimo_atendimento,
+          onu_mac: l.onu_mac,
           consumo,
         });
       }
@@ -244,6 +289,21 @@ export class DashboardService {
       dashboard.termos = dashboard.termos || [];
       dashboard.termos.push(...(r.termos || []));
       dashboard.ontInfo.push(...r.ontInfo);
+
+      // --- MAPEAMENTO DE NOTAS FISCAIS ---
+      if (r.notasFiscais && r.notasFiscais.length > 0) {
+        dashboard.notas_fiscais = dashboard.notas_fiscais || [];
+        r.notasFiscais.forEach((nf: any) => {
+          dashboard.notas_fiscais!.push({
+            id: nf.id,
+            numero: nf.numero || nf.documento || "N/A",
+            data_emissao: nf.data_emissao,
+            valor: nf.valor_total || nf.valor,
+            status: nf.status,
+            pdf_link: `/financeiro/notas/${nf.id}/imprimir`
+          });
+        });
+      }
     }
 
     // O consumo global agora realiza um merge inteligente por data/mês
@@ -334,9 +394,9 @@ export class DashboardService {
         { role: "user", content: prompt },
       ]);
       const parsedAi = JSON.parse(aiResponse.content);
-      dashboard.notas = [{ id: "ai-insights", ...parsedAi } as any];
+      dashboard.ai_insights = [{ id: "ai-insights", ...parsedAi } as any];
     } catch (e) {
-      dashboard.notas = [];
+      dashboard.ai_insights = [];
     }
 
     await cacheSet(cacheKey, dashboard, 60);

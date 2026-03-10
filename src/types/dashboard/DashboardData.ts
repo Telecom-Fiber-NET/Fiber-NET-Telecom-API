@@ -13,6 +13,8 @@ export interface DashboardData {
   faturas: DashboardFatura[];
   logins: DashboardLogin[];
   notas: any[];
+  notas_fiscais?: any[];
+  ai_insights?: any[];
   ordensServico: any[];
   tickets: any[];
   termos: any[];

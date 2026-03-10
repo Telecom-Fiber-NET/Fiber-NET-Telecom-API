@@ -13,15 +13,20 @@ import {
 import { handleChat } from "./controllers/chatController";
 import {
   assinarContrato,
+  assinarContratoDigital,
   executarAutoDesbloqueio,
   gerarPdfContrato,
   imprimirTermo,
   listarTermos,
+  reativarContrato,
+  suspenderContrato,
 } from "./controllers/contratosController";
 import { getResumo } from "./controllers/financeiroController";
 import {
+  alterarWifi,
   buscarConsumoDiario,
   buscarConsumoMensal,
+  buscarWifi,
   executarAcaoLogin,
 } from "./controllers/loginsController";
 import {
@@ -73,8 +78,11 @@ router.get("/contratos/:id_contrato/termos", verifyToken, listarTermos);
 router.get("/contratos/:id_contrato/financeiro", verifyToken, listarFinanceiroPorContrato);
 router.get("/financeiro/resumo", verifyToken, getResumo);
 router.post("/contratos/assinar/:id_termo", verifyToken, assinarContrato);
+router.post("/contratos/:id/assinar-digital", verifyToken, assinarContratoDigital); // <--- NOVA ROTA DE ASSINATURA DIGITAL
 router.post("/contratos/:id/pdf", verifyToken, gerarPdfContrato);
 router.post("/contratos/:id/desbloqueio", verifyToken, executarAutoDesbloqueio);
+router.post("/contratos/:id/suspender", verifyToken, suspenderContrato);
+router.post("/contratos/:id/reativar", verifyToken, reativarContrato);
 router.get("/contratos/termos/:id/imprimir", verifyToken, imprimirTermo); // <--- NOVA ROTA DE IMPRESSAO DE TERMO
 
 // ==================== TICKETS ====================
@@ -91,6 +99,8 @@ router.post("/senha/validar", validarForcaSenha);
 
 // ==================== LOGINS ====================
 router.post("/logins/:id/:action", verifyToken, executarAcaoLogin);
+router.get("/logins/:id/wifi", verifyToken, buscarWifi);
+router.post("/logins/:id/wifi", verifyToken, alterarWifi);
 router.get("/logins/:id/consumo/diario", verifyToken, buscarConsumoDiario); // <--- NOVA ROTA CONSUMO DIARIO
 router.get("/logins/:id/consumo/mensal", verifyToken, buscarConsumoMensal); // <--- NOVA ROTA CONSUMO MENSAL
 
