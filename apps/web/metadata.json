@@ -1,0 +1,5 @@
+{
+  "name": "Connect Fiber Customer Portal",
+  "description": "Customer portal for Connect Fiber ISP, allowing users to manage invoices, contracts, and view connection status.",
+  "requestFramePermissions": []
+}

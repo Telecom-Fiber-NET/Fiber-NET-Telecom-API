@@ -1,0 +1,2449 @@
+{
+  "user": {
+    "id": "7",
+    "ids_vinculados": [
+      "7"
+    ],
+    "nome": "CARLOS EDUARDO DA SILVA RIBEIRO",
+    "cnpj_cpf": "135.477.317-98",
+    "email": "carlos847@gmail.com;carlos847@gmail.com"
+  },
+  "dashboard": {
+    "clientes": [
+      {
+        "id": "7",
+        "nome": "CARLOS EDUARDO DA SILVA RIBEIRO",
+        "endereco": "ESTR. SITIO DA PEDREIRA, 100",
+        "cpn_cnpj": "135.477.317-98"
+      }
+    ],
+    "contratos": [
+      {
+        "id": "5874",
+        "plano": "",
+        "status": "A",
+        "pdf_link": "/contrato/5874"
+      },
+      {
+        "id": "1919",
+        "plano": "",
+        "status": "A",
+        "pdf_link": "/contrato/1919"
+      }
+    ],
+    "faturas": [
+      {
+        "id": "221266",
+        "vencimento": "2025-12-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "227442",
+        "vencimento": "2025-12-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "aberto",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "221265",
+        "vencimento": "2025-11-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "225046",
+        "vencimento": "2025-11-20",
+        "valor": "89.9",
+        "valor_recebido": "89.90",
+        "data_pagamento": "2025-11-10",
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 08508.440016 1 12710000008990"
+      },
+      {
+        "id": "221264",
+        "vencimento": "2025-10-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "224328",
+        "vencimento": "2025-10-20",
+        "valor": "89.9",
+        "valor_recebido": "89.90",
+        "data_pagamento": "2025-10-20",
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 08438.010012 4 12400000008990"
+      },
+      {
+        "id": "222117",
+        "vencimento": "2025-09-29",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 07516.980013 1 12190000008990"
+      },
+      {
+        "id": "222654",
+        "vencimento": "2025-09-29",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 08270.650016 7 12190000008990"
+      },
+      {
+        "id": "221263",
+        "vencimento": "2025-09-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "221262",
+        "vencimento": "2025-08-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "221261",
+        "vencimento": "2025-07-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 07431.550016 5 11480000008990"
+      },
+      {
+        "id": "213362",
+        "vencimento": "2025-06-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "213368",
+        "vencimento": "2025-06-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "213371",
+        "vencimento": "2025-06-20",
+        "valor": "89.9",
+        "valor_recebido": "89.90",
+        "data_pagamento": "2025-06-03",
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 06643.090019 6 11180000008990"
+      },
+      {
+        "id": "213359",
+        "vencimento": "2025-05-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "213361",
+        "vencimento": "2025-05-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "213367",
+        "vencimento": "2025-05-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "213370",
+        "vencimento": "2025-05-20",
+        "valor": "89.9",
+        "valor_recebido": "89.90",
+        "data_pagamento": "2025-05-12",
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 06642.900010 7 10870000008990"
+      },
+      {
+        "id": "213358",
+        "vencimento": "2025-04-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ". . .  "
+      },
+      {
+        "id": "213360",
+        "vencimento": "2025-04-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ". . .  "
+      },
+      {
+        "id": "213366",
+        "vencimento": "2025-04-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ". . .  "
+      },
+      {
+        "id": "213369",
+        "vencimento": "2025-04-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 06642.830019 5 10570000008990"
+      },
+      {
+        "id": "213375",
+        "vencimento": "2025-04-03",
+        "valor": "3",
+        "valor_recebido": "3.00",
+        "data_pagamento": "2025-04-03",
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 06643.480012 9 10400000000300"
+      },
+      {
+        "id": "213357",
+        "vencimento": "2025-03-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "204220",
+        "vencimento": "2024-09-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "00190000090334721200700204220172396010000012990"
+      },
+      {
+        "id": "204222",
+        "vencimento": "2024-08-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "00190000090334721200700204222178596320000012990"
+      },
+      {
+        "id": "204223",
+        "vencimento": "2024-07-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "00190000090334721200700204223176196610000012990"
+      },
+      {
+        "id": "199428",
+        "vencimento": "2024-07-09",
+        "valor": "15",
+        "valor_recebido": "15.00",
+        "data_pagamento": "2024-07-08",
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 05254.710014 2 97720000001500"
+      },
+      {
+        "id": "199429",
+        "vencimento": "2024-07-09",
+        "valor": "15",
+        "valor_recebido": "15.00",
+        "data_pagamento": "2024-07-08",
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 05254.890014 1 97720000001500"
+      },
+      {
+        "id": "195831",
+        "vencimento": "2024-06-20",
+        "valor": "20.00",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 04895.230011 1 97530000002000"
+      },
+      {
+        "id": "195833",
+        "vencimento": "2024-06-20",
+        "valor": "20",
+        "valor_recebido": "20.00",
+        "data_pagamento": "2024-06-12",
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 04895.480012 8 97530000002000"
+      },
+      {
+        "id": "204221",
+        "vencimento": "2024-06-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "00190000090334721200700204221170196010000012990"
+      },
+      {
+        "id": "195829",
+        "vencimento": "2024-06-06",
+        "valor": "10.00",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186761",
+        "vencimento": "2024-03-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186760",
+        "vencimento": "2024-02-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186759",
+        "vencimento": "2024-01-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186758",
+        "vencimento": "2023-12-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186762",
+        "vencimento": "2023-12-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186763",
+        "vencimento": "2023-12-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691326030108230400503989990019795700000012990"
+      },
+      {
+        "id": "186764",
+        "vencimento": "2023-12-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691326030108230400503990020012195700000008990"
+      },
+      {
+        "id": "186765",
+        "vencimento": "2023-12-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691326030108230400503990100012195700000012990"
+      },
+      {
+        "id": "186766",
+        "vencimento": "2023-12-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691326030108230400503990270013495700000012990"
+      },
+      {
+        "id": "195826",
+        "vencimento": "2023-12-20",
+        "valor": "249.80",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186530",
+        "vencimento": "2023-11-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186757",
+        "vencimento": "2023-11-20",
+        "valor": "89.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186687",
+        "vencimento": "2023-10-29",
+        "valor": "20",
+        "valor_recebido": "20.00",
+        "data_pagamento": "2023-09-29",
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 03982.300018 1 95180000002000"
+      },
+      {
+        "id": "186529",
+        "vencimento": "2023-10-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": ""
+      },
+      {
+        "id": "186756",
+        "vencimento": "2023-10-09",
+        "valor": "121.80",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691.32603 01082.304005 03989.280015 9 94980000012180"
+      },
+      {
+        "id": "186767",
+        "vencimento": "2023-10-09",
+        "valor": "175.99",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691326030108230400503990340014894980000017599"
+      },
+      {
+        "id": "186527",
+        "vencimento": "2023-09-20",
+        "valor": "129.90",
+        "valor_recebido": "0.00",
+        "data_pagamento": null,
+        "status": "pago",
+        "pix_code": "",
+        "linha_digitavel": "75691326030108230400503981110012394790000012990"
+      }
+    ],
+    "logins": [
+      {
+        "raw": "5141",
+        "id": "5141",
+        "login": "alex_silva",
+        "status": "offline",
+        "uptime": "0",
+        "contrato_id": "5874",
+        "download_atual": "0",
+        "upload_atual": "0",
+        "ip_privado": "Não atribuído",
+        "ip_publico": "::1",
+        "ipv4": null,
+        "endereco": "",
+        "plano": "",
+        "consumo": {
+          "total_download_bytes": 0,
+          "total_upload_bytes": 0,
+          "history": {
+            "daily": [
+              {
+                "data": "2026-01-01",
+                "download_bytes": 249565912,
+                "upload_bytes": 12646479
+              },
+              {
+                "data": "2026-01-02",
+                "download_bytes": 1097257728,
+                "upload_bytes": 43251906
+              },
+              {
+                "data": "2026-01-03",
+                "download_bytes": 8832,
+                "upload_bytes": 5109819
+              },
+              {
+                "data": "2026-01-25",
+                "download_bytes": 484395,
+                "upload_bytes": 2947741
+              },
+              {
+                "data": "2026-01-26",
+                "download_bytes": 829792,
+                "upload_bytes": 5688688
+              },
+              {
+                "data": "2026-01-27",
+                "download_bytes": 283421,
+                "upload_bytes": 1079279
+              },
+              {
+                "data": "2026-01-28",
+                "download_bytes": 289390,
+                "upload_bytes": 2054244
+              },
+              {
+                "data": "2026-01-29",
+                "download_bytes": 300408,
+                "upload_bytes": 3220467
+              },
+              {
+                "data": "2026-01-30",
+                "download_bytes": 469414,
+                "upload_bytes": 11306643
+              },
+              {
+                "data": "2026-01-31",
+                "download_bytes": 450854,
+                "upload_bytes": 2771624
+              },
+              {
+                "data": "2026-02-01",
+                "download_bytes": 324714,
+                "upload_bytes": 5063084
+              },
+              {
+                "data": "2026-02-02",
+                "download_bytes": 273069,
+                "upload_bytes": 1239
+              },
+              {
+                "data": "2026-02-03",
+                "download_bytes": 275777,
+                "upload_bytes": 16896
+              },
+              {
+                "data": "2026-02-04",
+                "download_bytes": 423098,
+                "upload_bytes": 4387953
+              },
+              {
+                "data": "2026-02-05",
+                "download_bytes": 275058,
+                "upload_bytes": 3636
+              },
+              {
+                "data": "2026-02-06",
+                "download_bytes": 265635,
+                "upload_bytes": 858151
+              },
+              {
+                "data": "2026-02-07",
+                "download_bytes": 278031,
+                "upload_bytes": 2150659
+              }
+            ],
+            "weekly": [
+              {
+                "data": "2026-01-01",
+                "download_bytes": 1346832472,
+                "upload_bytes": 61008204
+              },
+              {
+                "data": "2026-01-25",
+                "download_bytes": 3107674,
+                "upload_bytes": 29068686
+              },
+              {
+                "data": "2026-02-01",
+                "download_bytes": 2115382,
+                "upload_bytes": 12481618
+              }
+            ],
+            "monthly": [
+              {
+                "mes_ano": "2025-02",
+                "download_bytes": 345937906901,
+                "upload_bytes": 13803872503
+              },
+              {
+                "mes_ano": "2025-03",
+                "download_bytes": 638159524338,
+                "upload_bytes": 26521155413
+              },
+              {
+                "mes_ano": "2025-04",
+                "download_bytes": 645478311042,
+                "upload_bytes": 17869243635
+              },
+              {
+                "mes_ano": "2025-05",
+                "download_bytes": 743254769149,
+                "upload_bytes": 30912700285
+              },
+              {
+                "mes_ano": "2025-06",
+                "download_bytes": 299316028691,
+                "upload_bytes": 11249189881
+              },
+              {
+                "mes_ano": "2025-07",
+                "download_bytes": 434088155350,
+                "upload_bytes": 16560602299
+              },
+              {
+                "mes_ano": "2025-09",
+                "download_bytes": 297761386735,
+                "upload_bytes": 49481310438
+              },
+              {
+                "mes_ano": "2025-10",
+                "download_bytes": 926337482846,
+                "upload_bytes": 246869937513
+              },
+              {
+                "mes_ano": "2025-11",
+                "download_bytes": 910799727386,
+                "upload_bytes": 242028363843
+              },
+              {
+                "mes_ano": "2025-12",
+                "download_bytes": 441681712201,
+                "upload_bytes": 78927003703
+              },
+              {
+                "mes_ano": "2026-01",
+                "download_bytes": 1349940146,
+                "upload_bytes": 90076890
+              },
+              {
+                "mes_ano": "2026-02",
+                "download_bytes": 2115382,
+                "upload_bytes": 12481618
+              }
+            ]
+          },
+          "total_download": "0 Bytes",
+          "total_upload": "0 Bytes"
+        }
+      },
+      {
+        "raw": "1918",
+        "id": "1918",
+        "login": "carlos_casa",
+        "status": "online",
+        "uptime": "604803",
+        "contrato_id": "1919",
+        "download_atual": "723065704349",
+        "upload_atual": "94991437298",
+        "ip_privado": "100.65.3.13",
+        "ip_publico": "::1",
+        "ipv4": "100.65.3.13",
+        "endereco": "",
+        "plano": "",
+        "consumo": {
+          "total_download_bytes": 723065704349,
+          "total_upload_bytes": 94991437298,
+          "history": {
+            "daily": [
+              {
+                "data": "2026-02-06",
+                "download_bytes": 35299705255,
+                "upload_bytes": 6643343072
+              },
+              {
+                "data": "2026-02-07",
+                "download_bytes": 54802478323,
+                "upload_bytes": 5677195515
+              },
+              {
+                "data": "2026-02-08",
+                "download_bytes": 62640944584,
+                "upload_bytes": 19128436347
+              },
+              {
+                "data": "2026-02-09",
+                "download_bytes": 50149114149,
+                "upload_bytes": 8756382454
+              },
+              {
+                "data": "2026-02-10",
+                "download_bytes": 157696538952,
+                "upload_bytes": 11924910535
+              },
+              {
+                "data": "2026-02-11",
+                "download_bytes": 32790071306,
+                "upload_bytes": 8303569034
+              },
+              {
+                "data": "2026-02-12",
+                "download_bytes": 149844836621,
+                "upload_bytes": 13458727733
+              },
+              {
+                "data": "2026-02-13",
+                "download_bytes": 21638131818,
+                "upload_bytes": 2452842600
+              },
+              {
+                "data": "2026-02-14",
+                "download_bytes": 33949469546,
+                "upload_bytes": 8030052892
+              },
+              {
+                "data": "2026-02-15",
+                "download_bytes": 33974095434,
+                "upload_bytes": 13665713125
+              },
+              {
+                "data": "2026-02-16",
+                "download_bytes": 52018645079,
+                "upload_bytes": 12600536034
+              },
+              {
+                "data": "2026-02-17",
+                "download_bytes": 74684015090,
+                "upload_bytes": 8576417562
+              },
+              {
+                "data": "2026-02-18",
+                "download_bytes": 369098192532,
+                "upload_bytes": 13294706013
+              },
+              {
+                "data": "2026-02-19",
+                "download_bytes": 128874936988,
+                "upload_bytes": 9357557024
+              },
+              {
+                "data": "2026-02-20",
+                "download_bytes": 26734076574,
+                "upload_bytes": 8915723015
+              },
+              {
+                "data": "2026-02-21",
+                "download_bytes": 208261820738,
+                "upload_bytes": 14209350121
+              },
+              {
+                "data": "2026-02-22",
+                "download_bytes": 99840317996,
+                "upload_bytes": 9273801735
+              },
+              {
+                "data": "2026-02-23",
+                "download_bytes": 44601096638,
+                "upload_bytes": 2984059907
+              },
+              {
+                "data": "2026-02-24",
+                "download_bytes": 83836369626,
+                "upload_bytes": 10541309220
+              },
+              {
+                "data": "2026-02-25",
+                "download_bytes": 24142667715,
+                "upload_bytes": 6326400370
+              },
+              {
+                "data": "2026-02-26",
+                "download_bytes": 44213099941,
+                "upload_bytes": 12524719776
+              },
+              {
+                "data": "2026-02-27",
+                "download_bytes": 29837554048,
+                "upload_bytes": 8416875886
+              },
+              {
+                "data": "2026-02-28",
+                "download_bytes": 26724160694,
+                "upload_bytes": 7484682443
+              },
+              {
+                "data": "2026-03-01",
+                "download_bytes": 31466236435,
+                "upload_bytes": 8504518118
+              },
+              {
+                "data": "2026-03-02",
+                "download_bytes": 35491706877,
+                "upload_bytes": 8382209228
+              },
+              {
+                "data": "2026-03-03",
+                "download_bytes": 131084066744,
+                "upload_bytes": 12467333758
+              },
+              {
+                "data": "2026-03-04",
+                "download_bytes": 30929387975,
+                "upload_bytes": 12635253349
+              },
+              {
+                "data": "2026-03-05",
+                "download_bytes": 56538821939,
+                "upload_bytes": 15994474428
+              },
+              {
+                "data": "2026-03-06",
+                "download_bytes": 126091755466,
+                "upload_bytes": 10574708982
+              },
+              {
+                "data": "2026-03-07",
+                "download_bytes": 50390116255,
+                "upload_bytes": 20016156086
+              }
+            ],
+            "weekly": [
+              {
+                "data": "2026-02-06",
+                "download_bytes": 90102183578,
+                "upload_bytes": 12320538587
+              },
+              {
+                "data": "2026-02-08",
+                "download_bytes": 508709106976,
+                "upload_bytes": 72054921595
+              },
+              {
+                "data": "2026-02-15",
+                "download_bytes": 893645782435,
+                "upload_bytes": 80620002894
+              },
+              {
+                "data": "2026-02-22",
+                "download_bytes": 353195266658,
+                "upload_bytes": 57551849337
+              },
+              {
+                "data": "2026-03-01",
+                "download_bytes": 461992091691,
+                "upload_bytes": 88574653949
+              }
+            ],
+            "monthly": [
+              {
+                "mes_ano": "2025-03",
+                "download_bytes": 2628193426483,
+                "upload_bytes": 160943642392
+              },
+              {
+                "mes_ano": "2025-04",
+                "download_bytes": 2587633755075,
+                "upload_bytes": 158777219510
+              },
+              {
+                "mes_ano": "2025-05",
+                "download_bytes": 1717971223632,
+                "upload_bytes": 147076711604
+              },
+              {
+                "mes_ano": "2025-06",
+                "download_bytes": 1590848473333,
+                "upload_bytes": 240499191073
+              },
+              {
+                "mes_ano": "2025-07",
+                "download_bytes": 750918613094,
+                "upload_bytes": 164944836348
+              },
+              {
+                "mes_ano": "2025-09",
+                "download_bytes": 161935745692,
+                "upload_bytes": 25073712514
+              },
+              {
+                "mes_ano": "2025-10",
+                "download_bytes": 1650864744055,
+                "upload_bytes": 554210028294
+              },
+              {
+                "mes_ano": "2025-11",
+                "download_bytes": 986261007992,
+                "upload_bytes": 252740194112
+              },
+              {
+                "mes_ano": "2025-12",
+                "download_bytes": 1141560808307,
+                "upload_bytes": 324936125198
+              },
+              {
+                "mes_ano": "2026-01",
+                "download_bytes": 1817277867204,
+                "upload_bytes": 322311584805
+              },
+              {
+                "mes_ano": "2026-02",
+                "download_bytes": 2082698895007,
+                "upload_bytes": 293212663034
+              },
+              {
+                "mes_ano": "2026-03",
+                "download_bytes": 461992091691,
+                "upload_bytes": 88574653949
+              }
+            ]
+          },
+          "total_download": "673.41 GB",
+          "total_upload": "88.47 GB"
+        }
+      }
+    ],
+    "notas": [],
+    "ordensServico": [
+      {
+        "mensagem_resposta": "Troca de drop ",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "0000-00-00 00:00:00",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "2026-01-16 09:14:04",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "21965",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "N",
+        "data_abertura": "2026-01-15 22:05:21",
+        "melhor_horario_agenda": "Q",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "50",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "28",
+        "prioridade": "N",
+        "origem_os_aberta": "M",
+        "mensagem": "",
+        "protocolo": "20260122611",
+        "endereco": "RJ Valença 27602-350 PARAÍSO - ESTR. SITIO DA PEDREIRA, 100",
+        "complemento": "",
+        "id_condominio": "0",
+        "latitude": "-22.211241297597482",
+        "bloco": "",
+        "longitude": "-43.6481419344245",
+        "apartamento": "",
+        "bairro": "PARAÍSO",
+        "referencia": "",
+        "impresso": "N",
+        "data_inicio": "2026-01-16 09:36:19",
+        "data_agenda": "2026-01-16 08:14:04",
+        "data_final": "2026-01-16 09:36:19",
+        "data_fechamento": "2026-01-16 09:36:32",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "1918",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "M",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2026-01-16 09:36:33",
+        "assunto_nome": "SEM CONEXÃO",
+        "resolucao": "Troca de drop "
+      },
+      {
+        "mensagem_resposta": "Drop rompido",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "0000-00-00 00:00:00",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "5874",
+        "preview": "",
+        "data_agenda_final": "2025-10-16 09:25:46",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "21606",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "N",
+        "data_abertura": "2025-10-15 19:10:25",
+        "melhor_horario_agenda": "T",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "50",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "17",
+        "prioridade": "N",
+        "origem_os_aberta": "M",
+        "mensagem": "LOS PISCANDO ",
+        "protocolo": "20251022166",
+        "endereco": "RJ Valença 27602-350 PARAÍSO - ESTR. SITIO DA PEDREIRA, 100",
+        "complemento": "",
+        "id_condominio": "0",
+        "latitude": "-22.2114223",
+        "bloco": "",
+        "longitude": "-43.6481845",
+        "apartamento": "",
+        "bairro": "PARAÍSO",
+        "referencia": "",
+        "impresso": "N",
+        "data_inicio": "2025-10-16 14:37:14",
+        "data_agenda": "2025-10-16 08:13:40",
+        "data_final": "2025-10-16 14:37:14",
+        "data_fechamento": "2025-10-16 14:37:44",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "5141",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "L",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2025-10-16 14:37:44",
+        "assunto_nome": "SEM CONEXÃO",
+        "resolucao": "Drop rompido"
+      },
+      {
+        "mensagem_resposta": "Gambiarra corrigido ",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "0000-00-00 00:00:00",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "2024-01-04 11:54:08",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "19535",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "N",
+        "data_abertura": "2024-01-04 10:51:49",
+        "melhor_horario_agenda": "M",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "50",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "17",
+        "prioridade": "C",
+        "origem_os_aberta": "",
+        "mensagem": "SEM SINAL KKKK",
+        "protocolo": "20240119522",
+        "endereco": "RJ Valença 27600-000 PARAÍSO - ESTR. SITIO DA PEDREIRA, 100",
+        "complemento": "",
+        "id_condominio": "0",
+        "latitude": "-22.2114223",
+        "bloco": "",
+        "longitude": "-43.6481845",
+        "apartamento": "",
+        "bairro": "PARAÍSO",
+        "referencia": "",
+        "impresso": "N",
+        "data_inicio": "2024-01-04 13:42:27",
+        "data_agenda": "2024-01-04 11:02:02",
+        "data_final": "2024-01-04 13:42:27",
+        "data_fechamento": "2024-01-04 13:43:04",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "1918",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "L",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "M",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2024-01-04 13:43:04",
+        "assunto_nome": "SEM CONEXÃO",
+        "resolucao": "Gambiarra corrigido "
+      },
+      {
+        "mensagem_resposta": "Redução de 2dB na atenuação ",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "0000-00-00 00:00:00",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "2023-08-15 11:29:18",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "18872",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "N",
+        "data_abertura": "2023-08-15 08:21:03",
+        "melhor_horario_agenda": "M",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "359",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "17",
+        "prioridade": "B",
+        "origem_os_aberta": "",
+        "mensagem": "VERIFICAR SE TEM ATENUAÇÃO NA FIBRA ",
+        "protocolo": "20230818673",
+        "endereco": "RJ Valença 27600-000 PARAÍSO - ESTR. SITIO DA PEDREIRA, 100",
+        "complemento": "",
+        "id_condominio": "0",
+        "latitude": "-22.2097826",
+        "bloco": "",
+        "longitude": "-43.6487541",
+        "apartamento": "",
+        "bairro": "PARAÍSO",
+        "referencia": "",
+        "impresso": "N",
+        "data_inicio": "2023-08-16 09:57:17",
+        "data_agenda": "2023-08-15 10:27:10",
+        "data_final": "2023-08-16 09:57:17",
+        "data_fechamento": "2023-08-16 09:57:36",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "1918",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "L",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2023-08-16 09:57:36",
+        "assunto_nome": "POTENCIA BAIXA",
+        "resolucao": "Redução de 2dB na atenuação "
+      },
+      {
+        "mensagem_resposta": "Esticador quebrado ",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "2022-02-02 14:13:00",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "2022-02-02 20:00:00",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "15516",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "N",
+        "data_abertura": "2022-02-02 11:44:34",
+        "melhor_horario_agenda": "T",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "358",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "17",
+        "prioridade": "N",
+        "origem_os_aberta": "",
+        "mensagem": "levantar fibra",
+        "protocolo": "20220214726",
+        "endereco": "RJ Valença 27600-000 PARAÍSO - ESTR. SITIO DA PEDREIRA, 100",
+        "complemento": "",
+        "id_condominio": "",
+        "latitude": "-22.2107984",
+        "bloco": "",
+        "longitude": "-43.6246253",
+        "apartamento": "",
+        "bairro": "PARAÍSO",
+        "referencia": "",
+        "impresso": "N",
+        "data_inicio": "2022-02-02 14:12:46",
+        "data_agenda": "2022-02-02 19:00:00",
+        "data_final": "2022-02-02 14:12:46",
+        "data_fechamento": "2022-02-02 14:13:00",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "1918",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "C",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "0000-00-00 00:00:00",
+        "assunto_nome": "ACESSO PONTE",
+        "resolucao": "Esticador quebrado "
+      },
+      {
+        "mensagem_resposta": "Troca de fastconect ",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "2021-08-24 15:25:23",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "2021-08-24 16:00:00",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "14499",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "N",
+        "data_abertura": "2021-08-24 10:48:13",
+        "melhor_horario_agenda": "T",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "50",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "17",
+        "prioridade": "N",
+        "origem_os_aberta": "",
+        "mensagem": "CLIENTE SEM SINAL! O MESMO INFORMOU QUE PAROU DE FUNCIONAR",
+        "protocolo": "20210813569",
+        "endereco": "RJ Valença 27600-000 PARAÍSO - ESTR. SITIO DA PEDREIRA, 100",
+        "complemento": "",
+        "id_condominio": "",
+        "latitude": "-22.2097491",
+        "bloco": "",
+        "longitude": "-43.6394143",
+        "apartamento": "",
+        "bairro": "PARAÍSO",
+        "referencia": "",
+        "impresso": "N",
+        "data_inicio": "2021-08-24 15:25:06",
+        "data_agenda": "2021-08-24 15:00:00",
+        "data_final": "2021-08-24 15:25:06",
+        "data_fechamento": "2021-08-24 15:25:23",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "1918",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "L",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2021-12-10 08:52:31",
+        "assunto_nome": "SEM CONEXÃO",
+        "resolucao": "Troca de fastconect "
+      },
+      {
+        "mensagem_resposta": "Ok.",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "2021-02-08 10:50:47",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "2021-02-08 10:48:17",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "2021-02-08 13:00:00",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "12801",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "",
+        "data_abertura": "2021-02-08 10:47:36",
+        "melhor_horario_agenda": "M",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "352",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "17",
+        "prioridade": "N",
+        "origem_os_aberta": "",
+        "mensagem": "",
+        "protocolo": "20210211610",
+        "endereco": "",
+        "complemento": "",
+        "id_condominio": "",
+        "latitude": "-22.2480223",
+        "bloco": "",
+        "longitude": "-43.705163",
+        "apartamento": "",
+        "bairro": "PARAÍSO",
+        "referencia": "",
+        "impresso": "N",
+        "data_inicio": "2021-02-08 10:50:21",
+        "data_agenda": "2021-02-08 12:00:00",
+        "data_final": "2021-02-08 10:50:21",
+        "data_fechamento": "2021-02-08 10:50:47",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "1918",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "M",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2021-12-10 08:52:31",
+        "assunto_nome": "TROCA DE PONTO",
+        "resolucao": "Ok."
+      },
+      {
+        "mensagem_resposta": "Troca de fibra drop.",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "2021-01-29 18:26:30",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "2021-01-29 19:00:00",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "12578",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "",
+        "data_abertura": "2021-01-28 11:33:34",
+        "melhor_horario_agenda": "T",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "50",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "17",
+        "prioridade": "N",
+        "origem_os_aberta": "",
+        "mensagem": "",
+        "protocolo": "20210111360",
+        "endereco": "RJ Valença 27600-000 PARAÍSO - ESTR. SITIO DA PEDREIRA, 100",
+        "complemento": "",
+        "id_condominio": "",
+        "latitude": "-22.2123948",
+        "bloco": "",
+        "longitude": "-43.6228271",
+        "apartamento": "",
+        "bairro": "PARAÍSO",
+        "referencia": "",
+        "impresso": "N",
+        "data_inicio": "2021-01-29 18:24:09",
+        "data_agenda": "2021-01-29 18:00:00",
+        "data_final": "2021-01-29 18:24:09",
+        "data_fechamento": "2021-01-29 18:26:30",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "1918",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "L",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "2021-01-28 17:01:56",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2021-12-10 08:52:31",
+        "assunto_nome": "SEM CONEXÃO",
+        "resolucao": "Troca de fibra drop."
+      },
+      {
+        "mensagem_resposta": "SERVIÇO CONCLUÍDO.\nConector Rj45 com mau contato substituído",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "2021-01-23 10:50:04",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "2021-01-23 12:00:00",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "12488",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "",
+        "data_abertura": "2021-01-23 08:00:37",
+        "melhor_horario_agenda": "M",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "59",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "22",
+        "prioridade": "N",
+        "origem_os_aberta": "",
+        "mensagem": "",
+        "protocolo": "20210111256",
+        "endereco": "Rua Doutor Julio Xavier, 257 - 27600-000",
+        "complemento": "",
+        "id_condominio": "",
+        "latitude": "-22.2450598",
+        "bloco": "",
+        "longitude": "-43.6983982",
+        "apartamento": "",
+        "bairro": "Laranjeiras",
+        "referencia": "",
+        "impresso": "N",
+        "data_inicio": "2021-01-23 10:48:42",
+        "data_agenda": "2021-01-23 11:00:00",
+        "data_final": "2021-01-23 10:48:42",
+        "data_fechamento": "2021-01-23 10:50:04",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "4185",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "L",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2021-12-10 08:52:31",
+        "assunto_nome": "INTERMITÊNCIA",
+        "resolucao": "SERVIÇO CONCLUÍDO.\nConector Rj45 com mau contato substituído"
+      },
+      {
+        "mensagem_resposta": "SINAL NORMALIZADO, PORÉM ESTA CHEGANDO 57 MB",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "2020-11-25 09:47:17",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "0000-00-00 00:00:00",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "11254",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "",
+        "data_abertura": "2020-11-24 09:20:33",
+        "melhor_horario_agenda": "T",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "50",
+        "setor": "7",
+        "id_cidade": "3262",
+        "id_tecnico": "21",
+        "prioridade": "N",
+        "origem_os_aberta": "",
+        "mensagem": "CLIENTE COM QUEDAS CONSTANTES NO SINAL. INDO E VOLTANDO A REDE ",
+        "protocolo": "2020119841",
+        "endereco": "RJ Valença 27600-000 Laranjeiras - Rua Doutor Julio Xavier, 257",
+        "complemento": "",
+        "id_condominio": "",
+        "latitude": "",
+        "bloco": "",
+        "longitude": "",
+        "apartamento": "",
+        "bairro": "Laranjeiras",
+        "referencia": "",
+        "impresso": "S",
+        "data_inicio": "2020-11-24 09:20:33",
+        "data_agenda": "0000-00-00 00:00:00",
+        "data_final": "0000-00-00 00:00:00",
+        "data_fechamento": "2020-11-25 09:47:17",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "4185",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "L",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2024-03-01 16:03:49",
+        "assunto_nome": "SEM CONEXÃO",
+        "resolucao": "SINAL NORMALIZADO, PORÉM ESTA CHEGANDO 57 MB"
+      },
+      {
+        "mensagem_resposta": "TESTE REALIZADO PELO CARLOS ",
+        "data_hora_analise": "0000-00-00 00:00:00",
+        "data_hora_encaminhado": "2020-11-11 09:59:25",
+        "data_hora_assumido": "0000-00-00 00:00:00",
+        "data_hora_execucao": "0000-00-00 00:00:00",
+        "id_contrato_kit": "1919",
+        "preview": "",
+        "data_agenda_final": "0000-00-00 00:00:00",
+        "status_assinatura": "A",
+        "habilita_assinatura_cliente": "N",
+        "id": "10628",
+        "tipo": "C",
+        "id_filial": "1",
+        "id_wfl_tarefa": "0",
+        "status_sla": "",
+        "data_abertura": "2020-10-20 12:45:02",
+        "melhor_horario_agenda": "Q",
+        "liberado": "1",
+        "status": "F",
+        "id_cliente": "7",
+        "id_assunto": "150",
+        "setor": "7",
+        "id_cidade": "0",
+        "id_tecnico": "20",
+        "prioridade": "N",
+        "origem_os_aberta": "",
+        "mensagem": "",
+        "protocolo": "2020109121",
+        "endereco": ",  - ",
+        "complemento": "",
+        "id_condominio": "",
+        "latitude": "",
+        "bloco": "",
+        "longitude": "",
+        "apartamento": "",
+        "bairro": "",
+        "referencia": "",
+        "impresso": "S",
+        "data_inicio": "2020-11-11 09:59:08",
+        "data_agenda": "0000-00-00 00:00:00",
+        "data_final": "2020-11-11 10:00:13",
+        "data_fechamento": "2020-11-11 09:59:25",
+        "id_wfl_param_os": "0",
+        "valor_outras_despesas": "0.00",
+        "valor_total_comissao": "0.00",
+        "valor_total": "0.00",
+        "gera_comissao": "S",
+        "idx": "0",
+        "valor_unit_comissao": "0.00",
+        "id_su_diagnostico": "0",
+        "id_estrutura": "0",
+        "id_login": "0",
+        "data_prazo_limite": "0000-00-00 00:00:00",
+        "data_reservada": "0000-00-00",
+        "id_ticket": "0",
+        "origem_endereco": "L",
+        "justificativa_sla_atrasado": "",
+        "origem_endereco_estrutura": "E",
+        "data_reagendar": "0000-00-00 00:00:00",
+        "data_prev_final": "0000-00-00 00:00:00",
+        "origem_cadastro": "P",
+        "ultima_atualizacao": "2021-12-10 08:52:31",
+        "assunto_nome": "PEDIDO DE INSTALAÇÃO",
+        "resolucao": "TESTE REALIZADO PELO CARLOS "
+      }
+    ],
+    "tickets": [
+      {
+        "latitude": "",
+        "longitude": "",
+        "id_contrato": "0",
+        "endereco": "",
+        "id_resposta": "0",
+        "id": "171",
+        "status_sla": "",
+        "id_cliente": "7",
+        "titulo": "TESTE IXC",
+        "data_criacao": "2020-04-01 09:18:45",
+        "data_ultima_alteracao": "2020-04-01 09:19:29",
+        "ultima_atualizacao": "2021-12-10 08:52:32",
+        "su_status": "S",
+        "prioridade": "M",
+        "status": "C",
+        "id_ticket_setor": "1",
+        "mensagens_nao_lida_sup": "0",
+        "id_ticket_origem": "I",
+        "id_usuarios": "7",
+        "mensagens_nao_lida_cli": "0",
+        "protocolo": "2020045124",
+        "id_wfl_processo": "0",
+        "id_su_diagnostico": "0",
+        "origem_endereco": "M",
+        "token": "1f367f9941dad740bab534482c1ac25dd11d6d39",
+        "menssagem": "TESTE IXC",
+        "id_assunto": "0",
+        "id_login": "0",
+        "id_circuito": "0",
+        "id_filial": "1",
+        "id_responsavel_tecnico": "14",
+        "interacao_pendente": "E",
+        "id_evento_status_processo": "0",
+        "assunto_nome": "TESTE IXC",
+        "resolucao": "TESTE IXC",
+        "podeFechar": false
+      }
+    ],
+    "termos": [],
+    "ontInfo": [
+      {
+        "id_projeto": "4",
+        "gemport": "",
+        "login_onu_cliente": "30",
+        "senha_onu_cliente": "30",
+        "porta_telnet_onu_cliente": "10",
+        "perfil_onu_cliente": "0",
+        "script_onu_cliente": "",
+        "senorid": "",
+        "latitude": "-22.2114223",
+        "longitude": "-43.6481845",
+        "endereco_padrao_cliente": "S",
+        "id_condominio": "0",
+        "bloco": "",
+        "apartamento": "0",
+        "cep": "",
+        "endereco": "",
+        "numero": "",
+        "bairro": "",
+        "cidade": "0",
+        "referencia": "",
+        "complemento": "",
+        "distancia_onu": "",
+        "vlan_dhcp": "",
+        "vlan_tr69": "",
+        "vlan_iptv": "",
+        "vlan_voip": "",
+        "vlan_pppoe": "",
+        "vlan_outros": "",
+        "id_ramal": "0",
+        "id_onu_unms": "",
+        "id_activity": "",
+        "radpop_estrutura": "N",
+        "porta_web_onu_cliente": "0",
+        "tipo_operacao": "",
+        "id_radpop_radio_porta": "41",
+        "id": "2242",
+        "id_transmissor": "1",
+        "nome": "alex_silva\r",
+        "id_caixa_ftth": "0",
+        "porta_ftth": "0",
+        "id_login": "5141",
+        "id_contrato": "5320",
+        "onu_numero": "7",
+        "service_port": "",
+        "onu_tipo": "HWTC-EG8145V5",
+        "ponid": "0/1/0",
+        "comandos": "Interface gpon #subrack#/#slot#; ont add #pon# #onu_numero# sn-auth \"#onu_mac#\" omci ont-lineprofile-id #vlan# desc \"#nome#\";quit; service-port #service_port# vlan #vlan# gpon #pon_id# ont #onu_numero# gemport 1 multi-service user-vlan #vlan# tag-transform translate; ",
+        "mac": "48575443B7919C9F",
+        "sinal_rx": "0.00",
+        "sinal_tx": "0.00",
+        "temperatura": "0.00",
+        "voltagem": "0.00",
+        "data_sinal": "2026-03-08 15:52:42",
+        "ip_gerencia": "20",
+        "id_perfil": "19",
+        "slotno": "1",
+        "ponno": "0",
+        "tipo_autenticacao": "MAC",
+        "versao": "",
+        "vlan": "150",
+        "causa_ultima_queda": "LOSi/LOBi",
+        "onu_rede_neutra": "N",
+        "id_hardware": "0"
+      }
+    ],
+    "consumo": {
+      "total_download_bytes": 723065704349,
+      "total_upload_bytes": 94991437298,
+      "total_download": "673.41 GB",
+      "total_upload": "88.47 GB",
+      "history": {
+        "daily": [
+          {
+            "data": "2026-01-01",
+            "download_bytes": 249565912,
+            "upload_bytes": 12646479
+          },
+          {
+            "data": "2026-01-02",
+            "download_bytes": 1097257728,
+            "upload_bytes": 43251906
+          },
+          {
+            "data": "2026-01-03",
+            "download_bytes": 8832,
+            "upload_bytes": 5109819
+          },
+          {
+            "data": "2026-01-25",
+            "download_bytes": 484395,
+            "upload_bytes": 2947741
+          },
+          {
+            "data": "2026-01-26",
+            "download_bytes": 829792,
+            "upload_bytes": 5688688
+          },
+          {
+            "data": "2026-01-27",
+            "download_bytes": 283421,
+            "upload_bytes": 1079279
+          },
+          {
+            "data": "2026-01-28",
+            "download_bytes": 289390,
+            "upload_bytes": 2054244
+          },
+          {
+            "data": "2026-01-29",
+            "download_bytes": 300408,
+            "upload_bytes": 3220467
+          },
+          {
+            "data": "2026-01-30",
+            "download_bytes": 469414,
+            "upload_bytes": 11306643
+          },
+          {
+            "data": "2026-01-31",
+            "download_bytes": 450854,
+            "upload_bytes": 2771624
+          },
+          {
+            "data": "2026-02-01",
+            "download_bytes": 324714,
+            "upload_bytes": 5063084
+          },
+          {
+            "data": "2026-02-02",
+            "download_bytes": 273069,
+            "upload_bytes": 1239
+          },
+          {
+            "data": "2026-02-03",
+            "download_bytes": 275777,
+            "upload_bytes": 16896
+          },
+          {
+            "data": "2026-02-04",
+            "download_bytes": 423098,
+            "upload_bytes": 4387953
+          },
+          {
+            "data": "2026-02-05",
+            "download_bytes": 275058,
+            "upload_bytes": 3636
+          },
+          {
+            "data": "2026-02-06",
+            "download_bytes": 35299970890,
+            "upload_bytes": 6644201223
+          },
+          {
+            "data": "2026-02-07",
+            "download_bytes": 54802756354,
+            "upload_bytes": 5679346174
+          },
+          {
+            "data": "2026-02-08",
+            "download_bytes": 62640944584,
+            "upload_bytes": 19128436347
+          },
+          {
+            "data": "2026-02-09",
+            "download_bytes": 50149114149,
+            "upload_bytes": 8756382454
+          },
+          {
+            "data": "2026-02-10",
+            "download_bytes": 157696538952,
+            "upload_bytes": 11924910535
+          },
+          {
+            "data": "2026-02-11",
+            "download_bytes": 32790071306,
+            "upload_bytes": 8303569034
+          },
+          {
+            "data": "2026-02-12",
+            "download_bytes": 149844836621,
+            "upload_bytes": 13458727733
+          },
+          {
+            "data": "2026-02-13",
+            "download_bytes": 21638131818,
+            "upload_bytes": 2452842600
+          },
+          {
+            "data": "2026-02-14",
+            "download_bytes": 33949469546,
+            "upload_bytes": 8030052892
+          },
+          {
+            "data": "2026-02-15",
+            "download_bytes": 33974095434,
+            "upload_bytes": 13665713125
+          },
+          {
+            "data": "2026-02-16",
+            "download_bytes": 52018645079,
+            "upload_bytes": 12600536034
+          },
+          {
+            "data": "2026-02-17",
+            "download_bytes": 74684015090,
+            "upload_bytes": 8576417562
+          },
+          {
+            "data": "2026-02-18",
+            "download_bytes": 369098192532,
+            "upload_bytes": 13294706013
+          },
+          {
+            "data": "2026-02-19",
+            "download_bytes": 128874936988,
+            "upload_bytes": 9357557024
+          },
+          {
+            "data": "2026-02-20",
+            "download_bytes": 26734076574,
+            "upload_bytes": 8915723015
+          },
+          {
+            "data": "2026-02-21",
+            "download_bytes": 208261820738,
+            "upload_bytes": 14209350121
+          },
+          {
+            "data": "2026-02-22",
+            "download_bytes": 99840317996,
+            "upload_bytes": 9273801735
+          },
+          {
+            "data": "2026-02-23",
+            "download_bytes": 44601096638,
+            "upload_bytes": 2984059907
+          },
+          {
+            "data": "2026-02-24",
+            "download_bytes": 83836369626,
+            "upload_bytes": 10541309220
+          },
+          {
+            "data": "2026-02-25",
+            "download_bytes": 24142667715,
+            "upload_bytes": 6326400370
+          },
+          {
+            "data": "2026-02-26",
+            "download_bytes": 44213099941,
+            "upload_bytes": 12524719776
+          },
+          {
+            "data": "2026-02-27",
+            "download_bytes": 29837554048,
+            "upload_bytes": 8416875886
+          },
+          {
+            "data": "2026-02-28",
+            "download_bytes": 26724160694,
+            "upload_bytes": 7484682443
+          },
+          {
+            "data": "2026-03-01",
+            "download_bytes": 31466236435,
+            "upload_bytes": 8504518118
+          },
+          {
+            "data": "2026-03-02",
+            "download_bytes": 35491706877,
+            "upload_bytes": 8382209228
+          },
+          {
+            "data": "2026-03-03",
+            "download_bytes": 131084066744,
+            "upload_bytes": 12467333758
+          },
+          {
+            "data": "2026-03-04",
+            "download_bytes": 30929387975,
+            "upload_bytes": 12635253349
+          },
+          {
+            "data": "2026-03-05",
+            "download_bytes": 56538821939,
+            "upload_bytes": 15994474428
+          },
+          {
+            "data": "2026-03-06",
+            "download_bytes": 126091755466,
+            "upload_bytes": 10574708982
+          },
+          {
+            "data": "2026-03-07",
+            "download_bytes": 50390116255,
+            "upload_bytes": 20016156086
+          }
+        ],
+        "weekly": [
+          {
+            "data": "2026-01-01",
+            "download_bytes": 1346832472,
+            "upload_bytes": 61008204
+          },
+          {
+            "data": "2026-01-25",
+            "download_bytes": 3107674,
+            "upload_bytes": 29068686
+          },
+          {
+            "data": "2026-02-01",
+            "download_bytes": 2115382,
+            "upload_bytes": 12481618
+          },
+          {
+            "data": "2026-02-06",
+            "download_bytes": 90102183578,
+            "upload_bytes": 12320538587
+          },
+          {
+            "data": "2026-02-08",
+            "download_bytes": 508709106976,
+            "upload_bytes": 72054921595
+          },
+          {
+            "data": "2026-02-15",
+            "download_bytes": 893645782435,
+            "upload_bytes": 80620002894
+          },
+          {
+            "data": "2026-02-22",
+            "download_bytes": 353195266658,
+            "upload_bytes": 57551849337
+          },
+          {
+            "data": "2026-03-01",
+            "download_bytes": 461992091691,
+            "upload_bytes": 88574653949
+          }
+        ],
+        "monthly": [
+          {
+            "mes_ano": "2025-02",
+            "download_bytes": 345937906901,
+            "upload_bytes": 13803872503
+          },
+          {
+            "mes_ano": "2025-03",
+            "download_bytes": 3266352950821,
+            "upload_bytes": 187464797805
+          },
+          {
+            "mes_ano": "2025-04",
+            "download_bytes": 3233112066117,
+            "upload_bytes": 176646463145
+          },
+          {
+            "mes_ano": "2025-05",
+            "download_bytes": 2461225992781,
+            "upload_bytes": 177989411889
+          },
+          {
+            "mes_ano": "2025-06",
+            "download_bytes": 1890164502024,
+            "upload_bytes": 251748380954
+          },
+          {
+            "mes_ano": "2025-07",
+            "download_bytes": 1185006768444,
+            "upload_bytes": 181505438647
+          },
+          {
+            "mes_ano": "2025-09",
+            "download_bytes": 459697132427,
+            "upload_bytes": 74555022952
+          },
+          {
+            "mes_ano": "2025-10",
+            "download_bytes": 2577202226901,
+            "upload_bytes": 801079965807
+          },
+          {
+            "mes_ano": "2025-11",
+            "download_bytes": 1897060735378,
+            "upload_bytes": 494768557955
+          },
+          {
+            "mes_ano": "2025-12",
+            "download_bytes": 1583242520508,
+            "upload_bytes": 403863128901
+          },
+          {
+            "mes_ano": "2026-01",
+            "download_bytes": 1818627807350,
+            "upload_bytes": 322401661695
+          },
+          {
+            "mes_ano": "2026-02",
+            "download_bytes": 2082701010389,
+            "upload_bytes": 293225144652
+          },
+          {
+            "mes_ano": "2026-03",
+            "download_bytes": 461992091691,
+            "upload_bytes": 88574653949
+          }
+        ]
+      }
+    }
+  },
+  "financeiro_resumo": [
+    {
+      "id_contrato": "5874",
+      "contrato": "FTTH_FIBER_300MB_Plus",
+      "endereco": {
+        "endereco": "ESTR. SITIO DA PEDREIRA",
+        "numero": "100",
+        "bairro": "PARAÍSO",
+        "cidade": "3262",
+        "uf": "0",
+        "cep": "27602-350",
+        "complemento": ""
+      },
+      "financeiro": {
+        "media_pagamento": 89.9,
+        "media_diaria": 3,
+        "total_pago": 359.6,
+        "qtd_faturas": 4
+      },
+      "logins": [
+        {
+          "autenticacao_por_mac": "P",
+          "relacionar_concentrador_ao_login": "H",
+          "agent_circuit_id": "",
+          "pool_radius": "0",
+          "id_rad_dns": "0",
+          "modelo_tranmissor": "",
+          "auto_preencher_ipv6": "H",
+          "fixar_ipv6": "H",
+          "relacionar_ipv6_ao_login": "H",
+          "ip_aux": "",
+          "porta_aux": "0",
+          "id_radgrupos_pools": "0",
+          "service_tag_vlan": "N",
+          "acct_session_id": "",
+          "senha_rede_sem_fio_5ghz": "",
+          "ssid_router_wifi_5ghz": "",
+          "mtu": "1500",
+          "onu_compartilhada": "N",
+          "id_reserva_rede_neutra": "0",
+          "tipo_acesso": "http",
+          "usuario_wpa2aes": "",
+          "senha_wpa2aes": "",
+          "pacote_lte": "",
+          "id_predio": "",
+          "id": "5141",
+          "ativo": "S",
+          "online": "N",
+          "tipo_conexao_mapa": "58",
+          "id_contrato": "5874",
+          "id_grupo": "49",
+          "id_cliente": "7",
+          "login": "alex_silva",
+          "obs": "",
+          "senha": "1992",
+          "auto_preencher_ip": "H",
+          "ip": "",
+          "auto_preencher_mac": "H",
+          "pd_ipv6": "",
+          "mac": "5C:E8:83:D8:E1:D5",
+          "endereco": "",
+          "numero": "",
+          "complemento": "",
+          "relacionar_ip_ao_login": "H",
+          "bairro": "",
+          "relacionar_mac_ao_login": "H",
+          "conexao": "VLAN150",
+          "id_concentrador": "6",
+          "latitude": "-22.2114223",
+          "longitude": "-43.6481845",
+          "concentrador": "172.32.255.4",
+          "tipo_conexao": "Ethernet",
+          "ultima_conexao_inicial": "2026-02-07 15:20:55",
+          "ultima_conexao_final": "2026-02-07 17:24:02",
+          "interface": "0",
+          "tempo_conectado": "0",
+          "franquia_maximo": "0",
+          "franquia_consumo": "0.00000",
+          "autenticacao": "L",
+          "login_simultaneo": "1",
+          "senha_md5": "N",
+          "fixar_ip": "H",
+          "ip_aviso": "",
+          "porta_http": "",
+          "porta_router2": "0",
+          "id_transmissor": "1",
+          "id_caixa_ftth": "0",
+          "ftth_porta": "0",
+          "senha_router1": "",
+          "senha_router2": "",
+          "senha_rede_sem_fio": "",
+          "id_porta_transmissor": "0",
+          "cliente_tem_a_senha": "N",
+          "franquia_atingida": "N",
+          "autenticacao_wps": "N",
+          "id_df_projeto": "4",
+          "autenticacao_mac": "N",
+          "motivo_desconexao": "",
+          "autenticacao_wpa": "",
+          "tempo_conexao": "0",
+          "tipo_vinculo_plano": "D",
+          "count_desconexao": "0",
+          "onu_mac": "48575443B7919C9F",
+          "vlan": "0",
+          "vlan_ip_rede": "",
+          "id_hardware": "0",
+          "id_condominio": "0",
+          "tipo_equipamento": "",
+          "metragem_interna": "0",
+          "metragem_externa": "0",
+          "tronco": "",
+          "splitter": "0",
+          "sinal_ultimo_atendimento": "",
+          "interface_transmissao": "41",
+          "franquia_consumo_up": "0.00000",
+          "endereco_padrao_cliente": "S",
+          "cidade": "0",
+          "cep": "",
+          "referencia": "",
+          "ssid_router_wifi": "",
+          "bloco": "",
+          "apartamento": "0",
+          "usuario_router1": "",
+          "upload_atual": "0",
+          "download_atual": "0",
+          "gw_vlan": "",
+          "id_filial": "1",
+          "ponta": "",
+          "ultima_atualizacao": "2026-02-08 00:01:01",
+          "framed_fixar_ipv6": "H",
+          "framed_autopreencher_ipv6": "H",
+          "framed_relacionar_ipv6_ao_login": "H",
+          "framed_pd_ipv6": "2804:60fc:22ff:c1f8::/64",
+          "lte_id": "",
+          "id_integracao": "0"
+        }
+      ]
+    },
+    {
+      "id_contrato": "1919",
+      "contrato": "FTTH_FIBER_1024MB_PLUS_NO_CABO",
+      "endereco": {
+        "endereco": "ESTR. SITIO DA PEDREIRA",
+        "numero": "100",
+        "bairro": "PARAÍSO",
+        "cidade": "3262",
+        "uf": "0",
+        "cep": "27602-350",
+        "complemento": ""
+      },
+      "financeiro": {
+        "media_pagamento": 0,
+        "media_diaria": 0,
+        "total_pago": 0,
+        "qtd_faturas": 0
+      },
+      "logins": [
+        {
+          "autenticacao_por_mac": "N",
+          "relacionar_concentrador_ao_login": "N",
+          "agent_circuit_id": "",
+          "pool_radius": "0",
+          "id_rad_dns": "0",
+          "modelo_tranmissor": "",
+          "auto_preencher_ipv6": "H",
+          "fixar_ipv6": "H",
+          "relacionar_ipv6_ao_login": "H",
+          "ip_aux": "",
+          "porta_aux": "0",
+          "id_radgrupos_pools": "0",
+          "service_tag_vlan": "N",
+          "acct_session_id": "8192d670",
+          "senha_rede_sem_fio_5ghz": "",
+          "ssid_router_wifi_5ghz": "",
+          "mtu": "1500",
+          "onu_compartilhada": "N",
+          "id_reserva_rede_neutra": "0",
+          "tipo_acesso": "http",
+          "usuario_wpa2aes": "",
+          "senha_wpa2aes": "",
+          "pacote_lte": "",
+          "id_predio": "0",
+          "id": "1918",
+          "ativo": "S",
+          "online": "S",
+          "tipo_conexao_mapa": "F",
+          "id_contrato": "1919",
+          "id_grupo": "51",
+          "id_cliente": "7",
+          "login": "carlos_casa",
+          "obs": "",
+          "senha": "1990",
+          "auto_preencher_ip": "H",
+          "ip": "100.65.3.13",
+          "auto_preencher_mac": "N",
+          "pd_ipv6": "",
+          "mac": "",
+          "endereco": "",
+          "numero": "",
+          "complemento": "",
+          "relacionar_ip_ao_login": "H",
+          "bairro": "",
+          "relacionar_mac_ao_login": "N",
+          "conexao": "VLAN150",
+          "id_concentrador": "6",
+          "latitude": "-22.2114223",
+          "longitude": "-43.6481845",
+          "concentrador": "172.32.255.4",
+          "tipo_conexao": "Ethernet",
+          "ultima_conexao_inicial": "2026-03-01 21:20:02",
+          "ultima_conexao_final": "",
+          "interface": "0",
+          "tempo_conectado": "604803",
+          "franquia_maximo": "0",
+          "franquia_consumo": "0.00000",
+          "autenticacao": "L",
+          "login_simultaneo": "1",
+          "senha_md5": "N",
+          "fixar_ip": "H",
+          "ip_aviso": "100.65.3.13",
+          "porta_http": "",
+          "porta_router2": "0",
+          "id_transmissor": "0",
+          "id_caixa_ftth": "0",
+          "ftth_porta": "0",
+          "senha_router1": "",
+          "senha_router2": "",
+          "senha_rede_sem_fio": "",
+          "id_porta_transmissor": "0",
+          "cliente_tem_a_senha": "N",
+          "franquia_atingida": "N",
+          "autenticacao_wps": "N",
+          "id_df_projeto": "0",
+          "autenticacao_mac": "N",
+          "motivo_desconexao": "",
+          "autenticacao_wpa": "",
+          "tempo_conexao": "0",
+          "tipo_vinculo_plano": "D",
+          "count_desconexao": "0",
+          "onu_mac": "",
+          "vlan": "0",
+          "vlan_ip_rede": "",
+          "id_hardware": "0",
+          "id_condominio": "0",
+          "tipo_equipamento": "P",
+          "metragem_interna": "0",
+          "metragem_externa": "0",
+          "tronco": "",
+          "splitter": "0",
+          "sinal_ultimo_atendimento": "",
+          "interface_transmissao": "0",
+          "franquia_consumo_up": "0.00000",
+          "endereco_padrao_cliente": "S",
+          "cidade": "0",
+          "cep": "",
+          "referencia": "",
+          "ssid_router_wifi": "",
+          "bloco": "",
+          "apartamento": "0",
+          "usuario_router1": "",
+          "upload_atual": "94991437298",
+          "download_atual": "723065704349",
+          "gw_vlan": "",
+          "id_filial": "0",
+          "ponta": "",
+          "ultima_atualizacao": "2026-03-08 21:20:05",
+          "framed_fixar_ipv6": "H",
+          "framed_autopreencher_ipv6": "H",
+          "framed_relacionar_ipv6_ao_login": "H",
+          "framed_pd_ipv6": "2804:60fc:22ff:c709::/64",
+          "lte_id": "",
+          "id_integracao": "0"
+        }
+      ]
+    }
+  ]
+}
