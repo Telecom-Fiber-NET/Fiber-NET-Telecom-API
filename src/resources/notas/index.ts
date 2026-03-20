@@ -1,8 +1,7 @@
-import { ixcService } from "services/ixcService";
-import { base64 } from "zod";
+import { fetchIxc } from "services/ixcService";
 
 export async function imprimirNota(id: string) {
-  return ixcService.post("imprimir_nota", {
+  return fetchIxc("imprimir_nota", {
     id,
     base64: "s",
   });
