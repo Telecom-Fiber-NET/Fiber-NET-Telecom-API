@@ -3,36 +3,40 @@
   "version": "1.0.0",
   "private": true,
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p .",
     "start": "node dist/index.js",
     "test": "jest --runInBand --detectOpenHandles",
-    "doc": "typedoc"
+    "doc": "typedoc",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.30.0",
     "@anthropic-ai/sdk": "^0.71.2",
     "@google/generative-ai": "^0.24.1",
-    "@supabase/supabase-js": "^2.30.0",
-    "@types/winston": "^2.4.4",
     "axios": "^1.13.5",
     "axios-retry": "^4.5.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.22.1",
-    "groq-sdk": "^0.3.0",
     "jsonwebtoken": "^9.0.0",
     "node-cache": "^5.1.2",
-    "openai": "^6.10.0",
     "swagger-ui-express": "^4.6.3",
     "winston": "^3.18.3",
     "ws": "^8.18.3",
     "yamljs": "^0.3.0",
-    "zod": "^4.1.13"
+    "zod": "^4.1.13",
+    "groq-sdk": "^1.1.1",
+    "openai": "^6.10.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/dotenv": "^6.1.1",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.2",

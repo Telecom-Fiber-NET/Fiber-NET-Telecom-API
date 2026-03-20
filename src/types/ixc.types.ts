@@ -1,7 +1,47 @@
 /**
  * TIPOS PARA INTEGRAÇÃO COM API IXC SOFT
- * Documentação completa de todos os tipos usados na API
+ * Versão refatorada (nível sênior)
  */
+
+// ============================================================================
+// BASE TYPES
+// ============================================================================
+
+export type ISODateString = string;
+export type Base64Flag = "S" | "N";
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+export enum ClienteTipo {
+  FISICA = "F",
+  JURIDICA = "J",
+}
+
+export enum ClienteStatus {
+  ATIVO = "A",
+  INATIVO = "I",
+  DESATIVADO = "D",
+}
+
+export enum ContratoStatus {
+  ATIVO = "A",
+  INATIVO = "I",
+  CANCELADO = "C",
+}
+
+export enum FaturaStatus {
+  ABERTO = "A",
+  PAGO = "P",
+  CANCELADO = "C",
+}
+
+export enum LoginStatus {
+  ATIVO = "A",
+  BLOQUEADO = "B",
+  CANCELADO = "CA",
+}
 
 // ============================================================================
 // CLIENTE
@@ -12,7 +52,7 @@ export interface Cliente {
   razao: string;
   fantasia: string;
   cnpj_cpf: string;
-  tipo_cliente: "F" | "J"; // F=Física, J=Jurídica
+  tipo_cliente: ClienteTipo;
   fone_comercial?: string;
   celular?: string;
   email?: string;
@@ -24,8 +64,8 @@ export interface Cliente {
   cidade?: string;
   uf?: string;
   cep?: string;
-  status: "A" | "I" | "D"; // A=Ativo, I=Inativo, D=Desativado
-  data_cadastro: string;
+  status: ClienteStatus;
+  data_cadastro: ISODateString;
   observacao?: string;
 }
 
@@ -38,57 +78,75 @@ export interface Contrato {
   id_cliente: number;
   id_plano: number;
   descricao_plano?: string;
-  valor: string;
-  data_ativacao: string;
-  data_vencimento?: string;
-  status: "A" | "I" | "C"; // A=Ativo, I=Inativo, C=Cancelado
+  valor: string; // vindo da API
+  data_ativacao: ISODateString;
+  data_vencimento?: ISODateString;
+  status: ContratoStatus;
   tipo_contrato: string;
   dia_vencimento: number;
 }
 
 // ============================================================================
-// FINANCEIRO
+// FINANCEIRO (API RAW)
 // ============================================================================
 
 export interface Fatura {
   id: number;
   id_cliente: number;
   documento: string;
-  data_vencimento: string;
-  data_pagamento?: string;
-  valor: string;
+  data_vencimento: ISODateString;
+  data_pagamento?: ISODateString;
+  valor: string; // API retorna string
   valor_pago?: string;
-  status: "A" | "P" | "C"; // A=Aberto, P=Pago, C=Cancelado
+  status: FaturaStatus;
   linha_digitavel?: string;
-  boleto?: string; // URL do PDF
+  boleto?: string; // URL
   pix_txid?: string;
   pix_qrcode?: string;
   descricao?: string;
   observacao?: string;
 }
 
+// ============================================================================
+// FINANCEIRO (DOMÍNIO)
+// ============================================================================
+
+export type StatusBoleto =
+  | "Vencido"
+  | "Vence Hoje"
+  | "Vence em Breve"
+  | "A Vencer";
+
+export type StatusCor = "danger" | "warning" | "success";
+
 export interface ResumoBoleto {
   id: number;
   clienteId: number;
   clienteNome: string;
   documento: string;
-  vencimento: string;
+  vencimento: ISODateString;
   vencimentoFormatado: string;
   valor: number;
   valorFormatado: string;
   linhaDigitavel?: string;
   pixCopiaECola?: string;
-  boleto_pdf_link?: string;
+  boletoPdfLink?: string;
   status: StatusBoleto;
   statusCor: StatusCor;
   diasVencimento: number;
 }
 
-export type StatusBoleto = "Vencido" | "Vence Hoje" | "Vence em Breve" | "A Vencer";
-export type StatusCor = "danger" | "warning" | "success";
+// ============================================================================
+// NOTA FISCAL
+// ============================================================================
+
+export interface ImprimirNotaParams {
+  id: string;
+  base64: Base64Flag;
+}
 
 // ============================================================================
-// LOGIN (CONEXÃO)
+// LOGIN
 // ============================================================================
 
 export interface Login {
@@ -96,7 +154,7 @@ export interface Login {
   id_cliente: number;
   login: string;
   senha?: string;
-  status: "A" | "B" | "CA"; // A=Ativo, B=Bloqueado, CA=Cancelado
+  status: LoginStatus;
   download_atual?: string;
   upload_atual?: string;
   limite_download?: string;
@@ -108,7 +166,7 @@ export interface Login {
 }
 
 // ============================================================================
-// ONT (EQUIPAMENTO FIBRA)
+// ONT (FIBRA)
 // ============================================================================
 
 export interface Ont {
@@ -124,11 +182,11 @@ export interface Ont {
 }
 
 // ============================================================================
-// CONSUMO DE DADOS
+// CONSUMO
 // ============================================================================
 
 export interface ConsumoDaily {
-  data: string; // YYYY-MM-DD
+  data: ISODateString;
   download_bytes: number;
   upload_bytes: number;
 }
@@ -152,7 +210,7 @@ export interface ConsumoCompleto {
 }
 
 // ============================================================================
-// TICKETS E ORDEM DE SERVIÇO
+// TICKETS
 // ============================================================================
 
 export interface TicketPayload {
@@ -172,10 +230,14 @@ export interface TicketResponse {
   id_cliente: number;
   assunto: string;
   status: string;
-  data_abertura: string;
-  data_fechamento?: string;
-  [key: string]: any;
+  data_abertura: ISODateString;
+  data_fechamento?: ISODateString;
+  [key: string]: unknown;
 }
+
+// ============================================================================
+// ORDEM DE SERVIÇO
+// ============================================================================
 
 export interface OrdemServico {
   id: number;
@@ -185,14 +247,14 @@ export interface OrdemServico {
   descricao: string;
   status: string;
   prioridade: string;
-  data_abertura: string;
-  data_agendamento?: string;
-  data_conclusao?: string;
+  data_abertura: ISODateString;
+  data_agendamento?: ISODateString;
+  data_conclusao?: ISODateString;
   tecnico_responsavel?: string;
 }
 
 // ============================================================================
-// PAYLOADS DE REQUISIÇÃO
+// QUERY PADRÃO IXC
 // ============================================================================
 
 export interface IxcQueryPayload {
@@ -205,12 +267,20 @@ export interface IxcQueryPayload {
   sortorder: "asc" | "desc";
 }
 
-export interface IxcResponse<T> {
+// ============================================================================
+// RESPONSE PADRÃO (SEPARADO)
+// ============================================================================
+
+export interface IxcListResponse<T> {
   type: string;
   total: number;
   page: number;
-  registro: number;
   registros: T[];
+}
+
+export interface IxcSingleResponse<T> {
+  status: string;
+  data: T;
 }
 
 // ============================================================================
@@ -228,14 +298,14 @@ export interface AlterarSenhaResponse {
 }
 
 // ============================================================================
-// ERROS E RESPOSTAS
+// ERROS
 // ============================================================================
 
 export class IxcApiError extends Error {
   constructor(
     message: string,
     public statusCode?: number,
-    public originalError?: any
+    public originalError?: unknown,
   ) {
     super(message);
     this.name = "IxcApiError";
@@ -246,11 +316,11 @@ export interface ApiErrorResponse {
   error: string;
   detalhes?: string;
   statusCode?: number;
-  timestamp?: string;
+  timestamp?: ISODateString;
 }
 
 // ============================================================================
-// CONFIGURAÇÃO
+// CONFIG
 // ============================================================================
 
 export interface IxcConfig {
@@ -264,24 +334,15 @@ export interface IxcConfig {
 }
 
 // ============================================================================
-// UTILITÁRIOS DE TIPO
+// UTILITÁRIOS
 // ============================================================================
 
-/**
- * Remove null e undefined de um tipo
- */
 export type NonNullableFields<T> = {
   [P in keyof T]: NonNullable<T[P]>;
 };
 
-/**
- * Torna campos específicos opcionais
- */
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-/**
- * Torna campos específicos obrigatórios
- */
-export type Required<T, K extends keyof T> = T & {
+export type RequiredFields<T, K extends keyof T> = T & {
   [P in K]-?: T[P];
 };
