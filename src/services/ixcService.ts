@@ -32,7 +32,10 @@ const getHeaders = () => {
 /**
  * Função auxiliar para realizar requisições ao IXC
  */
-const fetchIxc = async (endpoint: string, payload: any): Promise<any[]> => {
+export const fetchIxc = async (
+  endpoint: string,
+  payload: any,
+): Promise<any[]> => {
   const baseUrl = getBaseUrl();
   if (!baseUrl) {
     console.warn("Base URL do IXC não configurada");
@@ -229,7 +232,7 @@ export const ixcService = {
    */
   async buscarContratosDetalhados(id_cliente: number): Promise<Contrato[]> {
     const contracts = (await this.buscarContratosPorIdCliente(
-      id_cliente
+      id_cliente,
     )) as Contrato[];
     const client = await this.buscarClientesPorId(id_cliente);
 
@@ -271,19 +274,30 @@ export const ixcService = {
   // FINANCEIRO
   // ==========================================================================
 
-  // ... (existing code for financeiroListar and listarNotasFiscais is fine, checking if I need to edit lines far away. No, I will just edit the block I targeted if possible? 
+  // ... (existing code for financeiroListar and listarNotasFiscais is fine, checking if I need to edit lines far away. No, I will just edit the block I targeted if possible?
   // Wait, replacing a huge block is bad. I should split edits.
-  // `buscarContratosDetalhados` is around line 230. 
+  // `buscarContratosDetalhados` is around line 230.
   // `ordensServicoListar` at 637
   // `ticketsListar` at 666.
   // I can't restart `view_file` to check exact lines easily without consuming tools.
   // The `replace_file_content` supports strict StartLine/EndLine.
   // I will do separate calls.)
 
-
   // ==========================================================================
   // FINANCEIRO
   // ==========================================================================
+
+  async listarVendsPorCliente(id_cliente: number): Promise<any[]> {
+    return await fetchIxc("vd_saida", {
+      qtype: "id_cliente",
+      query: String(id_cliente),
+      oper: "=",
+      page: "1",
+      rp: "20",
+      sortname: "vd_saida.id",
+      sortorder: "desc",
+    });
+  },
 
   /**
    * Realiza o Desbloqueio de Confiança (Liberação Provisória)
@@ -299,16 +313,25 @@ export const ixcService = {
       // O IXC retorna status "sucesso" ou erro se já foi usado
       return resp.data;
     } catch (error: any) {
-      console.error(`[IXC] Erro ao desbloquear contrato ${id_contrato}:`, error.message);
+      console.error(
+        `[IXC] Erro ao desbloquear contrato ${id_contrato}:`,
+        error.message,
+      );
       // Repassa a mensagem exata do IXC (ex: "Limite de desbloqueios atingido")
-      throw new Error(error.response?.data?.message || "Não foi possível realizar o desbloqueio no momento.");
+      throw new Error(
+        error.response?.data?.message ||
+          "Não foi possível realizar o desbloqueio no momento.",
+      );
     }
   },
 
   /**
    * Lista faturas e boletos do cliente
    */
-  async financeiroListar(id_cliente: number, id_contrato?: number): Promise<any[]> {
+  async financeiroListar(
+    id_cliente: number,
+    id_contrato?: number,
+  ): Promise<any[]> {
     const payload: any = {
       qtype: "fn_areceber.id_cliente",
       query: String(id_cliente),
@@ -339,7 +362,10 @@ export const ixcService = {
   /**
    * Lista Notas Fiscais (Modelo 21/22/55/etc)
    */
-  async listarNotasFiscais(id_cliente: number, id_contrato?: number): Promise<any[]> {
+  async listarNotasFiscais(
+    id_cliente: number,
+    id_contrato?: number,
+  ): Promise<any[]> {
     const payload: any = {
       qtype: "id_cliente",
       query: String(id_cliente),
@@ -355,7 +381,7 @@ export const ixcService = {
       payload.query = String(id_contrato);
     }
 
-    // Tenta buscar na tabela de saída de notas 
+    // Tenta buscar na tabela de saída de notas
     return await fetchIxc("fn_saida", payload);
   },
 
@@ -484,7 +510,7 @@ export const ixcService = {
 
     const payload = {
       id_saida: String(id), // ID da nota fiscal na tabela fn_saida
-      base64: "S"
+      base64: "S",
     };
 
     try {
@@ -504,14 +530,14 @@ export const ixcService = {
    */
   async imprimirTermo(id: number): Promise<string | null> {
     const baseUrl = getBaseUrl();
-    // Endpoint padrão para impressão de termo. O sufixo _17678 pode ser específico de versão, 
+    // Endpoint padrão para impressão de termo. O sufixo _17678 pode ser específico de versão,
     // mas vamos tentar o padrão ou manter o padrão visto em imprimirContrato se aplicável.
     // O endpoint correto geralmente é cliente_contrato_termo_imprimir_termo
     const url = `${baseUrl}/cliente_contrato_termo_imprimir_termo`;
 
     const payload = {
       id: String(id),
-      base64: "S" // Forçar retorno base64
+      base64: "S", // Forçar retorno base64
     };
 
     try {
@@ -800,7 +826,10 @@ export const ixcService = {
   /**
    * Lista ordens de serviço do cliente
    */
-  async ordensServicoListar(id_cliente: number, id_contrato?: number): Promise<any[]> {
+  async ordensServicoListar(
+    id_cliente: number,
+    id_contrato?: number,
+  ): Promise<any[]> {
     const payload: any = {
       qtype: "su_oss_chamado.id_cliente",
       query: String(id_cliente),
@@ -836,7 +865,10 @@ export const ixcService = {
   /**
    * Lista tickets do cliente
    */
-  async ticketsListar(id_cliente: number, id_contrato?: number): Promise<any[]> {
+  async ticketsListar(
+    id_cliente: number,
+    id_contrato?: number,
+  ): Promise<any[]> {
     const payload: any = {
       qtype: "su_ticket.id_cliente",
       query: String(id_cliente),
@@ -916,7 +948,10 @@ export const ixcService = {
   /**
    * Fecha um ticket
    */
-  async fecharTicket(id_ticket: number, mensagem: string = "Ticket fechado pelo cliente"): Promise<any> {
+  async fecharTicket(
+    id_ticket: number,
+    mensagem: string = "Ticket fechado pelo cliente",
+  ): Promise<any> {
     const baseUrl = getBaseUrl();
     const url = `${baseUrl}/su_ticket/${id_ticket}`;
 
@@ -924,10 +959,14 @@ export const ixcService = {
       // Atualiza status para F (Finalizado)
       // Nota: Algumas versões do IXC podem exigir endpoint específico ou interação.
       // Tentando PUT direto no ticket.
-      await axios.put(url, {
-        status: "F",
-        menssagem: mensagem // Alguns IXC exigem mensagem ao fechar
-      }, { headers: getHeaders() });
+      await axios.put(
+        url,
+        {
+          status: "F",
+          menssagem: mensagem, // Alguns IXC exigem mensagem ao fechar
+        },
+        { headers: getHeaders() },
+      );
 
       return { success: true };
     } catch (error: any) {
@@ -982,7 +1021,6 @@ export const ixcService = {
       throw new Error("IXC: Falha ao alterar senha");
     }
   },
-
 
   // CONSUMO E ESTATÍSTICAS
   // ==========================================================================
@@ -1088,4 +1126,3 @@ export const ixcService = {
     });
   },
 };
-
