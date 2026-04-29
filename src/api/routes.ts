@@ -17,6 +17,7 @@ import {
   gerarPdfContrato,
   imprimirTermo,
   listarTermos,
+  diagnosticoContrato,
 } from "./controllers/contratosController";
 import { getResumo } from "./controllers/financeiroController";
 import {
@@ -57,6 +58,7 @@ router.use("/support", supportRoutes);
 
 // ==================== CHAT IA (NOVO) ====================
 router.post("/chat", verifyToken, handleChat);
+router.post("/ai", verifyToken, handleChat); // Alias para o frontend
 
 // ==================== BUSCA PUBLICA (NOVO) ====================
 router.post("/buscar", buscarBoletosPorCpf);
@@ -73,8 +75,10 @@ router.get("/contratos/:id_contrato/termos", verifyToken, listarTermos);
 router.get("/contratos/:id_contrato/financeiro", verifyToken, listarFinanceiroPorContrato);
 router.get("/financeiro/resumo", verifyToken, getResumo);
 router.post("/contratos/assinar/:id_termo", verifyToken, assinarContrato);
+router.post("/termos/:id_termo/assinar", verifyToken, assinarContrato); // Alias frontend
 router.post("/contratos/:id/pdf", verifyToken, gerarPdfContrato);
 router.post("/contratos/:id/desbloqueio", verifyToken, executarAutoDesbloqueio);
+router.get("/contratos/:id/diagnostico", verifyToken, diagnosticoContrato); // Nova rota frontend
 router.get("/contratos/termos/:id/imprimir", verifyToken, imprimirTermo); // <--- NOVA ROTA DE IMPRESSAO DE TERMO
 
 // ==================== TICKETS ====================
@@ -83,10 +87,13 @@ router.get("/tickets", verifyToken, listarTickets);
 router.get("/tickets/tipos", listarTiposAtendimento);
 router.get("/tickets/:ticketId", verifyToken, buscarTicket);
 router.put("/tickets/:id/fechar", verifyToken, fecharTicket);
+router.post("/tickets/:id/close", verifyToken, fecharTicket); // Alias frontend
 
 // ==================== SENHA ====================
 router.post("/senha/trocar", verifyToken, trocarSenha);
+router.post("/auth/trocar-senha", verifyToken, trocarSenha); // Alias frontend
 router.post("/senha/recuperar", solicitarRecuperacaoSenha);
+router.post("/auth/recuperar-senha", solicitarRecuperacaoSenha); // Alias frontend
 router.post("/senha/validar", validarForcaSenha);
 
 // ==================== LOGINS ====================
@@ -101,6 +108,7 @@ router.get("/boletos/:fatura_id/segunda-via", gerarSegundaVia); // Mantém rota 
 router.get("/boletos/:id/pix", buscarPixBoleto);
 router.get("/segunda-via/:fatura_id", verifyToken, gerarSegundaVia);
 router.get("/financeiro/notas/:id/imprimir", verifyToken, imprimirNotaFiscal); // <--- NOVA ROTA DE NF
+router.get("/notas/:id/imprimir", verifyToken, imprimirNotaFiscal); // Alias frontend
 
 // ==================== BOLETOS PIX ====================
 

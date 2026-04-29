@@ -208,28 +208,28 @@ export function clienteCacheKey(identifier: string | number): string {
 /**
  * Gera chave de cache para contratos
  */
-export function contratoCacheKey(clienteId: number): string {
+export function contratoCacheKey(clienteId: number | string): string {
   return `contratos:${clienteId}`;
 }
 
 /**
  * Gera chave de cache para faturas
  */
-export function faturasCacheKey(clienteId: number): string {
+export function faturasCacheKey(clienteId: number | string): string {
   return `faturas:${clienteId}`;
 }
 
 /**
  * Gera chave de cache para logins
  */
-export function loginsCacheKey(clienteId: number): string {
+export function loginsCacheKey(clienteId: number | string): string {
   return `logins:${clienteId}`;
 }
 
 /**
  * Gera chave de cache para consumo
  */
-export function consumoCacheKey(loginId: number): string {
+export function consumoCacheKey(loginId: number | string): string {
   return `consumo:${loginId}`;
 }
 
@@ -265,7 +265,7 @@ export async function cacheOrFetch<T>(
 /**
  * Invalida cache relacionado a um cliente
  */
-export function invalidateClienteCache(clienteId: number): void {
+export function invalidateClienteCache(clienteId: number | string): void {
   const keysToDelete = [
     clienteCacheKey(clienteId),
     contratoCacheKey(clienteId),

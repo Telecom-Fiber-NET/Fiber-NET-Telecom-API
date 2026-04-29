@@ -27,6 +27,7 @@ export interface Cliente {
   status: "A" | "I" | "D"; // A=Ativo, I=Inativo, D=Desativado
   data_cadastro: string;
   observacao?: string;
+  senha?: string;
 }
 
 // ============================================================================
@@ -38,12 +39,15 @@ export interface Contrato {
   id_cliente: number;
   id_plano: number;
   descricao_plano?: string;
+  descricao_aux_plano_venda?: string;
   valor: string;
   data_ativacao: string;
   data_vencimento?: string;
   status: "A" | "I" | "C"; // A=Ativo, I=Inativo, C=Cancelado
   tipo_contrato: string;
   dia_vencimento: number;
+  endereco?: string;
+  numero?: string;
 }
 
 // ============================================================================
@@ -92,19 +96,24 @@ export type StatusCor = "danger" | "warning" | "success";
 // ============================================================================
 
 export interface Login {
-  id: number;
-  id_cliente: number;
+  id: number | string;
+  id_cliente: number | string;
+  id_contrato?: number | string;
   login: string;
   senha?: string;
-  status: "A" | "B" | "CA"; // A=Ativo, B=Bloqueado, CA=Cancelado
+  status: string; // A=Ativo, B=Bloqueado, CA=Cancelado, online=Conectado, etc.
+  online?: "S" | "N" | string;
   download_atual?: string;
   upload_atual?: string;
   limite_download?: string;
   limite_upload?: string;
   ip?: string;
+  ip_concentrador?: string;
   mac?: string;
-  id_pop?: number;
+  id_pop?: number | string;
   descricao_pop?: string;
+  tempo_conectado?: string;
+  uptime?: string | number;
 }
 
 // ============================================================================
@@ -112,14 +121,19 @@ export interface Login {
 // ============================================================================
 
 export interface Ont {
-  id: number;
-  id_login: number;
+  id: number | string;
+  id_login: number | string;
   serial: string;
   modelo?: string;
+  onu_tipo?: string;
   status: string;
   sinal?: string;
+  sinal_rx?: string;
+  sinal_tx?: string;
+  temperatura?: string;
   olt?: string;
   pon?: string;
+  mac?: string;
   online: "S" | "N";
 }
 
@@ -152,18 +166,34 @@ export interface ConsumoCompleto {
 }
 
 // ============================================================================
+// DOCUMENTOS E ARQUIVOS
+// ============================================================================
+
+export interface ClienteArquivo {
+  id: number;
+  id_cliente: number;
+  descricao: string;
+  local_arquivo: string;
+  data: string;
+  tamanho?: string;
+  extensao?: string;
+}
+
+// ============================================================================
 // TICKETS E ORDEM DE SERVIÇO
 // ============================================================================
 
 export interface TicketPayload {
-  id_cliente: number;
-  assunto: string;
-  descricao: string;
-  id_setor?: number;
-  id_tipo?: number;
-  prioridade?: "baixa" | "media" | "alta" | "urgente";
-  id_tecnico?: number;
-  observacao?: string;
+  id_cliente: number | string;
+  titulo: string;
+  menssagem: string;
+  id_setor?: number | string;
+  id_tipo?: number | string;
+  prioridade?: "B" | "M" | "A" | "U" | "N"; // Baixa, Média, Alta, Urgente, Normal
+  id_tecnico?: number | string;
+  id_contrato?: number | string;
+  id_login?: number | string;
+  status?: string;
 }
 
 export interface TicketResponse {
@@ -177,9 +207,20 @@ export interface TicketResponse {
   [key: string]: any;
 }
 
+export interface TicketInteracao {
+  id: number;
+  id_ticket: number;
+  data: string;
+  menssagem: string;
+  id_funcionario?: number;
+  nome_funcionario?: string;
+  origem: "F" | "C"; // Funcionário ou Cliente
+}
+
 export interface OrdemServico {
   id: number;
   id_cliente: number;
+  id_assunto?: number;
   protocolo: string;
   assunto: string;
   descricao: string;
@@ -189,20 +230,43 @@ export interface OrdemServico {
   data_agendamento?: string;
   data_conclusao?: string;
   tecnico_responsavel?: string;
+  mensagem_resposta?: string;
+  mensagem?: string;
+  endereco?: string;
+  bairro?: string;
+  cidade?: string;
+  data_fechamento?: string;
+  data_inicio?: string;
+  data_final?: string;
+  latitude?: string;
+  longitude?: string;
+  tipo?: string;
+}
+
+export interface IxcAssunto {
+  id: number;
+  assunto: string;
 }
 
 // ============================================================================
 // PAYLOADS DE REQUISIÇÃO
 // ============================================================================
 
+export interface GridParam {
+  TB: string; // Tabela.campo
+  OP: string; // Operador
+  P: string;  // Valor (Parâmetro)
+}
+
 export interface IxcQueryPayload {
-  qtype: string;
-  query: string;
-  oper: "=" | "!=" | ">" | "<" | ">=" | "<=" | "LIKE";
-  page: string;
-  rp: string;
-  sortname: string;
-  sortorder: "asc" | "desc";
+  qtype?: string;
+  query?: string;
+  oper?: string;
+  page?: string;
+  rp?: string;
+  sortname?: string;
+  sortorder?: "asc" | "desc";
+  grid_param?: string; // JSON string of GridParam[]
 }
 
 export interface IxcResponse<T> {

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { DashboardData } from "../types/dashboard/DashboardData";
-import { GeminiProvider } from "./ai/providers/GeminiProvider"; // Import GeminiProvider
+import { activeAIProvider } from "./ai"; // Import activeAIProvider
 import { cacheGet, cacheSet } from "./cache/supabaseClient";
 import { ixcService } from "./ixcService";
 
@@ -14,10 +14,7 @@ function formatBytes(bytes: number, decimals = 2): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-const geminiDashboardProvider = new GeminiProvider({
-  apiKey: process.env.GOOGLE_API_KEY || "",
-  model: "gemini-2.5-flash", // Usar o modelo flash para análise de dashboard (mais barato)
-});
+// O DashboardService agora usará o provedor ativo (que pode ser o OmniRoute via Orquestrador)
 
 export class DashboardService {
   constructor(private ixc = ixcService) { }
@@ -39,7 +36,7 @@ export class DashboardService {
 
     const promises = clientIds.map(async (id) => {
       try {
-        const cliente = await this.ixc.buscarClientesPorId(id);
+        const cliente = await this.ixc.buscarClientePorId(id);
         if (!cliente) return null;
 
         const contratos = await this.ixc.buscarContratosPorIdCliente(id);
@@ -47,6 +44,7 @@ export class DashboardService {
         const logins = await this.ixc.loginsListar(id);
         const ordensRaw = await this.ixc.ordensServicoListar(id);
         const ticketsRaw = await this.ixc.ticketsListar(id);
+        const notasRaw = await this.ixc.listarNotasFiscais(id);
 
         // Mapeia OS com nomes de assuntos
         const ordens = await Promise.all(
@@ -125,6 +123,7 @@ export class DashboardService {
           tickets,
           termos,
           ontInfo,
+          notas: notasRaw,
         };
       } catch (error) {
         console.error(`Erro ao processar cliente ${id}:`, error);
@@ -165,32 +164,65 @@ export class DashboardService {
         cpn_cnpj: r.cliente.cnpj_cpf,
       });
 
-      r.contratos.forEach((c: any) =>
+      r.contratos.forEach((c: any) => {
+        console.log(`[DEBUG] Contrato ${c.id} status IXC: ${c.status}`);
         dashboard.contratos.push({
           id: c.id,
-          plano: c.descricao_aux_plano_venda,
-          status: c.status,
+          id_cliente: c.id_cliente,
+          plano: c.plano || c.descricao_aux_plano_venda || "Plano Fiber",
+          status: ["A", "H", "F", "E"].includes(c.status) ? "ativo" : "cancelado",
           pdf_link: `/contrato/${c.id}`,
-        }),
-      );
+        });
+      });
+
+      const hoje = new Date();
+      const mesAtual = hoje.getMonth();
+      const anoAtual = hoje.getFullYear();
+
+      // 1. Filtrar faturas por Trava Forte
+      const faturasAbertasNormais = r.faturas.filter((f: any) => {
+        if (f.status !== "A") return false;
+        const dataVenc = new Date(f.data_vencimento || f.vencimento);
+        return (dataVenc.getFullYear() < anoAtual) || 
+               (dataVenc.getFullYear() === anoAtual && dataVenc.getMonth() <= mesAtual);
+      });
+
+      const podeMostrarProximoMes = faturasAbertasNormais.length === 0;
 
       r.faturas.forEach((f: any) => {
+        const dataVenc = new Date(f.data_vencimento || f.vencimento);
+        const mesVenc = dataVenc.getMonth();
+        const anoVenc = dataVenc.getFullYear();
+
+        // Trava Forte: Só mostra se (é deste mês ou anterior) OU se já está pago
+        const isFutura = (anoVenc > anoAtual) || (anoVenc === anoAtual && mesVenc > mesAtual);
+        
+        if (isFutura && f.status === "A") {
+          // NOVA REGRA: Se não tem nada vencido/atual, mostra o do próximo mês (apenas +1)
+          const isProximoMes = (anoVenc === anoAtual && mesVenc === mesAtual + 1) || 
+                               (anoVenc === anoAtual + 1 && mesAtual === 11 && mesVenc === 0);
+          
+          if (!podeMostrarProximoMes || !isProximoMes) {
+            return; // Pula boletos futuros
+          }
+        }
+
         const valorRecebido = f.valor_recebido || f.valor_pago || f.pagamento_valor || "0";
         const valorNum = parseFloat(f.valor);
         const valorRecebidoNum = parseFloat(valorRecebido.toString());
 
-        // Se estiver pago (status diferente de 'A'), e tivermos valor recebido, usamos ele como valor principal
-        // para evitar mostrar juros teóricos em faturas já liquidadas.
         const valorExibir = (f.status !== "A" && valorRecebidoNum > 0)
           ? valorRecebidoNum.toString()
           : f.valor;
 
         dashboard.faturas.push({
           id: f.id,
+          id_cliente: f.id_cliente,
+          id_contrato: f.id_contrato,
           vencimento: f.data_vencimento || f.vencimento,
           valor: valorExibir,
           valor_recebido: valorRecebido.toString(),
-          data_pagamento: f.data_pagamento || f.pagamento_data || null,
+          data_pagamento: f.data_pagamento || f.pagamento_data || undefined,
           status: f.status === "A" ? "aberto" : "pago",
           pix_code: f.pix_txid,
           linha_digitavel: f.linha_digitavel,
@@ -225,7 +257,7 @@ export class DashboardService {
           // --- NOVOS CAMPOS ---
           ip_privado: l.ip || l.ip_concentrador || "Não atribuído",
           ip_publico: clientIp,
-          ipv4: l.ip_concentrador || l.ip || null,
+          ipv4: l.ip_concentrador || l.ip || undefined,
           endereco,
           plano,
           consumo,
@@ -244,6 +276,7 @@ export class DashboardService {
       dashboard.termos = dashboard.termos || [];
       dashboard.termos.push(...(r.termos || []));
       dashboard.ontInfo.push(...r.ontInfo);
+      dashboard.notas.push(...(r.notas || []));
     }
 
     // O consumo global agora realiza um merge inteligente por data/mês
@@ -330,13 +363,13 @@ export class DashboardService {
         }
       `;
 
-      const aiResponse = await geminiDashboardProvider.chat([
+      const aiResponse = await activeAIProvider.chat([
         { role: "user", content: prompt },
       ]);
       const parsedAi = JSON.parse(aiResponse.content);
-      dashboard.notas = [{ id: "ai-insights", ...parsedAi } as any];
+      dashboard.ai_analysis = parsedAi;
     } catch (e) {
-      dashboard.notas = [];
+      dashboard.ai_analysis = undefined;
     }
 
     await cacheSet(cacheKey, dashboard, 60);

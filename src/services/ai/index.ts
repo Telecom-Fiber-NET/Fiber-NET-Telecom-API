@@ -1,18 +1,12 @@
-// api/src/services/ai/index.ts
-
-// Importe todos os provedores disponíveis
-import { OpenAIProvider } from "./providers/OpenAIProvider";
-import { ClaudeProvider } from "./providers/ClaudeProvider";
-import { GeminiProvider } from "./providers/GeminiProvider";
-import { GroqProvider } from "./providers/GroqProvider";
-import { AIOrchestrator } from "./AIOrchestrator";
+import { OmniRouteProvider } from "./providers/OmniRouteProvider";
 import { IAIProvider } from "./providers/IAIProvider";
 
-// --- ESCOLHA SEU MODO DE OPERAÇÃO ---
-
-// Opção 1: Usar o Orquestrador (RECOMENDADO para resiliência e roteamento inteligente)
-// O orquestrador gerencia múltiplos provedores, faz health checks e fallback automático.
-export const activeAIProvider = new AIOrchestrator();
+// --- MODO OMNIROUTE EXCLUSIVO ---
+export const activeAIProvider: IAIProvider = new OmniRouteProvider({
+  apiKey: process.env.OMNIROUTE_API_KEY || '',
+  model: process.env.OMNIROUTE_MODEL || 'gpt-4o',
+  baseURL: process.env.OMNIROUTE_BASE_URL || 'http://localhost:3000/api/v1',
+});
 
 
 // Opção 2: Usar um único provedor diretamente (se você não precisa de fallback ou roteamento)

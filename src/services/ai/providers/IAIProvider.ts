@@ -44,4 +44,9 @@ export interface IAIProvider {
    * @returns O custo estimado em dólares.
    */
   estimateCost(messages: AIMessage[]): number;
+
+  /**
+   * Limpa recursos (timers, conexões) ao encerrar o servidor.
+   */
+  destroy?(): void;
 }

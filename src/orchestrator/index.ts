@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import OpenAI from 'openai';
-import { ixcService } from '../services/ixcServiceClass'; // For fetching customer details
+import { ixcService } from '../services/ixcService'; // For fetching customer details
 import { ixcLogger } from '../utils/logger';
 
 // Define Action interface locally

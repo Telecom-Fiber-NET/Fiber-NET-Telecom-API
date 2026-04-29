@@ -1,4 +1,4 @@
-import { IxcService } from "../../services/ixcServiceClass";
+import { IxcService } from "../../services/ixcService";
 import { cacheManager } from "../../utils/cache";
 import axios from "axios";
 
@@ -263,9 +263,9 @@ describe("IxcService", () => {
   describe("criarTicket", () => {
     const mockTicketPayload = {
       id_cliente: 123,
-      assunto: "Problema de conexão",
-      descricao: "Internet lenta",
-      prioridade: "alta" as const,
+      titulo: "Problema de conexão",
+      menssagem: "Internet lenta",
+      prioridade: "A" as const,
     };
 
     const mockTicketResponse = {

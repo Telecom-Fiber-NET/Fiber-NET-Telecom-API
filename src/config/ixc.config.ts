@@ -112,6 +112,20 @@ export const IxcEndpoints = {
   TICKET: "su_ticket",
   ORDEM_SERVICO: "su_oss_chamado",
   ORDEM_SERVICO_ITEM: "su_oss_chamado_item",
+  ORDEM_SERVICO_ASSUNTO: "su_oss_assunto",
+  TICKET_ASSUNTO: "su_assunto",
+  TICKET_INTERACAO: "su_ticket_interacao",
+  
+  // Documentos e Termos
+  CLIENTE_ARQUIVOS: "cliente_arquivos",
+  TERMO_CONTRATO: "cliente_contrato_termo",
+  
+  // Financeiro Extra
+  NOTAS_FISCAIS: "fn_saida",
+  RECEBER_BAIXAS: "fn_areceber_baixas",
+  
+  // Diagnóstico
+  DIAGNOSTICO: "su_diagnostico",
 } as const;
 
 // ============================================================================
@@ -125,7 +139,12 @@ export const QueryOperators = {
   LESS: "<",
   GREATER_OR_EQUAL: ">=",
   LESS_OR_EQUAL: "<=",
-  LIKE: "LIKE",
+  CONTAINS: "L",
+  NOT_CONTAINS: "NL",
+  IN: "IN",
+  NOT_IN: "NI",
+  BETWEEN: "BE",
+  NOT_BETWEEN: "NBE",
 } as const;
 
 // ============================================================================

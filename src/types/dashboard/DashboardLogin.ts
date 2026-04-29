@@ -1,12 +1,12 @@
 import { DashboardConsumo } from "./DashboardConsumo";
 
 export interface DashboardLogin {
-  raw: number;
-  id: number;
+  raw: number | string;
+  id: number | string;
   login: string;
   status: string;
   uptime?: string;
-  contrato_id?: number;
+  contrato_id?: number | string;
   download_atual?: string;
   upload_atual?: string;
   // Novos campos

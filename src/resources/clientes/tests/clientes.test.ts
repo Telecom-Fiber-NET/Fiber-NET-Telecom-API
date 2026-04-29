@@ -1,4 +1,4 @@
-const { describe, it, expect, jest, beforeEach, afterEach } = require('@jest/globals');
+// Removed redundant @jest/globals import causing conflicts
 import { QueryBase } from "../../base";
 import { Clientes } from "..";
 

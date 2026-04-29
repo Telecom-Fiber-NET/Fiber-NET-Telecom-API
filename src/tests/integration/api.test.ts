@@ -3,6 +3,12 @@ import request from 'supertest';
 import app from '../../app';
 import { ixcService } from '../../services/ixcService';
 
+// Configuração de ambiente para testes
+process.env.IXC_API_URL = 'https://api.test.com';
+process.env.IXC_AUTH_BASIC = 'test_auth';
+process.env.JWT_SECRET = 'test_secret';
+process.env.OMNIROUTE_API_KEY = 'test_omni';
+
 // Mock do middleware de autenticação
 jest.mock('../../middleware/authMiddleware', () => ({
     verifyToken: (req: any, res: any, next: any) => {
@@ -13,11 +19,6 @@ jest.mock('../../middleware/authMiddleware', () => ({
 
 // Mock do ixcService
 jest.mock('../../services/ixcService');
-
-// Mock do ixcServiceClass (usado no supportController)
-jest.mock('../../services/ixcServiceClass', () => ({
-    ixcService: {},
-}));
 
 // Mock do serviço de AI
 jest.mock('../../services/ai', () => ({
@@ -88,7 +89,12 @@ describe('API Integration Tests', () => {
         it('should return ordens de servico', async () => {
             mockIxcService.ordensServicoListar.mockResolvedValue([{
                 id: 1,
-                id_assunto: 'Teste',
+                id_cliente: 123,
+                id_assunto: 1,
+                assunto: 'Teste',
+                protocolo: '2023010101',
+                descricao: 'Teste de OS',
+                prioridade: 'N',
                 status: 'A',
                 data_abertura: '2023-01-01 10:00:00'
             }]);
@@ -110,6 +116,7 @@ describe('API Integration Tests', () => {
             mockIxcService.buscarContratoPorId.mockResolvedValue({ id_cliente: '123' } as any);
             mockIxcService.financeiroListar.mockResolvedValue([{
                 id: 1,
+                id_cliente: 123,
                 documento: 'Fat-1',
                 data_vencimento: '2023-01-01',
                 valor: '100.00',

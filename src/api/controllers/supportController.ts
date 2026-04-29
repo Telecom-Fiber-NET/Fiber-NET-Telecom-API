@@ -3,12 +3,16 @@
 import { Request, Response } from "express";
 import { activeAIProvider } from "../../services/ai"; // Importa o provedor ativo (pode ser o orquestrador ou um único)
 import { AIMessage } from "../../services/ai/providers/IAIProvider";
-import { ixcService } from "../../services/ixcServiceClass"; // Import ixcService
+import { ixcService } from "../../services/ixcService"; // Import ixcService
 import { buildCustomerContext } from "../../websocket/utils"; // Import buildCustomerContext
 
 export const supportAI = async (req: Request, res: Response) => {
   const { message, conversationHistory = [] } = req.body; // Recebe histórico e mensagem
-  const userId = (req as any).userId; // Assuming userId is available from authentication middleware
+  const userId = (req as any).user?.ids?.[0]; // Obter o ID do cliente do token decodificado
+  
+  if (!userId) {
+    return res.status(401).json({ ok: false, error: "Usuário não autenticado." });
+  }
 
   if (!message) {
     return res.status(400).json({ ok: false, error: "Mensagem é obrigatória." });

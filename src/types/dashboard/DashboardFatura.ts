@@ -1,5 +1,7 @@
 export interface DashboardFatura {
-  id: number;
+  id: number | string;
+  id_cliente: number | string;
+  id_contrato?: number | string;
   vencimento: string;
   valor: string;
   valor_recebido: string;

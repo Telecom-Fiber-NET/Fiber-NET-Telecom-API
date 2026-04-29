@@ -3,6 +3,7 @@ import { OpenAIProvider } from "./providers/OpenAIProvider";
 import { ClaudeProvider } from "./providers/ClaudeProvider";
 import { GeminiProvider } from "./providers/GeminiProvider";
 import { GroqProvider } from "./providers/GroqProvider";
+import { OmniRouteProvider } from "./providers/OmniRouteProvider";
 import { ixcLogger } from "../../utils/logger"; // Importar ixcLogger
 
 interface ProviderEntry {
@@ -38,7 +39,12 @@ export class AIOrchestrator {
       },
       groq: {
         apiKey: process.env.GROQ_API_KEY || '',
-        model: 'llama-3.1-70b-versatile', // Ou outro modelo Groq como 'mixtral-8x7b-32768'
+        model: 'llama-3.1-70b-versatile', 
+      },
+      omniroute: {
+        apiKey: process.env.OMNIROUTE_API_KEY || '',
+        model: process.env.OMNIROUTE_MODEL || 'gpt-4o', // Modelo padrão no OmniRoute
+        baseURL: process.env.OMNIROUTE_BASE_URL || 'http://localhost:3000/api/v1',
       },
     };
 
@@ -58,6 +64,12 @@ export class AIOrchestrator {
 
     if (config.claude.apiKey) {
       this.registerProvider('claude', new ClaudeProvider(config.claude), 4, ['complex']); // Qualidade premium para complexos
+    }
+
+    if (config.omniroute.apiKey) {
+      // OmniRoute tem prioridade 0 (Máxima) se estiver configurado
+      this.registerProvider('omniroute', new OmniRouteProvider(config.omniroute), 0);
+      ixcLogger.info("OmniRoute configurado como provedor principal.");
     }
   }
 

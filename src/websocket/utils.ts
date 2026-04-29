@@ -2,10 +2,10 @@ import "dotenv/config";
 import { IncomingMessage } from 'http';
 import jwt from 'jsonwebtoken';
 import { ixcLogger } from '../utils/logger';
-import { ixcService } from '../services/ixcServiceClass'; // Import ixcServiceClass
+import { ixcService } from '../services/ixcService'; // Import ixcService
 
-// Placeholder for JWT_SECRET - will be read from env in actual implementation
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_dev_key';
+// Placeholder for JWT_SECRET - must be same as in authMiddleware
+const JWT_SECRET = process.env.JWT_SECRET || 'secret_padrao_seguro';
 
 interface AuthenticatedRequest extends IncomingMessage {
     userId?: string;
@@ -26,10 +26,11 @@ export const authenticateWebSocket = (req: IncomingMessage): string => {
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
-        (req as AuthenticatedRequest).userId = decoded.id;
-        ixcLogger.info('Token authenticated', { userId: decoded.id });
-        return decoded.id;
+        const decoded = jwt.verify(token, JWT_SECRET) as { ids: number[] };
+        const userId = String(decoded.ids[0]);
+        (req as AuthenticatedRequest).userId = userId;
+        ixcLogger.info('Token authenticated', { userId });
+        return userId;
     } catch (err) {
         ixcLogger.warn('WebSocket authentication failed: Invalid token', { error: (err as Error).message });
         throw new Error('Unauthorized: Invalid token');

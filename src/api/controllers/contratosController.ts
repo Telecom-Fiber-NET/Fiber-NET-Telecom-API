@@ -115,3 +115,41 @@ export async function imprimirTermo(req: any, res: Response) {
     });
   }
 }
+
+export async function diagnosticoContrato(req: any, res: Response) {
+  try {
+    const { id } = req.params; // ID do contrato
+
+    if (!id) {
+      return res.status(400).json({ error: "ID do contrato é obrigatório." });
+    }
+
+    // 1. Busca os logins do contrato
+    const logins = await ixcService.loginsListar(0, Number(id));
+
+    if (!logins || logins.length === 0) {
+      return res.status(404).json({ error: "Nenhum login encontrado para este contrato." });
+    }
+
+    const loginPrincipal = logins[0];
+
+    // 2. Busca informações da ONT
+    const ontInfo = await ixcService.ontListar(Number(loginPrincipal.id));
+
+    return res.json({
+      success: true,
+      login: loginPrincipal.login,
+      online: loginPrincipal.online === "S" || loginPrincipal.status === "online",
+      uptime: loginPrincipal.uptime,
+      sinal: ontInfo && ontInfo.length > 0 ? ontInfo[0].sinal_rx : null,
+      ont: ontInfo && ontInfo.length > 0 ? ontInfo[0] : null,
+      mensagem: "Diagnóstico realizado com sucesso."
+    });
+  } catch (error: any) {
+    console.error("Erro no diagnóstico:", error);
+    return res.status(500).json({
+      error: true,
+      message: error.message || "Erro ao realizar diagnóstico."
+    });
+  }
+}

@@ -18,4 +18,12 @@ export interface DashboardData {
   termos: any[];
   ontInfo: any[];
   consumo: DashboardConsumo;
+  ai_analysis?: {
+    summary: string;
+    insights: Array<{
+      type: "positive" | "negative" | "warning";
+      title: string;
+      message: string;
+    }>;
+  };
 }

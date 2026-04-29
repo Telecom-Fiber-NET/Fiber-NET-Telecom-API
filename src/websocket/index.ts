@@ -45,6 +45,9 @@ export const setupWebSocketServer = (expressServer: any) => {
     ws.userId = customerId;
     ixcLogger.info(`Cliente ${customerId} conectado via WebSocket`);
 
+    // Buscar contexto do cliente para personalizar a IA
+    const customerContext = await buildCustomerContext(customerId);
+
     // Enviar mensagem de boas-vindas
     ws.send(JSON.stringify({
       type: 'message',
@@ -52,7 +55,16 @@ export const setupWebSocketServer = (expressServer: any) => {
         id: crypto.randomUUID(),
         role: 'assistant',
         content: await activeAIProvider.chat([
-          { role: 'system', content: `Você é um assistente virtual para o cliente ${customerId} da Fiber.Net.` },
+          { 
+            role: 'system', 
+            content: `Você é o assistente virtual da FiberNet atendendo o cliente ${customerContext.customerName}.
+            CONTEXTO ATUAL:
+            - Email: ${customerContext.customerEmail}
+            - Faturas em Aberto: ${customerContext.openInvoices}
+            - Conexões Ativas: ${customerContext.activeConnections}
+            
+            Seja amigável e direto.` 
+          },
           { role: 'user', content: 'Olá, me dê uma mensagem de boas-vindas.' }
         ]).then((res: AIResponse) => res.content),
         timestamp: new Date(),
@@ -73,9 +85,15 @@ export const setupWebSocketServer = (expressServer: any) => {
           sendTypingStatus(ws, true);
 
           try {
-            // Adiciona a mensagem do usuário ao histórico para enviar ao orquestrador
+            const customerContext = await buildCustomerContext(customerId);
+            
+            const systemMessage: AIMessage = { 
+              role: 'system', 
+              content: `Assistente FiberNet. Cliente: ${customerContext.customerName}. Faturas: ${customerContext.openInvoices}. Conexões: ${customerContext.activeConnections}.` 
+            };
+
             const userMessage: AIMessage = { role: 'user', content: payload.content };
-            const fullConversation: AIMessage[] = [...(payload.chatHistory || []), userMessage];
+            const fullConversation: AIMessage[] = [systemMessage, ...(payload.chatHistory || []), userMessage];
 
             const response = await activeAIProvider.chat(fullConversation);
 

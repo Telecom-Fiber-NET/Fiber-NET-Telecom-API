@@ -44,11 +44,51 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
 
     for (const cliente of clientes) {
       const faturas = await ixcService.financeiroListar(cliente.id);
+      console.log(`[DEBUG] Cliente ${cliente.id} encontrou ${faturas.length} faturas no total.`);
+
+      // --- Lógica de Trava Forte Ajustada ---
+      const hoje = new Date();
+      const mesAtual = hoje.getMonth();
+      const anoAtual = hoje.getFullYear();
+
+      // 1. Verifica se existem faturas abertas no passado ou no mês atual
+      const faturasAbertasNormais = faturas.filter((f: any) => {
+        if (f.status !== "A") return false;
+        const dataVenc = new Date(f.data_vencimento || f.vencimento);
+        return (dataVenc.getFullYear() < anoAtual) || 
+               (dataVenc.getFullYear() === anoAtual && dataVenc.getMonth() <= mesAtual);
+      });
+
+      // Se não houver nenhuma, podemos mostrar o próximo mês
+      const podeMostrarProximoMes = faturasAbertasNormais.length === 0;
 
       // Filtramos apenas os relevantes para processar
-      const faturasParaProcessar = faturas.filter((f: any) =>
-        ["A", "P"].includes(f.status)
-      );
+      const faturasParaProcessar = faturas.filter((f: any) => {
+        // Se estiver pago (P ou R), mostra sempre no histórico
+        if (["P", "R"].includes(f.status)) return true;
+        
+        // Se estiver aberto (A), aplicamos a Trava Forte
+        if (f.status === "A") {
+          const dataVenc = new Date(f.data_vencimento || f.vencimento);
+          const mesVenc = dataVenc.getMonth();
+          const anoVenc = dataVenc.getFullYear();
+          
+          // Regra base: Mostrar se for deste mês ou anterior
+          const isFutura = (anoVenc > anoAtual) || (anoVenc === anoAtual && mesVenc > mesAtual);
+          
+          if (!isFutura) return true;
+
+          // Regra Especial: Se não tem nada pendente, mostra o PRÓXIMO mês (apenas +1)
+          const isProximoMes = (anoVenc === anoAtual && mesVenc === mesAtual + 1) || 
+                               (anoVenc === anoAtual + 1 && mesAtual === 11 && mesVenc === 0);
+          
+          return podeMostrarProximoMes && isProximoMes;
+        }
+        
+        return false;
+      });
+      
+      console.log(`[DEBUG] Cliente ${cliente.id} restaram ${faturasParaProcessar.length} faturas após filtro.`);
 
       // 🔥 USAMOS PROMISE.ALL PARA BUSCAR AS BAIXAS EM PARALELO (RÁPIDO)
       const boletosProcessados = await Promise.all(
@@ -244,6 +284,23 @@ export async function gerarSegundaVia(req: Request, res: Response) {
         return res.status(403).json({
           error: "Acesso negado: Fatura não pertence a este usuário.",
         });
+      }
+
+      // 1.1 Trava Forte: A fatura é futura?
+      const faturas = await ixcService.financeiroListar(Number(userIds[0])); // Pega lista para validar status/data
+      const fatura = faturas.find((f: any) => String(f.id) === String(fatura_id));
+      
+      if (fatura && fatura.status === "A") {
+        const hoje = new Date();
+        const dataVenc = new Date(fatura.data_vencimento);
+        const isFutura = (dataVenc.getFullYear() > hoje.getFullYear()) || 
+                        (dataVenc.getFullYear() === hoje.getFullYear() && dataVenc.getMonth() > hoje.getMonth());
+        
+        if (isFutura) {
+          return res.status(403).json({
+            error: "Trava Financeira: Esta fatura ainda não está disponível para pagamento.",
+          });
+        }
       }
     }
 

@@ -31,7 +31,7 @@ export async function handleChat(req: Request, res: Response) {
 
     // 2. Busca dados frescos do cliente para dar contexto à IA
     const [clientes, contratos, faturas, logins] = await Promise.all([
-      ixcService.buscarClientesPorId(userId),
+      ixcService.buscarClientePorId(userId),
       ixcService.buscarContratosPorIdCliente(userId),
       ixcService.financeiroListar(userId),
       ixcService.loginsListar(userId),
