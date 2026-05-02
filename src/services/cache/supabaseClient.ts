@@ -12,12 +12,12 @@ export const supabase = (URL && KEY) ? createClient(URL, KEY) : null;
 export async function cacheGet<T>(key: string): Promise<T | null> {
   if (!URL || !KEY) return null;
   try {
-    const { data, error } = await supabase.from("cache").select("value,expires_at").eq("key", key).single();
+    const { data, error } = if (supabase) await supabase.from("cache").select("value,expires_at").eq("key", key).single();
     if (error) return null;
     if (!data) return null;
     if (data.expires_at && new Date(data.expires_at) < new Date()) {
       // expired
-      await supabase.from("cache").delete().eq("key", key);
+      if (supabase) await supabase.from("cache").delete().eq("key", key);
       return null;
     }
     return JSON.parse(data.value) as T;
@@ -31,5 +31,5 @@ export async function cacheSet(key: string, value: any, ttlSeconds = 60) {
   if (!URL || !KEY) return;
   const stringValue = JSON.stringify(value);
   const expires_at = new Date(Date.now() + ttlSeconds * 1000).toISOString();
-  await supabase.from("cache").upsert({ key, value: stringValue, expires_at });
+  if (supabase) await supabase.from("cache").upsert({ key, value: stringValue, expires_at });
 }
