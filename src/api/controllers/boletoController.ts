@@ -219,12 +219,12 @@ export async function buscarPixBoleto(req: Request, res: Response) {
     if (!id)
       return res.status(400).json({ error: "ID da fatura é obrigatório" });
 
-    console.log(`[API] Buscando Pix para boleto ID: ${id}`); // LOG 1
+ // LOG 1
 
     const dadosPix = await ixcService.buscarPixDetalhado(Number(id));
 
     // LOG 2: Veja o que chegou no console
-    console.log("[API] Dados retornados do Service:", dadosPix);
+
 
     // Verificação robusta
     if (dadosPix && dadosPix.pix) {

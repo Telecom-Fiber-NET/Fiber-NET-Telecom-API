@@ -510,7 +510,7 @@ export class IxcService {
       ixcLogger.operation(`Get PIX Fatura ${faturaId}`, "start");
       const response = await this.axiosInstance.post(url, payload);
       const pixData = response.data;
-      console.log("[IXC-PIX-DATA]", JSON.stringify(pixData));
+
 
       const pix = pixData.pix || pixData;
       
