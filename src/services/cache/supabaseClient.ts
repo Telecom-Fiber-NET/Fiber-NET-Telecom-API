@@ -7,7 +7,7 @@ if (!URL || !KEY) {
   console.warn("Supabase não configurado. cacheGet/cacheSet irão falhar se usados.");
 }
 
-export const supabase = createClient(URL, KEY);
+export const supabase = (URL && KEY) ? createClient(URL, KEY) : null;
 
 export async function cacheGet<T>(key: string): Promise<T | null> {
   if (!URL || !KEY) return null;

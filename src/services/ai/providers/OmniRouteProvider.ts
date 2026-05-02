@@ -33,6 +33,8 @@ export class OmniRouteProvider implements IAIProvider {
           headers: {
             'Authorization': `Bearer ${this.config.apiKey}`,
             'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://centralfiber.online',
+            'X-Title': 'Fiber NET Telecom',
           },
           timeout: this.config.timeout,
         }

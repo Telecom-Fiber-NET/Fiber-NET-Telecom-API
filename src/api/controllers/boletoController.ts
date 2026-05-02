@@ -150,7 +150,7 @@ export async function buscarBoletosPorCpf(req: Request, res: Response) {
 
             valorFormatado: formatarValor(valorAExibir.toString()),
             linhaDigitavel: fatura.linha_digitavel,
-            pixCopiaECola: fatura.pix_txid || null,
+            pixCopiaECola: fatura.pix_txid || fatura.pix_copia_e_cola || null,
             boleto_pdf_link: fatura.boleto || null,
             status: fatura.status,
             statusDescricao:
@@ -227,11 +227,21 @@ export async function buscarPixBoleto(req: Request, res: Response) {
     console.log("[API] Dados retornados do Service:", dadosPix);
 
     // Verificação robusta
-    if (dadosPix && dadosPix.pix && dadosPix.pix.qrCode) {
+    if (dadosPix && dadosPix.pix) {
+      // Caso 1: Estrutura aninhada (vinda do buscarPixDetalhado original)
+      if (dadosPix.pix.qrCode) {
+        return res.json({
+          success: true,
+          pixCopiaECola: dadosPix.pix.qrCode.qrcode,
+          pixImagem: dadosPix.pix.qrCode.imagemQrcode,
+        });
+      }
+      
+      // Caso 2: Estrutura simplificada ou se o service retornou campos diretos
       return res.json({
         success: true,
-        pixCopiaECola: dadosPix.pix.qrCode.qrcode,
-        pixImagem: dadosPix.pix.qrCode.imagemQrcode,
+        pixCopiaECola: dadosPix.pix.qrcode || dadosPix.pix.pix_copia_e_cola || "",
+        pixImagem: dadosPix.pix.imagem || dadosPix.pix.pix_qrcode || "",
       });
     }
 
@@ -495,7 +505,7 @@ export async function listarFinanceiroPorContrato(req: Request, res: Response) {
           valor_recebido: valorRecebidoReal,
           status: fatura.status,
           linhaDigitavel: fatura.linha_digitavel,
-          pixCopiaECola: fatura.pix_txid || null,
+          pixCopiaECola: fatura.pix_txid || fatura.pix_copia_e_cola || null,
           boleto_pdf: fatura.boleto || null,
           link_pagamento: fatura.link_pagamento || null, // Expose payment link if available
           data_pagamento: dataPagamentoReal || null // Data do pagamento se houver

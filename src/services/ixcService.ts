@@ -502,7 +502,7 @@ export class IxcService {
     const url = `${this.baseUrl}/get_pix`;
 
     const payload = {
-      id_fatura: faturaId,
+      id_areceber: String(faturaId),
       retornar_qrcode: "S",
     };
 
@@ -510,20 +510,35 @@ export class IxcService {
       ixcLogger.operation(`Get PIX Fatura ${faturaId}`, "start");
       const response = await this.axiosInstance.post(url, payload);
       const pixData = response.data;
+      const pixData = response.data;
+      console.log("[IXC-PIX-DATA]", JSON.stringify(pixData));
 
-      if (!pixData || (!pixData.pix_qrcode && !pixData.pix_copia_e_cola)) {
-        ixcLogger.warn(`Resposta PIX inválida para fatura ${faturaId}`, {
-          responseData: pixData,
-        });
+      const pix = pixData.pix || pixData;
+      
+      const qrCode = pix.qrCode?.imagemQrcode || 
+                     pix.pix_qrcode || 
+                     pix.pix_qrcode_url || 
+                     null;
+                     
+      const qrCodeText = pix.qrCode?.qrcode || 
+                         pix.pix_copia_e_cola || 
+                         pix.pix_txid || 
+                         pix.pix_code ||
+                         null;
+
+      const valor = parseFloat(pix.dadosPix?.valor?.original || pix.valor || "0") || null;
+
+      if (!qrCodeText && !qrCode) {
+        ixcLogger.warn(`Resposta PIX sem dados válidos para fatura ${faturaId}`, { responseData: pixData });
         return null;
       }
 
       ixcLogger.operation(`Get PIX Fatura ${faturaId}`, "success");
       return {
-        qrCode: pixData.pix_qrcode_url || null,
-        qrCodeText: pixData.pix_copia_e_cola || pixData.pix_qrcode,
-        valor: parseFloat(pixData.valor) || null,
-        status: pixData.status || "pendente",
+        qrCode,
+        qrCodeText,
+        valor,
+        status: pixData.status || pixData.type || "pendente",
       };
     } catch (error) {
       ixcLogger.operation(`Get PIX Fatura ${faturaId}`, "error", {
