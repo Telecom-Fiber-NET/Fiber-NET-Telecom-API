@@ -166,11 +166,19 @@ export class DashboardService {
 
       r.contratos.forEach((c: any) => {
         console.log(`[DEBUG] Contrato ${c.id} status IXC: ${c.status}`);
+
+        let mappedStatus = "inativo";
+        if (["A", "H", "F", "E"].includes(c.status)) mappedStatus = "ativo";
+        else if (["C", "D"].includes(c.status)) mappedStatus = "cancelado";
+        else if (["N", "B"].includes(c.status)) mappedStatus = "bloqueado";
+        else if (c.status === "AA") mappedStatus = "aguardando_assinatura";
+        else if (c.status === "P") mappedStatus = "pre_contrato";
+
         dashboard.contratos.push({
           id: c.id,
           id_cliente: c.id_cliente,
           plano: c.plano || c.descricao_aux_plano_venda || "Plano Fiber",
-          status: ["A", "H", "F", "E"].includes(c.status) ? "ativo" : "cancelado",
+          status: mappedStatus,
           pdf_link: `/contrato/${c.id}`,
         });
       });

@@ -55,6 +55,13 @@ export class ContratosResource extends QueryBase {
     }
 
     /**
+     * Ativa um contrato.
+     */
+    async ativar(id: number): Promise<{ message: string }> {
+        return this.create<{ id_contrato: number }, { message: string }>('cliente_contrato_ativar_cliente', { id_contrato: id });
+    }
+
+    /**
      * Solicita o desbloqueio de confiança para um contrato.
      */
     async desbloqueioConfianca(id: number): Promise<any> {
