@@ -19,6 +19,10 @@ import {
   listarTermos,
   diagnosticoContrato,
 } from "./controllers/contratosController";
+import { cancelarContrato as cancelarContratoCtrl } from "./controllers/cancelarContratoController";
+import { listarComodatosContrato as listarComodatosCtrl } from "./controllers/cancelarContratoController";
+import { relatorioSemanal, relatorioSemanalResumo } from "./controllers/relatorioController";
+import { ontPotenciaPlanilha, ontPotenciaResumo } from "./controllers/ontController";
 import { getResumo } from "./controllers/financeiroController";
 import {
   buscarConsumoDiario,
@@ -44,6 +48,7 @@ import {
 import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import { supportRoutes } from "./routes/supportRoutes";
+import { corrigirCancelarLote, statusContrato, baixarComodatoExplicito } from "./controllers/correcaoController";
 
 const router = Router();
 
@@ -80,6 +85,11 @@ router.post("/contratos/:id/pdf", verifyToken, gerarPdfContrato);
 router.post("/contratos/:id/desbloqueio", verifyToken, executarAutoDesbloqueio);
 router.get("/contratos/:id/diagnostico", verifyToken, diagnosticoContrato); // Nova rota frontend
 router.get("/contratos/termos/:id/imprimir", verifyToken, imprimirTermo); // <--- NOVA ROTA DE IMPRESSAO DE TERMO
+router.post("/contratos/:id/cancelar", verifyToken, cancelarContratoCtrl); // <--- CANCELAR CONTRATO (baixa comodato + cancela)
+router.get("/contratos/:id/comodatos", verifyToken, listarComodatosCtrl); // <--- LISTAR COMODATOS (debug)
+router.get("/contratos/:id/status", verifyToken, statusContrato); // <--- STATUS REAL DO CONTRATO (confirmar cancelamento)
+router.post("/corrigir/cancelar", verifyToken, corrigirCancelarLote); // <--- CORRIGIR LOTE DE TRAVADOS (552)
+router.post("/comodato/baixar", verifyToken, baixarComodatoExplicito); // <--- BAIXAR COMODATO POR ID EXPLICITO
 
 // ==================== TICKETS ====================
 router.post("/tickets", verifyToken, criarTicket);
@@ -115,6 +125,14 @@ router.get("/notas/:id/imprimir", verifyToken, imprimirNotaFiscal); // Alias fro
 router.post("/faturas", buscarBoletosPorCpf);
 router.get("/faturas/:id/pix", buscarPixBoleto);
 router.get("/faturas/:fatura_id/segunda-via", gerarSegundaVia);
+
+// ==================== RELATÓRIOS SEMANAIS ====================
+router.get("/relatorios/semanal", verifyToken, relatorioSemanal); // <--- XLSX multi-aba (todas as segundas 07h via cron)
+router.get("/relatorios/semanal/resumo", verifyToken, relatorioSemanalResumo); // <--- resumo JSON p/ Telegram
+
+// ==================== POTÊNCIA DAS ONTs ====================
+router.get("/ont/potencia-planilha", verifyToken, ontPotenciaPlanilha); // <--- XLSX por OLT/PON/porta/endereco + plano melhoria
+router.get("/ont/potencia/resumo", verifyToken, ontPotenciaResumo); // <--- resumo JSON p/ Telegram
 
 // ==================== SISTEMA ====================
 router.get("/", (_, res) =>

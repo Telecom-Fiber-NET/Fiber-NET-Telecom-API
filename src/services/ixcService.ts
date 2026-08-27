@@ -597,6 +597,172 @@ export class IxcService {
     });
   }
 
+  // ==========================================================================
+  // CANCELAMENTO DE CONTRATO (baixa comodato + cancela financeiro)
+  // ==========================================================================
+
+  /**
+   * Cancela um contrato no IXC.
+   * Fluxo:
+   *   1) Baixa os produtos em comodato (obrigatório antes de cancelar).
+   *   2) Cancela o contrato (desativar_cancelar_financeiro_nao_vencido).
+   *
+   * @param idContrato       ID do cliente_contrato
+   * @param idAlmox          ID do almoxarifado de devolução
+   * @param idFilialBaixa    ID da filial de baixa
+   * @param motivo           ID do motivo de cancelamento (fn_areceber_mot_cancelamento)
+   * @param obs              Observação
+   * @param dataCancelamento Data no formato YYYY-MM-DD
+   */
+  async listarComodatos(idContrato: number | string): Promise<any[]> {
+    // Tenta as tabelas conhecidas de comodato do IXC
+    const tabelas = ["cliente_contrato_comodato", "cliente_contrato_comodato_produto"];
+    for (const tabela of tabelas) {
+      try {
+        const regs = await this.fetchIxc(tabela, {
+          qtype: `${tabela}.id_contrato`,
+          query: String(idContrato),
+          oper: "=",
+          page: "1",
+          rp: "50",
+          sortname: `${tabela}.id`,
+          sortorder: "desc",
+        });
+        if (regs.length > 0) return regs;
+      } catch {
+        // tenta próxima
+      }
+    }
+    return [];
+  }
+
+  /**
+   * GUARDRAILS DE CANCELAMENTO
+   * Regra (definida pelo cliente Kadu/FiberNET, 26/08/2026):
+   *   - NUNCA cancelar contrato com `pago_ate_data` atual ou futuro.
+   *   - Só cancelar se `pago_ate_data` estiver no máximo 2 meses retroativos
+   *     da data atual (ex.: hoje Ago/2026 => só cancela quem tem Pago até
+   *     Jun/2026 ou antes; Jul/2026+ => BLOQUEADO).
+   * Retorna { ok:true } ou { ok:false, motivo } para bloquear o cancelamento.
+   */
+  async validarCancelamento(idContrato: number | string, forcar = false): Promise<{ ok: boolean; motivo?: string; pagoAte?: string }> {
+    if (forcar) return { ok: true }; // escape explicito (uso manual)
+    try {
+      const regs = await this.fetchIxc("cliente_contrato", {
+        qtype: "cliente_contrato.id",
+        query: String(idContrato),
+        oper: "=",
+        page: "1",
+        rp: "1",
+      });
+      const c = regs[0];
+      if (!c) return { ok: false, motivo: "Contrato não encontrado no IXC." };
+      const pagoAte = c.pago_ate_data;
+      if (!pagoAte || pagoAte === "0000-00-00") {
+        // Sem data de pagamento => não conseguimos validar => BLOQUEIA por segurança
+        return { ok: false, motivo: "Sem data 'pago_ate_data' no IXC — cancelamento bloqueado por segurança.", pagoAte };
+      }
+      const hoje = new Date();
+      const [ay, am, ad] = pagoAte.split("-").map(Number);
+      const pagoAteDate = new Date(ay, am - 1, ad);
+      // limite = hoje menos 2 meses (no eixo de mes/ano)
+      const limite = new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1);
+      if (pagoAteDate >= limite) {
+        const limiteFmt = `${String(limite.getMonth() + 1).padStart(2, "0")}/${limite.getFullYear()}`;
+        return {
+          ok: false,
+          motivo: `BLOQUEADO pelo guardrails: Pago até ${pagoAte} é atual/futuro (limite: pagos até ${limiteFmt} ou antes).`,
+          pagoAte,
+        };
+      }
+      return { ok: true, pagoAte };
+    } catch (e: any) {
+      return { ok: false, motivo: "Erro ao validar contrato no IXC: " + (e?.message || e) };
+    }
+  }
+
+  async cancelarContrato(params: {
+    idContrato: number | string;
+    idAlmox?: string;
+    idFilialBaixa?: string;
+    motivo?: string;
+    obs?: string;
+    dataCancelamento?: string;
+    forcar?: boolean; // <-- GUARDRAILS: se true, ignora a regra (uso manual/explicito apenas)
+  }): Promise<{ baixa: any; cancelamento: any }> {
+    const {
+      idContrato,
+      idAlmox = "1",
+      idFilialBaixa = "1",
+      motivo = "11", // VENDA DA EMPRESA (padrão)
+      obs = "Cancelamento automatico - Data base > 6 meses",
+      dataCancelamento = new Date().toISOString().slice(0, 10),
+    } = params;
+
+    // ===== GUARDRAILS (obrigatório antes de qualquer cancelamento) =====
+    const validacao = await this.validarCancelamento(idContrato, params.forcar);
+    if (!validacao.ok) {
+      // NÃO cancela: retorna erro de guardrails sem tocar no IXC
+      return {
+        baixa: { ok: false, aviso: "cancelamento bloqueado pelo guardrails" },
+        cancelamento: { type: "error", message: validacao.motivo || "Bloqueado pelo guardrails.", pagoAte: validacao.pagoAte },
+      };
+    }
+
+    // 1) Baixar comodato(s) — CORREÇÃO: o IXC exige o ID DO REGISTRO de comodato
+    //    (tabela cliente_contrato_comodato), NÃO o ID do contrato. Listamos os
+    //    registros reais e baixamos cada um pelo `id` verdadeiro.
+    let baixa: any = { ignorado: true };
+    try {
+      const comodatos = await this.listarComodatos(idContrato);
+      if (comodatos.length === 0) {
+        baixa = { ok: true, aviso: "sem comodato a baixar" };
+      } else {
+        const resultados: any[] = [];
+        for (const c of comodatos) {
+          try {
+            const r = await this.executeAction("baixar_comodato_23069", {
+              id: String(c.id), // <-- ID DO REGISTRO DE COMODATO (correto)
+              id_almox: idAlmox,
+              id_almox_label: "Almoxarifado Principal",
+              id_filial_baixa: idFilialBaixa,
+              id_filial_baixa_label: "Filial 1",
+            });
+            const msg = JSON.stringify(r).toLowerCase();
+            resultados.push({
+              id_comodato: c.id,
+              ok: msg.includes("devolvido") ? true : r?.type === "success",
+              resposta: r,
+            });
+          } catch (err: any) {
+            const emsg = (err?.message || "").toLowerCase();
+            resultados.push({
+              id_comodato: c.id,
+              ok: emsg.includes("devolvido"),
+              erro: err?.message,
+            });
+          }
+        }
+        baixa = { ok: resultados.every((r) => r.ok), comodatos: resultados };
+      }
+    } catch (err: any) {
+      baixa = { aviso: "lista/baixa de comodato falhou", erro: err?.message };
+    }
+
+    // 2) Cancelar contrato
+    const cancelamento = await this.executeAction(
+      "desativar_cancelar_financeiro_nao_vencido",
+      {
+        id_contrato: String(idContrato),
+        data_cancelamento: dataCancelamento,
+        motivo_cancelamento: motivo,
+        obs_cancelamento: obs,
+      }
+    );
+
+    return { baixa, cancelamento };
+  }
+
   async limparMacLogin(id: number): Promise<any> {
     return this.update(IxcEndpoints.LOGINS, id, { mac: "" });
   }
