@@ -60,7 +60,7 @@ npm run dev
 
 `POST /api/whatsapp/webhook` — recebe mensagens do OpenWA.
 
-`GET /api/whatsapp/status` — consulta status da sessao OpenWA.
+`GET /api/whatsapp/status` — consulta a sessao OpenWA configurada em `OPENWA_SESSION`.
 
 `GET /api/reativacao/bloqueados` — lista contratos bloqueados consultando o IXC.
 

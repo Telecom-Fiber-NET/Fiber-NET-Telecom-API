@@ -15,10 +15,16 @@ export class OpenWAService {
           timeout: Number(process.env.CHATBOT_TIMEOUT || 30000),
           headers: {
             "Content-Type": "application/json",
-            ...(process.env.OPENWA_API_KEY ? { Authorization: `Bearer ${process.env.OPENWA_API_KEY}` } : {}),
+            ...(process.env.OPENWA_API_KEY ? { "X-API-Key": process.env.OPENWA_API_KEY } : {}),
           },
         })
       : null;
+  }
+
+  toChatId(phone: string): string {
+    const normalized = normalizePhone(phone);
+    if (phone.includes("@c.us") || phone.includes("@g.us")) return phone;
+    return `${normalized}@c.us`;
   }
 
   async sendText(phone: string, message: string): Promise<void> {
@@ -27,37 +33,35 @@ export class OpenWAService {
       return;
     }
 
-    await this.client.post("/sendText", {
-      session: this.session,
-      phone: normalizePhone(phone),
-      message,
+    await this.client.post(`/api/sessions/${this.session}/messages/send-text`, {
+      chatId: this.toChatId(phone),
+      text: message,
     });
   }
 
   async sendMedia(phone: string, media: { url?: string; base64?: string; caption?: string }): Promise<void> {
     if (!this.client) return;
-    await this.client.post("/sendMedia", {
-      session: this.session,
-      phone: normalizePhone(phone),
+    await this.client.post(`/api/sessions/${this.session}/messages/send-image`, {
+      chatId: this.toChatId(phone),
       ...media,
     });
   }
 
   async getSessionStatus(): Promise<any> {
     if (!this.client) return { configured: false, status: "not_configured" };
-    const { data } = await this.client.get(`/session/${this.session}/status`);
+    const { data } = await this.client.get(`/api/sessions/${this.session}`);
     return data;
   }
 
   async createSession(): Promise<any> {
     if (!this.client) return { configured: false };
-    const { data } = await this.client.post("/session", { session: this.session });
+    const { data } = await this.client.post("/api/sessions", { name: this.session });
     return data;
   }
 
   async disconnectSession(): Promise<any> {
     if (!this.client) return { configured: false };
-    const { data } = await this.client.post(`/session/${this.session}/disconnect`);
+    const { data } = await this.client.post(`/api/sessions/${this.session}/stop`);
     return data;
   }
 }

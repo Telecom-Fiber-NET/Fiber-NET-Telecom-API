@@ -27,7 +27,11 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'ixcsoft'],
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({
+  verify: (req, _res, buf) => {
+    (req as any).rawBody = buf;
+  },
+}));
 
 // Rotas Reais
 app.use("/api", routes);
