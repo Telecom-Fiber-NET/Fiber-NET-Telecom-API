@@ -49,6 +49,9 @@ import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import { supportRoutes } from "./routes/supportRoutes";
 import { corrigirCancelarLote, statusContrato, baixarComodatoExplicito } from "./controllers/correcaoController";
+import { chatbotRoutes } from "../chatbot/routes";
+import { whatsappRoutes } from "../whatsapp/routes";
+import { reactivationRoutes } from "../reativacao/routes";
 
 const router = Router();
 
@@ -60,6 +63,11 @@ router.use("/dashboard", dashboardRoutes);
 
 // ==================== SUPORTE ====================
 router.use("/support", supportRoutes);
+
+// ==================== CHATBOT WHATSAPP / REATIVAÇÃO ====================
+router.use("/chatbot", chatbotRoutes);
+router.use("/whatsapp", whatsappRoutes);
+router.use("/reativacao", reactivationRoutes);
 
 // ==================== CHAT IA (NOVO) ====================
 router.post("/chat", verifyToken, handleChat);

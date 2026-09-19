@@ -7,6 +7,7 @@
 - Cache usando Supabase (tabela `cache`)
 - Módulo de IA (Gemini 2.5 Flash) como stub - substitua pela integração real quando tiver a chave
 - Scripts: `npm run dev`, `npm run build`, `npm run test`
+- Chatbot WhatsApp/OpenWA para atendimento, financeiro e reativacao
 
 ## Variáveis de ambiente
 
@@ -19,6 +20,13 @@ JWT_SECRET=
 IXC_BASE_URL=
 IXC_AUTH_BASIC=
 GEMINI_API_KEY=
+OPENWA_URL=
+OPENWA_API_KEY=
+OPENWA_SESSION=
+OPENWA_WEBHOOK_SECRET=
+CHATBOT_ENABLED=true
+CHATBOT_MAX_HISTORY=12
+CHATBOT_TIMEOUT=30000
 PORT=3333
 API_BASE_URL=
 ```
@@ -47,6 +55,20 @@ npm run dev
 `POST /api/auth/login` — rota de login (DEV stub: `dev@fibernet.com` / `dev`)
 
 `GET /api/dashboard` — retorna `DashboardData`. Requer `Authorization: Bearer <token>` (token DEV retornado pelo `/auth/login`).
+
+`POST /api/chatbot/message` — processa uma mensagem do chatbot.
+
+`POST /api/whatsapp/webhook` — recebe mensagens do OpenWA.
+
+`GET /api/whatsapp/status` — consulta status da sessao OpenWA.
+
+`GET /api/reativacao/bloqueados` — lista contratos bloqueados consultando o IXC.
+
+Documentacao complementar:
+
+- `docs/chatbot.md`
+- `docs/whatsapp-openwa.md`
+- `docs/reativacao.md`
 
 ## Exemplo (curl)
 

@@ -318,6 +318,46 @@ export class IxcService {
     );
   }
 
+  async buscarClientesPorTelefone(phone: string): Promise<Cliente[]> {
+    const digits = phone.replace(/\D/g, "");
+    const variants = Array.from(new Set([
+      digits,
+      digits.startsWith("55") ? digits.slice(2) : `55${digits}`,
+      digits.slice(-11),
+      digits.slice(-9),
+      digits.slice(-8),
+    ].filter(Boolean)));
+
+    const results: Cliente[] = [];
+    const seen = new Set<number>();
+    const fields = ["cliente.celular", "cliente.fone_comercial"];
+
+    for (const field of fields) {
+      for (const variant of variants) {
+        const registros = await this.fetchIxc<Cliente>(IxcEndpoints.CLIENTE, {
+          qtype: field,
+          query: variant,
+          oper: variant.length <= 9 ? "L" : "=",
+          page: "1",
+          rp: "20",
+          sortname: "cliente.id",
+          sortorder: "desc",
+        });
+
+        for (const cliente of registros) {
+          const phones = [cliente.celular, cliente.fone_comercial].map((value) => String(value || "").replace(/\D/g, ""));
+          const matches = phones.some((value) => value && variants.some((variantValue) => value.endsWith(variantValue.slice(-8))));
+          if (matches && !seen.has(Number(cliente.id))) {
+            seen.add(Number(cliente.id));
+            results.push(cliente);
+          }
+        }
+      }
+    }
+
+    return results;
+  }
+
   // ==========================================================================
   // CONTRATOS
   // ==========================================================================
@@ -352,6 +392,34 @@ export class IxcService {
       rp: "1",
     });
     return registros[0] || null;
+  }
+
+  async listarContratosBloqueados(): Promise<any[]> {
+    const statusValues = ["CA", "CM", "B", "BL"];
+    const all: any[] = [];
+    const seen = new Set<string>();
+
+    for (const status of statusValues) {
+      const registros = await this.fetchIxc<any>(IxcEndpoints.CLIENTE_CONTRATO, {
+        qtype: "cliente_contrato.status_internet",
+        query: status,
+        oper: "=",
+        page: "1",
+        rp: "100",
+        sortname: "cliente_contrato.id",
+        sortorder: "desc",
+      });
+
+      for (const registro of registros) {
+        const key = String(registro.id);
+        if (!seen.has(key)) {
+          seen.add(key);
+          all.push(registro);
+        }
+      }
+    }
+
+    return all;
   }
 
   /**
