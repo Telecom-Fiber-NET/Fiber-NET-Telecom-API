@@ -69,6 +69,7 @@ Documentacao complementar:
 - `docs/chatbot.md`
 - `docs/whatsapp-openwa.md`
 - `docs/reativacao.md`
+- `docs/tutorial-implementacao.md`
 
 ## Exemplo (curl)
 
